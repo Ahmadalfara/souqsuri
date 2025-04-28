@@ -9,7 +9,7 @@ interface GeometricPatternProps {
 
 const GeometricPattern = ({ className, children }: GeometricPatternProps) => {
   return (
-    <div className={cn("geometric-pattern relative", className)}>
+    <div className={cn("geometric-pattern relative bg-syrian-light", className)}>
       {children}
     </div>
   );

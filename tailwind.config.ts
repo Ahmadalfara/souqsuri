@@ -63,13 +63,20 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-        arabic: {
-          blue: '#1e3a8a',
-          gold: '#f59e0b',
-          turquoise: '#0d9488',
-          cream: '#fffbeb',
-          dark: '#1e293b'
-        }
+				arabic: {
+					blue: '#1e3a8a',
+					gold: '#f59e0b',
+					turquoise: '#0d9488',
+					cream: '#fffbeb',
+					dark: '#1e293b'
+				},
+				syrian: {
+					green: '#0d9967', // الأخضر السوري الرئيسي
+					red: '#E63946',    // الأحمر السوري
+					light: '#F2FCE2',  // أخضر فاتح للخلفيات
+					dark: '#1A5E39',   // أخضر داكن للتفاصيل
+					gold: '#ECBE42',   // لون ذهبي للتفاصيل
+				}
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
