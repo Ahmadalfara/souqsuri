@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+        arabic: {
+          blue: '#1e3a8a',
+          gold: '#f59e0b',
+          turquoise: '#0d9488',
+          cream: '#fffbeb',
+          dark: '#1e293b'
+        }
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,12 +92,25 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+        'float': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' }
+        },
+        'pulse-subtle': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.8' }
+        }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+        'float': 'float 6s ease-in-out infinite',
+        'pulse-subtle': 'pulse-subtle 4s ease-in-out infinite'
+			},
+      fontFamily: {
+        'arabic': ['Scheherazade New', 'serif'],
+      }
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
