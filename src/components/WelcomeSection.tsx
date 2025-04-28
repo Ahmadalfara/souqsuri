@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import ArabicText from './ArabicText';
 import ArabicBorder from './ArabicBorder';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -36,12 +37,14 @@ const FeaturedListing = ({ item }: { item: ListingItem }) => {
         <p className="text-muted-foreground text-sm">{item.location}</p>
       </CardContent>
       <CardFooter className="pt-0">
-        <Button 
-          variant="outline" 
-          className="w-full border-syrian-green text-syrian-green hover:bg-syrian-green hover:text-white"
-        >
-          <ArabicText text="عرض التفاصيل" />
-        </Button>
+        <Link to={`/listing/${item.id}`} className="w-full">
+          <Button 
+            variant="outline" 
+            className="w-full border-syrian-green text-syrian-green hover:bg-syrian-green hover:text-white"
+          >
+            <ArabicText text="عرض التفاصيل" />
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   );

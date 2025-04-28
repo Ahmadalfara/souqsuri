@@ -1,7 +1,10 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import ArabicText from './ArabicText';
 import { Card, CardContent } from '@/components/ui/card';
+import CreateListingSheet from './listings/CreateListingSheet';
+import { Button } from './ui/button';
 
 type CategoryProps = {
   title: string;
@@ -11,17 +14,19 @@ type CategoryProps = {
 
 const CategoryCard = ({ title, icon, count }: CategoryProps) => {
   return (
-    <Card className="bg-white hover:shadow-md transition-shadow border-syrian-green/20 hover:border-syrian-green">
-      <CardContent className="p-6 flex flex-col items-center">
-        <div className="text-4xl mb-4">{icon}</div>
-        <h3 className="text-center mb-2">
-          <ArabicText text={title} size="large" className="font-bold text-syrian-green" />
-        </h3>
-        <p className="text-center">
-          <ArabicText text={`${count} إعلان`} size="normal" className="text-gray-600" />
-        </p>
-      </CardContent>
-    </Card>
+    <Link to={`/category/${title}`}>
+      <Card className="bg-white hover:shadow-md transition-shadow border-syrian-green/20 hover:border-syrian-green">
+        <CardContent className="p-6 flex flex-col items-center">
+          <div className="text-4xl mb-4">{icon}</div>
+          <h3 className="text-center mb-2">
+            <ArabicText text={title} size="large" className="font-bold text-syrian-green" />
+          </h3>
+          <p className="text-center">
+            <ArabicText text={`${count} إعلان`} size="normal" className="text-gray-600" />
+          </p>
+        </CardContent>
+      </Card>
+    </Link>
   );
 };
 
@@ -97,9 +102,11 @@ const FeaturesSection = () => {
                 </p>
               </div>
               <div>
-                <button className="bg-syrian-green text-white px-8 py-3 rounded-md hover:bg-syrian-dark transition-colors">
-                  <ArabicText text="أضف إعلانك الآن" size="large" />
-                </button>
+                <CreateListingSheet>
+                  <Button className="bg-syrian-green text-white px-8 py-3 rounded-md hover:bg-syrian-dark transition-colors">
+                    <ArabicText text="أضف إعلانك الآن" size="large" />
+                  </Button>
+                </CreateListingSheet>
               </div>
             </div>
           </Card>

@@ -1,9 +1,12 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import ArabicText from './ArabicText';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { Search, User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import AuthSheet from './auth/AuthSheet';
+import CreateListingSheet from './listings/CreateListingSheet';
 
 const Header = () => {
   return (
@@ -11,21 +14,31 @@ const Header = () => {
       {/* Upper header with logo and auth buttons */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
-          <div className="w-10 h-10 rounded-full bg-syrian-green flex items-center justify-center">
-            <span className="text-white font-bold">س</span>
-          </div>
-          <ArabicText text="سوقنا" className="ml-3 text-syrian-green font-bold" size="large" />
+          <Link to="/">
+            <div className="w-10 h-10 rounded-full bg-syrian-green flex items-center justify-center">
+              <span className="text-white font-bold">س</span>
+            </div>
+          </Link>
+          <Link to="/">
+            <ArabicText text="سوقنا" className="ml-3 text-syrian-green font-bold" size="large" />
+          </Link>
         </div>
         <div className="flex space-x-4">
-          <Button 
-            variant="outline" 
-            className="border-syrian-gold text-syrian-dark hover:bg-syrian-gold/10"
-          >
-            <ArabicText text="تسجيل الدخول" />
-          </Button>
-          <Button className="bg-syrian-green hover:bg-syrian-dark text-white">
-            <ArabicText text="إضافة إعلان" />
-          </Button>
+          <AuthSheet>
+            <Button 
+              variant="outline" 
+              className="border-syrian-gold text-syrian-dark hover:bg-syrian-gold/10"
+            >
+              <User className="ml-1 h-4 w-4" />
+              <ArabicText text="تسجيل الدخول" />
+            </Button>
+          </AuthSheet>
+          
+          <CreateListingSheet>
+            <Button className="bg-syrian-green hover:bg-syrian-dark text-white">
+              <ArabicText text="إضافة إعلان" />
+            </Button>
+          </CreateListingSheet>
         </div>
       </div>
       
@@ -46,24 +59,24 @@ const Header = () => {
       
       {/* Categories menu */}
       <div className="flex justify-center mt-4 space-x-6 rtl">
-        <a href="#" className="text-syrian-dark hover:text-syrian-green transition-colors">
+        <Link to="/" className="text-syrian-dark hover:text-syrian-green transition-colors">
           <ArabicText text="العقارات" />
-        </a>
-        <a href="#" className="text-syrian-dark hover:text-syrian-green transition-colors">
+        </Link>
+        <Link to="/" className="text-syrian-dark hover:text-syrian-green transition-colors">
           <ArabicText text="سيارات" />
-        </a>
-        <a href="#" className="text-syrian-dark hover:text-syrian-green transition-colors">
+        </Link>
+        <Link to="/" className="text-syrian-dark hover:text-syrian-green transition-colors">
           <ArabicText text="إلكترونيات" />
-        </a>
-        <a href="#" className="text-syrian-dark hover:text-syrian-green transition-colors">
+        </Link>
+        <Link to="/" className="text-syrian-dark hover:text-syrian-green transition-colors">
           <ArabicText text="أثاث" />
-        </a>
-        <a href="#" className="text-syrian-dark hover:text-syrian-green transition-colors">
+        </Link>
+        <Link to="/" className="text-syrian-dark hover:text-syrian-green transition-colors">
           <ArabicText text="وظائف" />
-        </a>
-        <a href="#" className="text-syrian-dark hover:text-syrian-green transition-colors">
+        </Link>
+        <Link to="/" className="text-syrian-dark hover:text-syrian-green transition-colors">
           <ArabicText text="خدمات" />
-        </a>
+        </Link>
       </div>
     </header>
   );
