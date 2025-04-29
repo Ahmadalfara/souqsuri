@@ -3,10 +3,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import ArabicText from './ArabicText';
 import { Button } from '@/components/ui/button';
-import { Search, User } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { User } from 'lucide-react';
 import AuthSheet from './auth/AuthSheet';
 import CreateListingSheet from './listings/CreateListingSheet';
+import SearchBar from './SearchBar';
 
 const Header = () => {
   return (
@@ -15,8 +15,12 @@ const Header = () => {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <Link to="/">
-            <div className="w-10 h-10 rounded-full bg-syrian-green flex items-center justify-center">
-              <span className="text-white font-bold">س</span>
+            <div className="w-12 h-12 flex items-center justify-center">
+              <img 
+                src="/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png" 
+                alt="سوقنا" 
+                className="w-12 h-12 object-contain" 
+              />
             </div>
           </Link>
           <Link to="/">
@@ -43,38 +47,26 @@ const Header = () => {
       </div>
       
       {/* Search bar */}
-      <div className="flex items-center space-x-2 w-full max-w-4xl mx-auto">
-        <div className="relative flex-1">
-          <Input
-            className="pl-10 py-6 bg-white"
-            placeholder="ابحث عن منتجات أو خدمات..."
-            dir="rtl"
-          />
-          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-syrian-green/60" />
-        </div>
-        <Button className="bg-syrian-green hover:bg-syrian-dark text-white py-6 px-8">
-          <ArabicText text="بحث" />
-        </Button>
-      </div>
+      <SearchBar className="max-w-4xl mx-auto" />
       
       {/* Categories menu */}
       <div className="flex justify-center mt-4 space-x-6 rtl">
-        <Link to="/" className="text-syrian-dark hover:text-syrian-green transition-colors">
+        <Link to="/category/real-estate" className="text-syrian-dark hover:text-syrian-green transition-colors">
           <ArabicText text="العقارات" />
         </Link>
-        <Link to="/" className="text-syrian-dark hover:text-syrian-green transition-colors">
+        <Link to="/category/cars" className="text-syrian-dark hover:text-syrian-green transition-colors">
           <ArabicText text="سيارات" />
         </Link>
-        <Link to="/" className="text-syrian-dark hover:text-syrian-green transition-colors">
+        <Link to="/category/electronics" className="text-syrian-dark hover:text-syrian-green transition-colors">
           <ArabicText text="إلكترونيات" />
         </Link>
-        <Link to="/" className="text-syrian-dark hover:text-syrian-green transition-colors">
+        <Link to="/category/furniture" className="text-syrian-dark hover:text-syrian-green transition-colors">
           <ArabicText text="أثاث" />
         </Link>
-        <Link to="/" className="text-syrian-dark hover:text-syrian-green transition-colors">
+        <Link to="/category/jobs" className="text-syrian-dark hover:text-syrian-green transition-colors">
           <ArabicText text="وظائف" />
         </Link>
-        <Link to="/" className="text-syrian-dark hover:text-syrian-green transition-colors">
+        <Link to="/category/services" className="text-syrian-dark hover:text-syrian-green transition-colors">
           <ArabicText text="خدمات" />
         </Link>
       </div>
