@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import ArabicText from '../ArabicText';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -30,6 +33,10 @@ const formSchema = z.object({
 
 const RegisterForm = () => {
   const { toast } = useToast();
+  const { register } = useAuth();
+  const { language } = useLanguage();
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,13 +48,16 @@ const RegisterForm = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // In a real implementation, we'd connect to Supabase or another authentication service
-    console.log(values);
-    toast({
-      title: "تم إنشاء الحساب",
-      description: "تم إنشاء حسابك بنجاح.",
-    });
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      await register(values.name, values.email, values.password, values.phone);
+      // Success toast is handled in the AuthContext
+    } catch (error) {
+      // Error toast is handled in the AuthContext
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -57,12 +67,18 @@ const RegisterForm = () => {
           control={form.control}
           name="name"
           render={({ field }) => (
-            <FormItem dir="rtl">
-              <FormLabel><ArabicText text="الاسم الكامل" /></FormLabel>
+            <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
+              <FormLabel>
+                {language === 'ar' ? (
+                  <ArabicText text="الاسم الكامل" />
+                ) : (
+                  "Full Name"
+                )}
+              </FormLabel>
               <FormControl>
-                <Input placeholder="محمد أحمد" {...field} />
+                <Input placeholder={language === 'ar' ? "محمد أحمد" : "John Doe"} {...field} />
               </FormControl>
-              <FormMessage className="rtl" />
+              <FormMessage className={language === 'ar' ? "rtl" : ""} />
             </FormItem>
           )}
         />
@@ -70,12 +86,18 @@ const RegisterForm = () => {
           control={form.control}
           name="email"
           render={({ field }) => (
-            <FormItem dir="rtl">
-              <FormLabel><ArabicText text="البريد الإلكتروني" /></FormLabel>
+            <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
+              <FormLabel>
+                {language === 'ar' ? (
+                  <ArabicText text="البريد الإلكتروني" />
+                ) : (
+                  "Email Address"
+                )}
+              </FormLabel>
               <FormControl>
                 <Input placeholder="example@mail.com" {...field} />
               </FormControl>
-              <FormMessage className="rtl" />
+              <FormMessage className={language === 'ar' ? "rtl" : ""} />
             </FormItem>
           )}
         />
@@ -83,12 +105,18 @@ const RegisterForm = () => {
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem dir="rtl">
-              <FormLabel><ArabicText text="كلمة المرور" /></FormLabel>
+            <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
+              <FormLabel>
+                {language === 'ar' ? (
+                  <ArabicText text="كلمة المرور" />
+                ) : (
+                  "Password"
+                )}
+              </FormLabel>
               <FormControl>
                 <Input type="password" placeholder="******" {...field} />
               </FormControl>
-              <FormMessage className="rtl" />
+              <FormMessage className={language === 'ar' ? "rtl" : ""} />
             </FormItem>
           )}
         />
@@ -96,12 +124,18 @@ const RegisterForm = () => {
           control={form.control}
           name="phone"
           render={({ field }) => (
-            <FormItem dir="rtl">
-              <FormLabel><ArabicText text="رقم الهاتف" /></FormLabel>
+            <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
+              <FormLabel>
+                {language === 'ar' ? (
+                  <ArabicText text="رقم الهاتف" />
+                ) : (
+                  "Phone Number"
+                )}
+              </FormLabel>
               <FormControl>
-                <Input placeholder="+963 912 345 678" {...field} />
+                <Input placeholder={language === 'ar' ? "+963 912 345 678" : "+1 234 567 8900"} {...field} />
               </FormControl>
-              <FormMessage className="rtl" />
+              <FormMessage className={language === 'ar' ? "rtl" : ""} />
             </FormItem>
           )}
         />
@@ -109,7 +143,7 @@ const RegisterForm = () => {
           control={form.control}
           name="terms"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rtl space-x-reverse">
+            <FormItem className={`flex flex-row items-start space-x-3 space-y-0 ${language === 'ar' ? "rtl space-x-reverse" : ""}`}>
               <FormControl>
                 <Checkbox 
                   checked={field.value} 
@@ -118,15 +152,30 @@ const RegisterForm = () => {
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel>
-                  <ArabicText text="أوافق على الشروط والأحكام" />
+                  {language === 'ar' ? (
+                    <ArabicText text="أوافق على الشروط والأحكام" />
+                  ) : (
+                    "I agree to the terms and conditions"
+                  )}
                 </FormLabel>
-                <FormMessage className="rtl" />
+                <FormMessage className={language === 'ar' ? "rtl" : ""} />
               </div>
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full bg-syrian-green hover:bg-syrian-dark">
-          <ArabicText text="إنشاء حساب" />
+        <Button 
+          type="submit" 
+          className="w-full bg-syrian-green hover:bg-syrian-dark"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <Loader2 className="animate-spin h-4 w-4 mr-2" />
+          ) : null}
+          {language === 'ar' ? (
+            <ArabicText text="إنشاء حساب" />
+          ) : (
+            "Sign Up"
+          )}
         </Button>
       </form>
     </Form>

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -8,6 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ArabicText from '../ArabicText';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -20,6 +23,10 @@ const formSchema = z.object({
 
 const LoginForm = () => {
   const { toast } = useToast();
+  const { login } = useAuth();
+  const { language } = useLanguage();
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -28,13 +35,16 @@ const LoginForm = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // In a real implementation, we'd connect to Supabase or another authentication service
-    console.log(values);
-    toast({
-      title: "تم تسجيل الدخول",
-      description: "تم تسجيل الدخول بنجاح.",
-    });
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      await login(values.email, values.password);
+      // Success toast is handled in the AuthContext
+    } catch (error) {
+      // Error toast is handled in the AuthContext
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -44,12 +54,18 @@ const LoginForm = () => {
           control={form.control}
           name="email"
           render={({ field }) => (
-            <FormItem dir="rtl">
-              <FormLabel><ArabicText text="البريد الإلكتروني" /></FormLabel>
+            <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
+              <FormLabel>
+                {language === 'ar' ? (
+                  <ArabicText text="البريد الإلكتروني" />
+                ) : (
+                  "Email Address"
+                )}
+              </FormLabel>
               <FormControl>
                 <Input placeholder="example@mail.com" {...field} />
               </FormControl>
-              <FormMessage className="rtl" />
+              <FormMessage className={language === 'ar' ? "rtl" : ""} />
             </FormItem>
           )}
         />
@@ -57,17 +73,34 @@ const LoginForm = () => {
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem dir="rtl">
-              <FormLabel><ArabicText text="كلمة المرور" /></FormLabel>
+            <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
+              <FormLabel>
+                {language === 'ar' ? (
+                  <ArabicText text="كلمة المرور" />
+                ) : (
+                  "Password"
+                )}
+              </FormLabel>
               <FormControl>
                 <Input type="password" placeholder="******" {...field} />
               </FormControl>
-              <FormMessage className="rtl" />
+              <FormMessage className={language === 'ar' ? "rtl" : ""} />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full bg-syrian-green hover:bg-syrian-dark">
-          <ArabicText text="تسجيل الدخول" />
+        <Button 
+          type="submit" 
+          className="w-full bg-syrian-green hover:bg-syrian-dark"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <Loader2 className="animate-spin h-4 w-4 mr-2" />
+          ) : null}
+          {language === 'ar' ? (
+            <ArabicText text="تسجيل الدخول" />
+          ) : (
+            "Sign In"
+          )}
         </Button>
       </form>
     </Form>

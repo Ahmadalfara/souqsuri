@@ -1,17 +1,47 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ArabicText from './ArabicText';
 import { Button } from '@/components/ui/button';
-import { User } from 'lucide-react';
+import { User, LogOut } from 'lucide-react';
 import AuthSheet from './auth/AuthSheet';
 import CreateListingSheet from './listings/CreateListingSheet';
 import SearchBar from './SearchBar';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 const Header = () => {
   const { language, t } = useLanguage();
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
+  
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
   
   return (
     <header className="flex flex-col py-4 px-6 bg-syrian-green/10 border-b border-syrian-green/20">
@@ -39,29 +69,83 @@ const Header = () => {
         <div className="flex items-center space-x-4">
           <LanguageSwitcher />
           
-          <AuthSheet>
-            <Button 
-              variant="outline" 
-              className="border-syrian-gold text-syrian-dark hover:bg-syrian-gold/10"
-            >
-              <User className={`${language === 'ar' ? 'ml-1' : 'mr-1'} h-4 w-4`} />
-              {language === 'ar' ? (
-                <ArabicText text="تسجيل الدخول" />
-              ) : (
-                <span>{t('login')}</span>
-              )}
-            </Button>
-          </AuthSheet>
-          
-          <CreateListingSheet>
-            <Button className="bg-syrian-green hover:bg-syrian-dark text-white">
-              {language === 'ar' ? (
-                <ArabicText text="إضافة إعلان" />
-              ) : (
-                <span>{t('addListing')}</span>
-              )}
-            </Button>
-          </CreateListingSheet>
+          {currentUser ? (
+            <div className="flex items-center space-x-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="rounded-full w-10 h-10 p-0">
+                    <Avatar>
+                      <AvatarFallback className="bg-syrian-green text-white">
+                        {getInitials(currentUser.displayName || 'User')}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    {language === 'ar' ? (
+                      <ArabicText text="حسابي" />
+                    ) : (
+                      "My Account"
+                    )}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/profile')}>
+                    <User className="mr-2 h-4 w-4" />
+                    {language === 'ar' ? (
+                      <ArabicText text="الملف الشخصي" />
+                    ) : (
+                      "Profile"
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {language === 'ar' ? (
+                      <ArabicText text="تسجيل الخروج" />
+                    ) : (
+                      "Logout"
+                    )}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
+              <CreateListingSheet>
+                <Button className="bg-syrian-green hover:bg-syrian-dark text-white">
+                  {language === 'ar' ? (
+                    <ArabicText text="إضافة إعلان" />
+                  ) : (
+                    <span>{t('addListing')}</span>
+                  )}
+                </Button>
+              </CreateListingSheet>
+            </div>
+          ) : (
+            <>
+              <AuthSheet>
+                <Button 
+                  variant="outline" 
+                  className="border-syrian-gold text-syrian-dark hover:bg-syrian-gold/10"
+                >
+                  <User className={`${language === 'ar' ? 'ml-1' : 'mr-1'} h-4 w-4`} />
+                  {language === 'ar' ? (
+                    <ArabicText text="تسجيل الدخول" />
+                  ) : (
+                    <span>{t('login')}</span>
+                  )}
+                </Button>
+              </AuthSheet>
+              
+              <CreateListingSheet>
+                <Button className="bg-syrian-green hover:bg-syrian-dark text-white">
+                  {language === 'ar' ? (
+                    <ArabicText text="إضافة إعلان" />
+                  ) : (
+                    <span>{t('addListing')}</span>
+                  )}
+                </Button>
+              </CreateListingSheet>
+            </>
+          )}
         </div>
       </div>
       
@@ -70,7 +154,7 @@ const Header = () => {
       
       {/* Categories menu */}
       <div className={`flex justify-center mt-4 space-x-6 ${language === 'ar' ? 'rtl' : ''}`}>
-        <Link to="/category/real-estate" className="text-syrian-dark hover:text-syrian-green transition-colors">
+        <Link to="/category/real_estate" className="text-syrian-dark hover:text-syrian-green transition-colors">
           {language === 'ar' ? (
             <ArabicText text="العقارات" />
           ) : (
