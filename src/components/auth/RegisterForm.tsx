@@ -55,6 +55,7 @@ const RegisterForm = () => {
       // Success toast is handled in the AuthContext
     } catch (error) {
       // Error toast is handled in the AuthContext
+      console.error('Registration error:', error);
     } finally {
       setIsLoading(false);
     }

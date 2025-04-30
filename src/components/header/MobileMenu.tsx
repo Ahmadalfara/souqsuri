@@ -42,7 +42,7 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
               className="justify-start"
               onClick={() => navigate('/profile')}
             >
-              <User className="mr-2 h-4 w-4" />
+              <User className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
               {language === 'ar' ? (
                 <ArabicText text="الملف الشخصي" />
               ) : (
@@ -55,7 +55,7 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
               className="justify-start text-destructive"
               onClick={handleLogout}
             >
-              <LogOut className="mr-2 h-4 w-4" />
+              <LogOut className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
               {language === 'ar' ? (
                 <ArabicText text="تسجيل الخروج" />
               ) : (

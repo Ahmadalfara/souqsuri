@@ -31,6 +31,7 @@ const UserMenu = () => {
   };
 
   const getInitials = (name: string) => {
+    if (!name) return 'U';
     return name
       .split(' ')
       .map(part => part[0])
@@ -39,13 +40,18 @@ const UserMenu = () => {
       .substring(0, 2);
   };
 
+  // Get name from user metadata or fallback to email
+  const displayName = currentUser?.user_metadata?.name || 
+                      currentUser?.user_metadata?.full_name || 
+                      (currentUser?.email ? currentUser.email.split('@')[0] : 'User');
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="rounded-full w-10 h-10 p-0">
           <Avatar>
             <AvatarFallback className="bg-syrian-green text-white">
-              {getInitials(currentUser.displayName || 'User')}
+              {getInitials(displayName)}
             </AvatarFallback>
           </Avatar>
         </Button>

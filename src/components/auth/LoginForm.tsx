@@ -42,6 +42,7 @@ const LoginForm = () => {
       // Success toast is handled in the AuthContext
     } catch (error) {
       // Error toast is handled in the AuthContext
+      console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }

@@ -1,20 +1,13 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { 
-  User, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  updateProfile
-} from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../lib/firebase';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '../integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useLanguage } from './LanguageContext';
 
 interface AuthContextType {
   currentUser: User | null;
+  session: Session | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<User>;
   register: (name: string, email: string, password: string, phone: string) => Promise<User>;
@@ -34,41 +27,75 @@ export function useAuth() {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { t } = useLanguage();
   
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, newSession) => {
+        setSession(newSession);
+        setCurrentUser(newSession?.user ?? null);
+        
+        if (event === 'SIGNED_IN') {
+          toast({
+            title: t('loginSuccess'),
+            description: t('welcomeBack'),
+          });
+        }
+        
+        if (event === 'SIGNED_OUT') {
+          toast({
+            title: t('logoutSuccess'),
+            description: t('comeBackSoon'),
+          });
+        }
+      }
+    );
+    
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      setSession(currentSession);
+      setCurrentUser(currentSession?.user ?? null);
       setLoading(false);
     });
     
-    return unsubscribe;
-  }, []);
+    return () => subscription.unsubscribe();
+  }, [toast, t]);
   
   const login = async (email: string, password: string): Promise<User> => {
     try {
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      toast({
-        title: t('loginSuccess'),
-        description: t('welcomeBack'),
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      return result.user;
-    } catch (error: any) {
-      let errorMessage = t('loginFailed');
       
-      if (error.code === 'auth/user-not-found') {
-        errorMessage = t('userNotFound');
-      } else if (error.code === 'auth/wrong-password') {
-        errorMessage = t('wrongPassword');
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = t('invalidEmail');
+      if (error) {
+        let errorMessage = t('loginFailed');
+        
+        if (error.message.includes('Invalid login')) {
+          errorMessage = t('wrongPassword');
+        } else if (error.message.includes('Email not confirmed')) {
+          errorMessage = t('emailNotConfirmed');
+        } else if (error.message.includes('User not found')) {
+          errorMessage = t('userNotFound');
+        }
+        
+        toast({
+          title: t('error'),
+          description: errorMessage,
+          variant: "destructive"
+        });
+        throw error;
       }
       
+      return data.user;
+    } catch (error: any) {
       toast({
         title: t('error'),
-        description: errorMessage,
+        description: error.message || t('loginFailed'),
         variant: "destructive"
       });
       throw error;
@@ -77,42 +104,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const register = async (name: string, email: string, password: string, phone: string): Promise<User> => {
     try {
-      const result = await createUserWithEmailAndPassword(auth, email, password);
-      
-      // Update user profile
-      await updateProfile(result.user, {
-        displayName: name
-      });
-      
-      // Create user document in Firestore
-      await setDoc(doc(db, "users", result.user.uid), {
-        name,
+      const { data, error } = await supabase.auth.signUp({
         email,
-        phone,
-        createdAt: new Date().toISOString(),
-        location: "",
+        password,
+        options: {
+          data: {
+            name,
+            phone
+          }
+        }
       });
+      
+      if (error) {
+        let errorMessage = t('registrationFailed');
+        
+        if (error.message.includes('already registered')) {
+          errorMessage = t('emailInUse');
+        } else if (error.message.includes('weak password')) {
+          errorMessage = t('weakPassword');
+        }
+        
+        toast({
+          title: t('error'),
+          description: errorMessage,
+          variant: "destructive"
+        });
+        throw error;
+      }
       
       toast({
         title: t('registrationSuccess'),
         description: t('accountCreated'),
       });
       
-      return result.user;
+      return data.user;
     } catch (error: any) {
-      let errorMessage = t('registrationFailed');
-      
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = t('emailInUse');
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = t('invalidEmail');
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = t('weakPassword');
-      }
-      
       toast({
         title: t('error'),
-        description: errorMessage,
+        description: error.message || t('registrationFailed'),
         variant: "destructive"
       });
       throw error;
@@ -121,12 +150,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const logout = async (): Promise<void> => {
     try {
-      await signOut(auth);
-      toast({
-        title: t('logoutSuccess'),
-        description: t('comeBackSoon'),
-      });
-    } catch (error) {
+      await supabase.auth.signOut();
+    } catch (error: any) {
       toast({
         title: t('error'),
         description: t('logoutFailed'),
@@ -140,14 +165,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!currentUser) throw new Error(t('notLoggedIn'));
     
     try {
-      // Update in Firestore
-      const userRef = doc(db, "users", currentUser.uid);
-      await setDoc(userRef, data, { merge: true });
+      // Update profile in our profiles table
+      const { error } = await supabase
+        .from('profiles')
+        .update(data)
+        .eq('id', currentUser.id);
       
-      // Update display name if provided
+      if (error) throw error;
+      
+      // Update auth metadata if name provided
       if (data.name) {
-        await updateProfile(currentUser, {
-          displayName: data.name
+        await supabase.auth.updateUser({
+          data: { name: data.name }
         });
       }
       
@@ -155,10 +184,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: t('profileUpdated'),
         description: t('profileUpdateSuccess'),
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: t('error'),
-        description: t('profileUpdateFailed'),
+        description: error.message || t('profileUpdateFailed'),
         variant: "destructive"
       });
       throw error;
@@ -167,6 +196,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const value = {
     currentUser,
+    session,
     loading,
     login,
     register,
@@ -180,4 +210,3 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </AuthContext.Provider>
   );
 };
-
