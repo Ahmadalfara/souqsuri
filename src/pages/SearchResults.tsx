@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -42,14 +41,27 @@ const SearchResults = () => {
     queryKey: ['search', query],
     queryFn: () => searchListings(query),
     enabled: !!query,
-    onError: () => {
+    meta: {
+      onError: () => {
+        toast({
+          title: "خطأ في البحث",
+          description: "لم نتمكن من إتمام البحث، يرجى المحاولة مرة أخرى.",
+          variant: "destructive",
+        });
+      }
+    }
+  });
+
+  // Display error toast when an error occurs
+  useEffect(() => {
+    if (error) {
       toast({
         title: "خطأ في البحث",
         description: "لم نتمكن من إتمام البحث، يرجى المحاولة مرة أخرى.",
         variant: "destructive",
       });
     }
-  });
+  }, [error, toast]);
 
   return (
     <div className="min-h-screen flex flex-col bg-syrian-light">

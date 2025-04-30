@@ -1,0 +1,83 @@
+
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { User, LogOut } from 'lucide-react';
+import ArabicText from '@/components/ArabicText';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+
+const UserMenu = () => {
+  const { language } = useLanguage();
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="rounded-full w-10 h-10 p-0">
+          <Avatar>
+            <AvatarFallback className="bg-syrian-green text-white">
+              {getInitials(currentUser.displayName || 'User')}
+            </AvatarFallback>
+          </Avatar>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>
+          {language === 'ar' ? (
+            <ArabicText text="حسابي" />
+          ) : (
+            "My Account"
+          )}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => navigate('/profile')}>
+          <User className="mr-2 h-4 w-4" />
+          {language === 'ar' ? (
+            <ArabicText text="الملف الشخصي" />
+          ) : (
+            "Profile"
+          )}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>
+          <LogOut className="mr-2 h-4 w-4" />
+          {language === 'ar' ? (
+            <ArabicText text="تسجيل الخروج" />
+          ) : (
+            "Logout"
+          )}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+export default UserMenu;
