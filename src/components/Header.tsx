@@ -1,9 +1,9 @@
 
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import ArabicText from './ArabicText';
 import { Button } from '@/components/ui/button';
-import { User, LogOut } from 'lucide-react';
+import { User, LogOut, Menu, X } from 'lucide-react';
 import AuthSheet from './auth/AuthSheet';
 import CreateListingSheet from './listings/CreateListingSheet';
 import SearchBar from './SearchBar';
@@ -24,6 +24,9 @@ const Header = () => {
   const { language, t } = useLanguage();
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   
   const handleLogout = async () => {
     try {
@@ -42,9 +45,31 @@ const Header = () => {
       .toUpperCase()
       .substring(0, 2);
   };
+
+  useEffect(() => {
+    // Extract category from URL if on a category page
+    if (location.pathname.startsWith('/category/')) {
+      const categoryName = location.pathname.split('/').pop();
+      setActiveCategory(categoryName || null);
+    } else {
+      setActiveCategory(null);
+    }
+
+    // Close mobile menu when navigating
+    setMobileMenuOpen(false);
+  }, [location]);
+
+  const categories = [
+    { name: 'real_estate', label: language === 'ar' ? 'العقارات' : t('realEstate') },
+    { name: 'cars', label: language === 'ar' ? 'سيارات' : t('cars') },
+    { name: 'electronics', label: language === 'ar' ? 'إلكترونيات' : t('electronics') },
+    { name: 'furniture', label: language === 'ar' ? 'أثاث' : t('furniture') },
+    { name: 'jobs', label: language === 'ar' ? 'وظائف' : t('jobs') },
+    { name: 'services', label: language === 'ar' ? 'خدمات' : t('services') },
+  ];
   
   return (
-    <header className="flex flex-col py-4 px-6 bg-syrian-green/10 border-b border-syrian-green/20">
+    <header className="flex flex-col py-4 px-6 bg-white border-b border-syrian-green/20 shadow-sm sticky top-0 z-20">
       {/* Upper header with logo, language switcher and auth buttons */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
@@ -65,8 +90,17 @@ const Header = () => {
             )}
           </Link>
         </div>
+
+        {/* Mobile menu toggle */}
+        <button 
+          className="md:hidden text-syrian-dark p-1"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+        >
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
         
-        <div className="flex items-center space-x-4">
+        <div className="hidden md:flex items-center space-x-4">
           <LanguageSwitcher />
           
           {currentUser ? (
@@ -149,53 +183,97 @@ const Header = () => {
         </div>
       </div>
       
+      {/* Mobile menu (shown on small screens) */}
+      {mobileMenuOpen && (
+        <div className="md:hidden py-4 border-t border-syrian-green/10">
+          <div className="flex flex-col space-y-4">
+            <LanguageSwitcher className="self-start" />
+            
+            {currentUser ? (
+              <>
+                <Button 
+                  variant="outline" 
+                  className="justify-start"
+                  onClick={() => navigate('/profile')}
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  {language === 'ar' ? (
+                    <ArabicText text="الملف الشخصي" />
+                  ) : (
+                    "Profile"
+                  )}
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  className="justify-start text-destructive"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  {language === 'ar' ? (
+                    <ArabicText text="تسجيل الخروج" />
+                  ) : (
+                    "Logout"
+                  )}
+                </Button>
+              </>
+            ) : (
+              <>
+                <AuthSheet>
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-syrian-gold text-syrian-dark hover:bg-syrian-gold/10"
+                  >
+                    <User className={`${language === 'ar' ? 'ml-1' : 'mr-1'} h-4 w-4`} />
+                    {language === 'ar' ? (
+                      <ArabicText text="تسجيل الدخول" />
+                    ) : (
+                      <span>{t('login')}</span>
+                    )}
+                  </Button>
+                </AuthSheet>
+              </>
+            )}
+            
+            <CreateListingSheet>
+              <Button className="w-full bg-syrian-green hover:bg-syrian-dark text-white">
+                {language === 'ar' ? (
+                  <ArabicText text="إضافة إعلان" />
+                ) : (
+                  <span>{t('addListing')}</span>
+                )}
+              </Button>
+            </CreateListingSheet>
+          </div>
+        </div>
+      )}
+      
       {/* Search bar */}
-      <SearchBar className="max-w-4xl mx-auto" />
+      <div className="mb-4">
+        <SearchBar className="max-w-4xl mx-auto" />
+      </div>
       
       {/* Categories menu */}
-      <div className={`flex justify-center mt-4 space-x-6 ${language === 'ar' ? 'rtl' : ''}`}>
-        <Link to="/category/real_estate" className="text-syrian-dark hover:text-syrian-green transition-colors">
-          {language === 'ar' ? (
-            <ArabicText text="العقارات" />
-          ) : (
-            <span>{t('realEstate')}</span>
-          )}
-        </Link>
-        <Link to="/category/cars" className="text-syrian-dark hover:text-syrian-green transition-colors">
-          {language === 'ar' ? (
-            <ArabicText text="سيارات" />
-          ) : (
-            <span>{t('cars')}</span>
-          )}
-        </Link>
-        <Link to="/category/electronics" className="text-syrian-dark hover:text-syrian-green transition-colors">
-          {language === 'ar' ? (
-            <ArabicText text="إلكترونيات" />
-          ) : (
-            <span>{t('electronics')}</span>
-          )}
-        </Link>
-        <Link to="/category/furniture" className="text-syrian-dark hover:text-syrian-green transition-colors">
-          {language === 'ar' ? (
-            <ArabicText text="أثاث" />
-          ) : (
-            <span>{t('furniture')}</span>
-          )}
-        </Link>
-        <Link to="/category/jobs" className="text-syrian-dark hover:text-syrian-green transition-colors">
-          {language === 'ar' ? (
-            <ArabicText text="وظائف" />
-          ) : (
-            <span>{t('jobs')}</span>
-          )}
-        </Link>
-        <Link to="/category/services" className="text-syrian-dark hover:text-syrian-green transition-colors">
-          {language === 'ar' ? (
-            <ArabicText text="خدمات" />
-          ) : (
-            <span>{t('services')}</span>
-          )}
-        </Link>
+      <div className={`flex justify-center space-x-1 md:space-x-6 overflow-x-auto pb-2 ${language === 'ar' ? 'rtl' : ''}`}>
+        {categories.map((category) => (
+          <Link 
+            key={category.name}
+            to={`/category/${category.name}`} 
+            className={`
+              whitespace-nowrap px-3 py-2 rounded-full transition-colors
+              ${activeCategory === category.name 
+                ? 'bg-syrian-green text-white font-bold' 
+                : 'text-syrian-dark hover:bg-syrian-green/10'
+              }
+            `}
+          >
+            {language === 'ar' ? (
+              <ArabicText text={category.label} />
+            ) : (
+              <span>{category.label}</span>
+            )}
+          </Link>
+        ))}
       </div>
     </header>
   );
