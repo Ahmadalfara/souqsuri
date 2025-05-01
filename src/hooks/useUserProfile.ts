@@ -32,17 +32,24 @@ export const useUserProfile = () => {
         const { data: profileData, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', currentUser.id) // Changed from uid to id
+          .eq('id', currentUser.id)
           .single();
           
         if (error) throw error;
         
         if (profileData) {
-          setUserData(profileData as UserData);
+          // Map the Supabase profile data to our UserData interface
+          setUserData({
+            name: profileData.name,
+            email: profileData.email,
+            phone: profileData.phone || '',
+            location: profileData.location || '',
+            createdAt: profileData.created_at
+          });
         }
 
         // Get user listings
-        const listings = await getUserListings(currentUser.id); // Changed from uid to id
+        const listings = await getUserListings(currentUser.id);
         setUserListings(listings);
       } catch (error) {
         console.error("Error fetching user data:", error);
