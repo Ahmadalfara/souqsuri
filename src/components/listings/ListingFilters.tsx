@@ -12,31 +12,52 @@ import {
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import ArabicText from '../ArabicText';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Filter, X } from 'lucide-react';
+import { Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface ListingFiltersProps {
   onFilter: (filters: {
     priceRange: [number, number];
     location: string;
     sortBy: string;
+    keywords?: string;
+    category?: string;
+    condition?: string[];
+    urgent?: boolean;
   }) => void;
   className?: string;
 }
 
 const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [location, setLocation] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('newest');
+  const [keywords, setKeywords] = useState<string>('');
+  const [category, setCategory] = useState<string>('');
+  const [condition, setCondition] = useState<string[]>([]);
+  const [urgent, setUrgent] = useState<boolean>(false);
+
+  const handleConditionChange = (value: string) => {
+    setCondition(prev => 
+      prev.includes(value)
+        ? prev.filter(item => item !== value)
+        : [...prev, value]
+    );
+  };
 
   const handleApplyFilters = () => {
     onFilter({
       priceRange,
       location,
-      sortBy
+      sortBy,
+      keywords,
+      category,
+      condition,
+      urgent
     });
   };
 
@@ -44,6 +65,10 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
     setPriceRange([0, 10000]);
     setLocation('');
     setSortBy('newest');
+    setKeywords('');
+    setCategory('');
+    setCondition([]);
+    setUrgent(false);
     onFilter({
       priceRange: [0, 10000],
       location: '',
@@ -59,32 +84,106 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
           {language === 'ar' ? (
             <ArabicText text="فلترة النتائج" />
           ) : (
-            "Filter Results"
+            t('filterResults')
           )}
         </h3>
         <Button 
           variant="ghost" 
           size="sm" 
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-sm"
+          className="text-sm flex items-center"
         >
-          {language === 'ar' ? (
-            <ArabicText text={isExpanded ? "عرض أقل" : "خيارات أكثر"} />
+          {isExpanded ? (
+            <ChevronUp className="h-4 w-4 mr-1" />
           ) : (
-            isExpanded ? "Less options" : "More options"
+            <ChevronDown className="h-4 w-4 mr-1" />
+          )}
+          {language === 'ar' ? (
+            <ArabicText text={isExpanded ? t('lessOptions') : t('moreOptions')} />
+          ) : (
+            isExpanded ? t('lessOptions') : t('moreOptions')
           )}
         </Button>
       </div>
 
       <div className={`p-4 space-y-6 ${isExpanded ? 'block' : 'block'}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        {/* Keywords */}
+        <div className="space-y-2">
+          <Label className={language === 'ar' ? 'block text-right' : ''}>
+            {language === 'ar' ? (
+              <ArabicText text={t('keywords')} />
+            ) : (
+              t('keywords')
+            )}
+          </Label>
+          <Input 
+            placeholder={language === 'ar' ? "بحث في العنوان أو الوصف" : "Search in title or description"}
+            value={keywords}
+            onChange={(e) => setKeywords(e.target.value)}
+          />
+        </div>
+        
+        {/* Category */}
+        <div className="space-y-2">
+          <Label className={language === 'ar' ? 'block text-right' : ''}>
+            {language === 'ar' ? (
+              <ArabicText text={t('category')} />
+            ) : (
+              t('category')
+            )}
+          </Label>
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger>
+              <SelectValue placeholder={language === 'ar' ? "اختر الفئة" : "Select category"} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">
+                {language === 'ar' ? (
+                  <ArabicText text="جميع الفئات" />
+                ) : (
+                  "All Categories"
+                )}
+              </SelectItem>
+              <SelectItem value="real_estate">
+                {language === 'ar' ? (
+                  <ArabicText text="عقارات" />
+                ) : (
+                  "Real Estate"
+                )}
+              </SelectItem>
+              <SelectItem value="cars">
+                {language === 'ar' ? (
+                  <ArabicText text="سيارات" />
+                ) : (
+                  "Cars"
+                )}
+              </SelectItem>
+              <SelectItem value="electronics">
+                {language === 'ar' ? (
+                  <ArabicText text="إلكترونيات" />
+                ) : (
+                  "Electronics"
+                )}
+              </SelectItem>
+              <SelectItem value="furniture">
+                {language === 'ar' ? (
+                  <ArabicText text="أثاث" />
+                ) : (
+                  "Furniture"
+                )}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Price Range */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <Label className={language === 'ar' ? 'block text-right' : ''}>
               {language === 'ar' ? (
-                <ArabicText text="نطاق السعر" />
+                <ArabicText text={t('priceRange')} />
               ) : (
-                "Price Range"
+                t('priceRange')
               )}
             </Label>
             <div className="text-sm text-gray-500">
@@ -110,21 +209,21 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
         <div className="space-y-2">
           <Label className={language === 'ar' ? 'block text-right' : ''}>
             {language === 'ar' ? (
-              <ArabicText text="الموقع" />
+              <ArabicText text={t('location')} />
             ) : (
-              "Location"
+              t('location')
             )}
           </Label>
           <Select value={location} onValueChange={setLocation}>
             <SelectTrigger>
-              <SelectValue placeholder={language === 'ar' ? "اختر المدينة" : "Select city"} />
+              <SelectValue placeholder={language === 'ar' ? t('selectCity') : t('selectCity')} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">
                 {language === 'ar' ? (
-                  <ArabicText text="جميع المدن" />
+                  <ArabicText text={t('allCities')} />
                 ) : (
-                  "All Cities"
+                  t('allCities')
                 )}
               </SelectItem>
               <SelectItem value="damascus">
@@ -163,9 +262,9 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
         <div className="space-y-2">
           <Label className={language === 'ar' ? 'block text-right' : ''}>
             {language === 'ar' ? (
-              <ArabicText text="الترتيب حسب" />
+              <ArabicText text={t('sortBy')} />
             ) : (
-              "Sort By"
+              t('sortBy')
             )}
           </Label>
           <Select value={sortBy} onValueChange={setSortBy}>
@@ -175,30 +274,30 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
             <SelectContent>
               <SelectItem value="newest">
                 {language === 'ar' ? (
-                  <ArabicText text="الأحدث" />
+                  <ArabicText text={t('newest')} />
                 ) : (
-                  "Newest"
+                  t('newest')
                 )}
               </SelectItem>
               <SelectItem value="price_asc">
                 {language === 'ar' ? (
-                  <ArabicText text="السعر: الأقل إلى الأعلى" />
+                  <ArabicText text={t('priceLowToHigh')} />
                 ) : (
-                  "Price: Low to High"
+                  t('priceLowToHigh')
                 )}
               </SelectItem>
               <SelectItem value="price_desc">
                 {language === 'ar' ? (
-                  <ArabicText text="السعر: الأعلى إلى الأقل" />
+                  <ArabicText text={t('priceHighToLow')} />
                 ) : (
-                  "Price: High to Low"
+                  t('priceHighToLow')
                 )}
               </SelectItem>
               <SelectItem value="views">
                 {language === 'ar' ? (
-                  <ArabicText text="الأكثر مشاهدة" />
+                  <ArabicText text={t('views')} />
                 ) : (
-                  "Most Viewed"
+                  t('views')
                 )}
               </SelectItem>
             </SelectContent>
@@ -206,18 +305,73 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
         </div>
         
         {isExpanded && (
-          <div className="space-y-2">
-            <Label className={language === 'ar' ? 'block text-right' : ''}>
-              {language === 'ar' ? (
-                <ArabicText text="كلمات مفتاحية" />
-              ) : (
-                "Keywords"
-              )}
-            </Label>
-            <Input 
-              placeholder={language === 'ar' ? "بحث في العنوان أو الوصف" : "Search in title or description"} 
-            />
-          </div>
+          <>
+            {/* Condition checkboxes */}
+            <div className="space-y-2">
+              <Label className={language === 'ar' ? 'block text-right' : ''}>
+                {language === 'ar' ? (
+                  <ArabicText text="الحالة" />
+                ) : (
+                  "Condition"
+                )}
+              </Label>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="condition-new" 
+                    checked={condition.includes('new')}
+                    onCheckedChange={() => handleConditionChange('new')}
+                  />
+                  <label
+                    htmlFor="condition-new"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {language === 'ar' ? (
+                      <ArabicText text="جديد" />
+                    ) : (
+                      "New"
+                    )}
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="condition-used" 
+                    checked={condition.includes('used')}
+                    onCheckedChange={() => handleConditionChange('used')}
+                  />
+                  <label
+                    htmlFor="condition-used"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {language === 'ar' ? (
+                      <ArabicText text="مستعمل" />
+                    ) : (
+                      "Used"
+                    )}
+                  </label>
+                </div>
+              </div>
+            </div>
+            
+            {/* Urgent checkbox */}
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="urgent" 
+                checked={urgent}
+                onCheckedChange={(checked) => setUrgent(checked === true)}
+              />
+              <label
+                htmlFor="urgent"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {language === 'ar' ? (
+                  <ArabicText text="عاجل فقط" />
+                ) : (
+                  "Urgent only"
+                )}
+              </label>
+            </div>
+          </>
         )}
         
         <div className="pt-2 flex flex-wrap gap-2">
@@ -226,9 +380,9 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
             className="flex-1 bg-syrian-green hover:bg-syrian-dark"
           >
             {language === 'ar' ? (
-              <ArabicText text="تطبيق الفلتر" />
+              <ArabicText text={t('applyFilter')} />
             ) : (
-              "Apply Filter"
+              t('applyFilter')
             )}
           </Button>
           
@@ -239,9 +393,9 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
           >
             <X className="h-4 w-4 mr-1" />
             {language === 'ar' ? (
-              <ArabicText text="إعادة ضبط" />
+              <ArabicText text={t('reset')} />
             ) : (
-              "Reset"
+              t('reset')
             )}
           </Button>
         </div>

@@ -11,7 +11,7 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-// Simple translation dictionary
+// Enhanced translation dictionary with additional footer items
 const translations: Record<string, Record<string, string>> = {
   ar: {
     // Navigation
@@ -73,6 +73,7 @@ const translations: Record<string, Record<string, string>> = {
     'howToSell': 'كيفية البيع',
     'faq': 'الأسئلة الشائعة',
     'customerSupport': 'دعم العملاء',
+    'legal': 'قانوني',
     
     // Settings
     'darkMode': 'الوضع الداكن',
@@ -84,6 +85,18 @@ const translations: Record<string, Record<string, string>> = {
     'loading': 'جاري التحميل...',
     'processing': 'جاري المعالجة...',
     'submitting': 'جاري الإرسال...',
+    
+    // Filters
+    'priceRange': 'نطاق السعر',
+    'filterResults': 'فلترة النتائج',
+    'sortBy': 'الترتيب حسب',
+    'applyFilter': 'تطبيق الفلتر',
+    'reset': 'إعادة ضبط',
+    'keywords': 'كلمات مفتاحية',
+    'selectCity': 'اختر المدينة',
+    'allCities': 'جميع المدن',
+    'moreOptions': 'خيارات أكثر',
+    'lessOptions': 'عرض أقل',
     
     // Misc
     'active': 'نشط',
@@ -172,6 +185,7 @@ const translations: Record<string, Record<string, string>> = {
     'howToSell': 'How to Sell',
     'faq': 'FAQ',
     'customerSupport': 'Customer Support',
+    'legal': 'Legal',
     
     // Settings
     'darkMode': 'Dark Mode',
@@ -183,6 +197,18 @@ const translations: Record<string, Record<string, string>> = {
     'loading': 'Loading...',
     'processing': 'Processing...',
     'submitting': 'Submitting...',
+    
+    // Filters
+    'priceRange': 'Price Range',
+    'filterResults': 'Filter Results',
+    'sortBy': 'Sort By',
+    'applyFilter': 'Apply Filter',
+    'reset': 'Reset',
+    'keywords': 'Keywords',
+    'selectCity': 'Select city',
+    'allCities': 'All Cities',
+    'moreOptions': 'More options',
+    'lessOptions': 'Less options',
     
     // Misc
     'active': 'Active',
@@ -236,12 +262,20 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     
     // Update document direction based on language
     document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
-  }, []);
+    
+    // Add language class to body for global styling
+    document.body.classList.remove('lang-ar', 'lang-en');
+    document.body.classList.add(`lang-${language}`);
+  }, [language]);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('language', lang);
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    
+    // Update body class for global styling
+    document.body.classList.remove('lang-ar', 'lang-en');
+    document.body.classList.add(`lang-${lang}`);
   };
 
   const t = (key: string): string => {

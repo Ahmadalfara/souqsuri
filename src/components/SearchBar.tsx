@@ -1,12 +1,15 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, X } from 'lucide-react';
+import { Search, X, Filter } from 'lucide-react';
 import ArabicText from './ArabicText';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/components/ui/use-toast';
 import { useTheme } from '@/contexts/ThemeContext';
+import { Card } from './ui/card';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 
 interface SearchBarProps {
   className?: string;
@@ -27,25 +30,45 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
   const [isFocused, setIsFocused] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const navigate = useNavigate();
   const { language, t } = useLanguage();
   const { toast } = useToast();
   const { theme } = useTheme();
   const searchRef = useRef<HTMLDivElement>(null);
+  
+  // Quick filters state
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const quickCategories = [
+    { id: 'all', name: language === 'ar' ? 'الكل' : 'All' },
+    { id: 'real_estate', name: language === 'ar' ? 'عقارات' : 'Real Estate' },
+    { id: 'cars', name: language === 'ar' ? 'سيارات' : 'Cars' },
+    { id: 'electronics', name: language === 'ar' ? 'إلكترونيات' : 'Electronics' },
+    { id: 'furniture', name: language === 'ar' ? 'أثاث' : 'Furniture' },
+  ];
 
   useEffect(() => {
-    // Filter results based on search query
+    // Filter results based on search query and category
     if (searchQuery.trim()) {
-      const filtered = mockSearchData.filter(item => 
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        item.category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      let filtered = mockSearchData.filter(item => {
+        const matchesQuery = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                             item.category.toLowerCase().includes(searchQuery.toLowerCase());
+        
+        // Apply category filter if one is selected
+        const matchesCategory = !selectedCategory || 
+                               selectedCategory === 'all' || 
+                               item.category.toLowerCase().includes(selectedCategory.toLowerCase());
+        
+        return matchesQuery && matchesCategory;
+      });
+      
       setSearchResults(filtered);
       setShowResults(true);
     } else {
       setShowResults(false);
     }
-  }, [searchQuery]);
+  }, [searchQuery, selectedCategory]);
 
   useEffect(() => {
     // Close search results when clicking outside
@@ -64,7 +87,14 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      const queryParams = new URLSearchParams();
+      queryParams.append('q', searchQuery);
+      
+      if (selectedCategory && selectedCategory !== 'all') {
+        queryParams.append('category', selectedCategory);
+      }
+      
+      navigate(`/search?${queryParams.toString()}`);
       setShowResults(false);
     } else {
       toast({
@@ -87,12 +117,23 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
     setShowResults(false);
   };
 
+  const handleCategoryClick = (categoryId: string) => {
+    setSelectedCategory(categoryId === selectedCategory ? null : categoryId);
+  };
+
   // This function handles the "View all results" button click correctly
   const handleViewAllResults = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      const queryParams = new URLSearchParams();
+      queryParams.append('q', searchQuery);
+      
+      if (selectedCategory && selectedCategory !== 'all') {
+        queryParams.append('category', selectedCategory);
+      }
+      
+      navigate(`/search?${queryParams.toString()}`);
       setShowResults(false);
     } else {
       toast({
@@ -152,7 +193,83 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
               size={variant === 'default' ? 20 : 16}
             />
           </div>
+          
+          {/* Quick Category Filters */}
+          <div className="flex mt-2 space-x-2 overflow-x-auto pb-1 no-scrollbar">
+            {quickCategories.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                className={`
+                  text-xs py-1 px-2 rounded-full whitespace-nowrap transition-colors
+                  ${selectedCategory === cat.id 
+                    ? 'bg-syrian-green text-white' 
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }
+                `}
+                onClick={() => handleCategoryClick(cat.id)}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
         </div>
+
+        {/* Advanced Filter Button */}
+        <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="px-3">
+              <Filter size={18} />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80" align="end">
+            <div className="space-y-3 p-2">
+              <h3 className="text-md font-semibold">
+                {language === 'ar' ? (
+                  <ArabicText text="خيارات متقدمة" />
+                ) : (
+                  "Advanced Options"
+                )}
+              </h3>
+              
+              <div className="space-y-2">
+                <div className="text-sm font-medium">
+                  {language === 'ar' ? (
+                    <ArabicText text="السعر" />
+                  ) : (
+                    "Price"
+                  )}
+                </div>
+                <div className="flex space-x-2">
+                  <Input 
+                    placeholder={language === 'ar' ? "الحد الأدنى" : "Min"} 
+                    type="number"
+                    className="w-1/2"
+                  />
+                  <Input 
+                    placeholder={language === 'ar' ? "الحد الأقصى" : "Max"} 
+                    type="number" 
+                    className="w-1/2"
+                  />
+                </div>
+              </div>
+              
+              <div className="pt-2">
+                <Button 
+                  onClick={() => setIsFilterOpen(false)}
+                  className="w-full bg-syrian-green hover:bg-syrian-dark"
+                >
+                  {language === 'ar' ? (
+                    <ArabicText text="تطبيق" />
+                  ) : (
+                    "Apply"
+                  )}
+                </Button>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+        
         <Button 
           type="submit" 
           className={`
@@ -170,9 +287,9 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
         </Button>
       </form>
 
-      {/* Immediate Search Results Dropdown */}
+      {/* Smart Search Results Dropdown */}
       {showResults && searchResults.length > 0 && (
-        <div className={`
+        <Card className={`
           absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 
           shadow-lg rounded-lg border border-gray-200 dark:border-gray-700
           overflow-hidden max-h-80 overflow-y-auto
@@ -229,7 +346,7 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
               )}
             </Button>
           </div>
-        </div>
+        </Card>
       )}
 
       {showResults && searchResults.length === 0 && searchQuery.trim() && (

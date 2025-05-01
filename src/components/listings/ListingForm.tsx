@@ -19,24 +19,24 @@ import { Camera, X, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { addListing } from '@/services/listingService';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Sheet } from '@/components/ui/sheet';
 import { useNavigate } from 'react-router-dom';
 
+// Modified schema to remove minimum length requirements
 const formSchema = z.object({
-  title: z.string().min(5, {
-    message: "العنوان يجب أن يكون 5 أحرف على الأقل.",
+  title: z.string().nonempty({
+    message: "Title is required",
   }),
-  description: z.string().min(20, {
-    message: "الوصف يجب أن يكون 20 حرفاً على الأقل.",
+  description: z.string().nonempty({
+    message: "Description is required",
   }),
-  price: z.string().min(1, {
-    message: "الرجاء إدخال السعر.",
+  price: z.string().nonempty({
+    message: "Price is required",
   }),
-  location: z.string().min(2, {
-    message: "الرجاء تحديد الموقع.",
+  location: z.string().nonempty({
+    message: "Location is required",
   }),
   category: z.string({
-    required_error: "الرجاء اختيار فئة.",
+    required_error: "Category is required",
   }),
 });
 
@@ -124,9 +124,9 @@ const ListingForm = () => {
         price: values.price,
         location: values.location,
         category: values.category,
-        userId: currentUser.id, // Changed from uid to id
-        userName: currentUser.user_metadata?.name || "Anonymous User", // Changed from displayName to user_metadata?.name
-        images: [] // This will be populated in the service
+        userId: currentUser.id,
+        userName: currentUser.user_metadata?.name || "Anonymous User",
+        images: []
       };
       
       const listingId = await addListing(listingData, images);

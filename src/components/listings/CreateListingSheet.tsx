@@ -31,16 +31,9 @@ const CreateListingSheet = ({ children }: CreateListingSheetProps) => {
     };
   }, []);
 
+  // No need to prevent opening if user is not logged in
+  // We'll show the login prompt inside the sheet instead
   const handleOpen = (openState: boolean) => {
-    if (openState && !currentUser) {
-      toast({
-        title: language === 'ar' ? "تنبيه" : "Notice",
-        description: language === 'ar' 
-          ? "يجب تسجيل الدخول أولاً قبل إضافة إعلان" 
-          : "You must be logged in to add a listing",
-      });
-      return;
-    }
     setOpen(openState);
   };
 
@@ -50,13 +43,13 @@ const CreateListingSheet = ({ children }: CreateListingSheetProps) => {
         <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
           <p className="mb-4">
             {language === 'ar' ? (
-              <ArabicText text="يجب تسجيل الدخول أولاً قبل إضافة إعلان جديد" />
+              <ArabicText text="يمكنك تسجيل الدخول أولاً قبل إضافة إعلان جديد" />
             ) : (
-              "You need to sign in first before adding a new listing"
+              "You can sign in first before adding a new listing"
             )}
           </p>
           <AuthSheet>
-            <Button className="bg-syrian-green hover:bg-syrian-dark">
+            <Button className="bg-syrian-green hover:bg-syrian-dark mb-4">
               {language === 'ar' ? (
                 <ArabicText text="تسجيل الدخول" />
               ) : (
@@ -64,6 +57,29 @@ const CreateListingSheet = ({ children }: CreateListingSheetProps) => {
               )}
             </Button>
           </AuthSheet>
+          
+          <p className="text-sm text-muted-foreground">
+            {language === 'ar' ? (
+              <ArabicText text="أو يمكنك المتابعة كضيف" />
+            ) : (
+              "Or you can continue as a guest"
+            )}
+          </p>
+          
+          <Button 
+            variant="outline" 
+            className="mt-2" 
+            onClick={() => document.getElementById('continue-as-guest')?.click()}
+          >
+            {language === 'ar' ? (
+              <ArabicText text="الاستمرار كضيف" />
+            ) : (
+              "Continue as Guest"
+            )}
+          </Button>
+          
+          {/* Hidden button to trigger the continue as guest functionality */}
+          <button id="continue-as-guest" className="hidden" />
         </div>
       );
     }
