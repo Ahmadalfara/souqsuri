@@ -29,6 +29,7 @@ export const useUserProfile = () => {
       try {
         setLoading(true);
         // Get user data from Supabase profiles table
+        // This will automatically respect RLS policies since we're using the authenticated client
         const { data: profileData, error } = await supabase
           .from('profiles')
           .select('*')

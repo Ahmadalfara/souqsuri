@@ -11,6 +11,9 @@
  * 
  * These policies are implemented directly in Supabase and this file serves
  * as documentation for the application's security model.
+ * 
+ * The auto-profile creation is handled by the handle_new_user() trigger function
+ * which creates a profile entry whenever a new user is registered.
  */
 
 export const checkUserOwnership = async (userId: string, resourceId: string): Promise<boolean> => {
@@ -20,4 +23,10 @@ export const checkUserOwnership = async (userId: string, resourceId: string): Pr
 
 export const isAuthEnabled = (): boolean => {
   return true; // Authentication is enabled for this application
+};
+
+// Constant that reflects which resources have RLS enabled
+export const RLS_PROTECTED_RESOURCES = {
+  PROFILES: 'profiles',
+  // Add more resources as they get RLS protection
 };

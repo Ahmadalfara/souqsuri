@@ -10,6 +10,7 @@ import ArabicText from '../ArabicText';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -21,6 +22,8 @@ const ResetPasswordForm = () => {
   const { resetPassword } = useAuth();
   const { language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -33,10 +36,25 @@ const ResetPasswordForm = () => {
     setIsLoading(true);
     try {
       await resetPassword(values.email);
+      setResetSent(true);
       // Reset form after successful submission
       form.reset();
+      toast({
+        title: language === 'ar' ? 'تم إرسال رابط إعادة التعيين' : 'Reset Link Sent',
+        description: language === 'ar' 
+          ? 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني' 
+          : 'A password reset link has been sent to your email',
+        variant: "default",
+      });
     } catch (error) {
       console.error('Password reset error:', error);
+      toast({
+        title: language === 'ar' ? 'حدث خطأ' : 'Error',
+        description: language === 'ar' 
+          ? 'حدث خطأ أثناء إرسال رابط إعادة التعيين' 
+          : 'There was an error sending the reset link',
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -85,6 +103,16 @@ const ResetPasswordForm = () => {
             "Send Reset Link"
           )}
         </Button>
+
+        {resetSent && (
+          <div className="mt-4 text-center text-sm text-green-600">
+            {language === 'ar' ? (
+              <ArabicText text="تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني" />
+            ) : (
+              "Reset link sent to your email"
+            )}
+          </div>
+        )}
       </form>
     </Form>
   );
