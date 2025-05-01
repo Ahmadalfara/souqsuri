@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
 type Language = 'ar' | 'en';
@@ -151,6 +150,14 @@ const translations: Record<string, Record<string, string>> = {
     'usd': 'دولار أمريكي',
     'currencySymbol': 'ل.س',
     'changeCurrency': 'تغيير العملة',
+    'maxImages': 'الحد الأقصى للصور',
+    'maxImagesDesc': 'يمكنك رفع 5 صور كحد أقصى',
+    
+    // Chat
+    'chatTitle': 'مساعد سوقنا',
+    'chatPlaceholder': 'اكتب رسالتك هنا...',
+    'chatGreeting': 'مرحباً! أنا المساعد الافتراضي لسوقنا. كيف يمكنني مساعدتك اليوم؟',
+    'chatError': 'حدث خطأ في الاتصال بالمساعد الذكي. حاول مرة أخرى.',
   },
   en: {
     // Navigation
@@ -290,6 +297,14 @@ const translations: Record<string, Record<string, string>> = {
     'usd': 'USD',
     'currencySymbol': '$',
     'changeCurrency': 'Change Currency',
+    'maxImages': 'Maximum Images',
+    'maxImagesDesc': 'You can upload maximum 5 images',
+    
+    // Chat
+    'chatTitle': 'Souqna Assistant',
+    'chatPlaceholder': 'Type your message here...',
+    'chatGreeting': 'Hello! I\'m Souqna\'s AI assistant. How can I help you today?',
+    'chatError': 'Error connecting to the AI assistant. Please try again.',
   },
 };
 

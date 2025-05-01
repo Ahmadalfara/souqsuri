@@ -37,16 +37,32 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
       <DropdownMenuContent align="end" className={`${theme === 'dark' ? 'dark' : ''} min-w-[140px]`}>
         <DropdownMenuItem onClick={() => setLanguage('ar')} className="flex items-center justify-between">
           <span className={`flex items-center ${language === 'ar' ? 'text-syrian-green font-bold' : ''}`}>
-            <span className="w-5 h-3 mr-2 bg-green-600"></span>
+            <div className="w-5 h-3 mr-2 bg-green-600 relative overflow-hidden">
+              {/* Syrian independence flag with three red stars */}
+              <div className="absolute inset-0 flex justify-center">
+                <div className="flex space-x-[2px] items-center">
+                  <div className="w-1 h-1 bg-red-600 transform rotate-0 rounded-full"></div>
+                  <div className="w-1 h-1 bg-red-600 transform rotate-0 rounded-full"></div>
+                  <div className="w-1 h-1 bg-red-600 transform rotate-0 rounded-full"></div>
+                </div>
+              </div>
+            </div>
             العربية
             {language === 'ar' && <span className="ml-2">✓</span>}
           </span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setLanguage('en')} className="flex items-center justify-between">
           <span className={`flex items-center ${language === 'en' ? 'text-syrian-green font-bold' : ''}`}>
-            <span className="w-5 h-3 mr-2 bg-blue-800 relative">
-              <span className="absolute inset-0 flex items-center justify-center text-[8px] text-white">US</span>
-            </span>
+            <div className="w-5 h-3 mr-2 bg-blue-800 relative overflow-hidden">
+              {/* American flag representation */}
+              <div className="absolute top-0 left-0 w-2 h-2 bg-blue-900">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 bg-white opacity-70 transform rotate-45"></div>
+                </div>
+              </div>
+              <div className="absolute top-0 right-0 h-1.5 w-3 bg-red-600"></div>
+              <div className="absolute bottom-0 right-0 h-1.5 w-3 bg-red-600"></div>
+            </div>
             English
             {language === 'en' && <span className="ml-2">✓</span>}
           </span>

@@ -56,7 +56,8 @@ serve(async (req) => {
         model: 'gpt-4o-mini',
         messages: formattedMessages,
         temperature: 0.7,
-        max_tokens: 500
+        max_tokens: 500,
+        stream: false
       }),
     });
 

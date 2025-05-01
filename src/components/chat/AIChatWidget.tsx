@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, ChevronDown, ChevronUp, Bot } from 'lucide-react';
+import { Send, ChevronDown, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar } from '@/components/ui/avatar';
@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ArabicText from '../ArabicText';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/components/ui/use-toast';
 
 interface Message {
   id: string;
@@ -24,6 +25,7 @@ const AIChatWidget: React.FC = () => {
   const { language, t } = useLanguage();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   // Add initial bot message when widget is first opened
   useEffect(() => {
@@ -72,19 +74,25 @@ const AIChatWidget: React.FC = () => {
     setIsLoading(true);
     
     try {
+      console.log("Calling chat-assistant edge function...");
       // Call edge function to get AI response
       const { data, error } = await supabase.functions.invoke('chat-assistant', {
         body: { 
           message: message,
           language: language,
-          previousMessages: messages.map(msg => ({
+          previousMessages: messages.slice(-5).map(msg => ({
             role: msg.role,
             content: msg.content
           }))
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase function error:", error);
+        throw error;
+      }
+      
+      console.log("Received response:", data);
       
       const botMessage = {
         id: (Date.now() + 1).toString(),
@@ -99,6 +107,14 @@ const AIChatWidget: React.FC = () => {
       setMessages((prevMessages) => [...prevMessages, botMessage]);
     } catch (error) {
       console.error('Error getting AI response:', error);
+      
+      toast({
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: language === 'ar' 
+          ? "حدث خطأ في الاتصال بالمساعد الذكي. حاول مرة أخرى." 
+          : "Error connecting to the AI assistant. Please try again.",
+        variant: "destructive"
+      });
       
       // Add error message
       const errorMessage = {

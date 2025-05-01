@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -22,16 +21,16 @@ import { addListing } from '@/services/listingService';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 
-// Removed minimum length requirements to fix form submission
+// Define the form schema with more relaxed validation
 const formSchema = z.object({
   title: z.string().nonempty({
     message: "Title is required",
   }),
-  description: z.string(),  // No minimum length requirement
+  description: z.string().optional(),
   price: z.string().nonempty({
     message: "Price is required",
   }),
-  location: z.string(),  // No minimum length requirement
+  location: z.string().optional(),
   category: z.string({
     required_error: "Category is required",
   }),
@@ -65,10 +64,8 @@ const ListingForm = () => {
       
       if (images.length >= 5) {
         toast({
-          title: language === 'ar' ? "الحد الأقصى للصور" : "Maximum Images",
-          description: language === 'ar' 
-            ? "يمكنك رفع 5 صور كحد أقصى" 
-            : "You can upload maximum 5 images",
+          title: t('maxImages'),
+          description: t('maxImagesDesc'),
           variant: "destructive"
         });
         return;
@@ -133,7 +130,9 @@ const ListingForm = () => {
       document.dispatchEvent(closeEvent);
       
       // Navigate to the newly created listing
-      navigate(`/listing/${listingId}`);
+      if (listingId) {
+        navigate(`/listing/${listingId}`);
+      }
     } catch (error) {
       console.error('Error creating listing:', error);
       toast({
