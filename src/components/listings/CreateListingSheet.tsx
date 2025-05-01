@@ -37,10 +37,16 @@ const CreateListingSheet = ({ children }: CreateListingSheetProps) => {
     setOpen(openState);
   };
 
+  const handleContinueAsGuest = () => {
+    // Hide the prompt and show the form
+    document.getElementById('listing-form-container')?.classList.remove('hidden');
+    document.getElementById('guest-prompt-container')?.classList.add('hidden');
+  };
+
   const renderContent = () => {
     if (!currentUser) {
       return (
-        <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
+        <div className="flex flex-col items-center justify-center py-10 px-4 text-center" id="guest-prompt-container">
           <p className="mb-4">
             {language === 'ar' ? (
               <ArabicText text="يمكنك تسجيل الدخول أولاً قبل إضافة إعلان جديد" />
@@ -69,7 +75,7 @@ const CreateListingSheet = ({ children }: CreateListingSheetProps) => {
           <Button 
             variant="outline" 
             className="mt-2" 
-            onClick={() => document.getElementById('continue-as-guest')?.click()}
+            onClick={handleContinueAsGuest}
           >
             {language === 'ar' ? (
               <ArabicText text="الاستمرار كضيف" />
@@ -78,8 +84,22 @@ const CreateListingSheet = ({ children }: CreateListingSheetProps) => {
             )}
           </Button>
           
-          {/* Hidden button to trigger the continue as guest functionality */}
-          <button id="continue-as-guest" className="hidden" />
+          {/* Hidden form container that will be shown when continuing as guest */}
+          <div id="listing-form-container" className="hidden w-full">
+            <SheetHeader className={`text-${language === 'ar' ? 'right' : 'left'}`}>
+              <SheetTitle>
+                {language === 'ar' ? (
+                  <ArabicText text="إضافة إعلان جديد" size="large" />
+                ) : (
+                  "Add New Listing"
+                )}
+              </SheetTitle>
+            </SheetHeader>
+            
+            <div className="mt-6">
+              <ListingForm />
+            </div>
+          </div>
         </div>
       );
     }

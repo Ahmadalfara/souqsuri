@@ -1,4 +1,3 @@
-
 import { 
   collection, 
   addDoc, 
@@ -22,6 +21,7 @@ export interface Listing {
   title: string;
   description: string;
   price: string;
+  currency?: string;
   location: string;
   category: string;
   images: string[];
@@ -31,6 +31,8 @@ export interface Listing {
   createdAt?: any;
   active: boolean;
   views: number;
+  condition?: string; // new, used
+  urgent?: boolean;
 }
 
 export const addListing = async (listing: Omit<Listing, 'id' | 'createdAt' | 'active' | 'views'>, imageFiles: File[]): Promise<string> => {
@@ -51,7 +53,8 @@ export const addListing = async (listing: Omit<Listing, 'id' | 'createdAt' | 'ac
       images: imageUrls,
       createdAt: serverTimestamp(),
       active: true,
-      views: 0
+      views: 0,
+      currency: listing.currency || 'SYP'
     };
     
     const docRef = await addDoc(collection(db, 'listings'), listingData);
@@ -149,7 +152,13 @@ export const getListing = async (id: string): Promise<Listing | null> => {
 export const searchListings = async (params: {
   query?: string,
   category?: string,
-  location?: string
+  location?: string,
+  priceMin?: number,
+  priceMax?: number,
+  condition?: string[],
+  sortBy?: string,
+  urgent?: boolean,
+  currency?: string
 }): Promise<Listing[]> => {
   try {
     const constraints: QueryConstraint[] = [
@@ -164,7 +173,39 @@ export const searchListings = async (params: {
       constraints.push(where('location', '==', params.location));
     }
     
-    constraints.push(orderBy('createdAt', 'desc'));
+    if (params.urgent === true) {
+      constraints.push(where('urgent', '==', true));
+    }
+    
+    if (params.condition && params.condition.length > 0) {
+      constraints.push(where('condition', 'in', params.condition));
+    }
+    
+    // Default sort order
+    let sortField = 'createdAt';
+    let sortDirection: 'asc' | 'desc' = 'desc';
+    
+    if (params.sortBy) {
+      switch (params.sortBy) {
+        case 'price_asc':
+          sortField = 'price';
+          sortDirection = 'asc';
+          break;
+        case 'price_desc':
+          sortField = 'price';
+          sortDirection = 'desc';
+          break;
+        case 'views':
+          sortField = 'views';
+          sortDirection = 'desc';
+          break;
+        default:
+          // Keep default
+          break;
+      }
+    }
+    
+    constraints.push(orderBy(sortField, sortDirection));
     
     const q = query(collection(db, 'listings'), ...constraints);
     const querySnapshot = await getDocs(q);
@@ -174,13 +215,34 @@ export const searchListings = async (params: {
       ...doc.data()
     } as Listing));
     
-    // Client-side filtering for text search since Firestore doesn't support full text search
+    // Client-side filtering for text search and price range
     if (params.query) {
       const searchQuery = params.query.toLowerCase();
       results = results.filter(listing => 
         listing.title.toLowerCase().includes(searchQuery) ||
         listing.description.toLowerCase().includes(searchQuery)
       );
+    }
+    
+    if (params.priceMin !== undefined || params.priceMax !== undefined) {
+      results = results.filter(listing => {
+        const price = parseFloat(listing.price);
+        
+        if (params.priceMin !== undefined && params.priceMax !== undefined) {
+          return price >= params.priceMin && price <= params.priceMax;
+        } else if (params.priceMin !== undefined) {
+          return price >= params.priceMin;
+        } else if (params.priceMax !== undefined) {
+          return price <= params.priceMax;
+        }
+        
+        return true;
+      });
+    }
+    
+    // Filter by currency if specified
+    if (params.currency) {
+      results = results.filter(listing => listing.currency === params.currency);
     }
     
     return results;

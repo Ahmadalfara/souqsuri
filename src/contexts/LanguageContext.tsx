@@ -11,7 +11,7 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-// Enhanced translation dictionary with additional footer items
+// Enhanced translation dictionary with additional items
 const translations: Record<string, Record<string, string>> = {
   ar: {
     // Navigation
@@ -37,13 +37,18 @@ const translations: Record<string, Record<string, string>> = {
     // Listing form
     'listingTitle': 'عنوان الإعلان',
     'category': 'الفئة',
-    'price': 'السعر (ل.س)',
+    'price': 'السعر',
+    'currency': 'العملة',
     'description': 'وصف الإعلان',
     'location': 'الموقع',
     'images': 'صور الإعلان',
     'addImage': 'أضف صورة',
     'phone': 'رقم الهاتف',
     'publish': 'نشر الإعلان',
+    'condition': 'الحالة',
+    'new': 'جديد',
+    'used': 'مستعمل',
+    'urgent': 'عاجل',
     
     // Auth
     'email': 'البريد الإلكتروني',
@@ -51,6 +56,9 @@ const translations: Record<string, Record<string, string>> = {
     'name': 'الاسم الكامل',
     'phoneNumber': 'رقم الهاتف',
     'terms': 'أوافق على الشروط والأحكام',
+    'guestUser': 'مستخدم زائر',
+    'continueAsGuest': 'متابعة كضيف',
+    'signInToPost': 'تسجيل الدخول للنشر',
     
     // Search
     'searchFor': 'ابحث عن منتجات أو خدمات...',
@@ -85,6 +93,7 @@ const translations: Record<string, Record<string, string>> = {
     'loading': 'جاري التحميل...',
     'processing': 'جاري المعالجة...',
     'submitting': 'جاري الإرسال...',
+    'publishing': 'جاري النشر...',
     
     // Filters
     'priceRange': 'نطاق السعر',
@@ -97,6 +106,7 @@ const translations: Record<string, Record<string, string>> = {
     'allCities': 'جميع المدن',
     'moreOptions': 'خيارات أكثر',
     'lessOptions': 'عرض أقل',
+    'advancedSearch': 'بحث متقدم',
     
     // Misc
     'active': 'نشط',
@@ -124,6 +134,23 @@ const translations: Record<string, Record<string, string>> = {
     'success': 'تم بنجاح',
     'error': 'حدث خطأ',
     'required': 'مطلوب',
+    
+    // Website description
+    'siteDescription': 'منصة إعلانات مبوبة سورية تتيح للمستخدمين بيع وشراء المنتجات والخدمات بسهولة وأمان.',
+    'siteCategories': 'فئات الإعلانات',
+    'siteHowToSell': 'كيفية البيع',
+    'siteFeatured': 'الإعلانات المميزة',
+    'siteSupport': 'دعم العملاء',
+    'siteFaq': 'الأسئلة الشائعة',
+    'siteContact': 'اتصل بنا',
+    'sitePrivacy': 'سياسة الخصوصية',
+    'siteTerms': 'شروط الاستخدام',
+    
+    // Currency
+    'syrianPound': 'ل.س',
+    'usd': 'دولار أمريكي',
+    'currencySymbol': 'ل.س',
+    'changeCurrency': 'تغيير العملة',
   },
   en: {
     // Navigation
@@ -149,13 +176,18 @@ const translations: Record<string, Record<string, string>> = {
     // Listing form
     'listingTitle': 'Listing Title',
     'category': 'Category',
-    'price': 'Price (SYP)',
+    'price': 'Price',
+    'currency': 'Currency',
     'description': 'Description',
     'location': 'Location',
     'images': 'Images',
     'addImage': 'Add Image',
     'phone': 'Phone',
     'publish': 'Publish Listing',
+    'condition': 'Condition',
+    'new': 'New',
+    'used': 'Used',
+    'urgent': 'Urgent',
     
     // Auth
     'email': 'Email',
@@ -163,6 +195,9 @@ const translations: Record<string, Record<string, string>> = {
     'name': 'Full Name',
     'phoneNumber': 'Phone Number',
     'terms': 'I agree to the Terms and Conditions',
+    'guestUser': 'Guest User',
+    'continueAsGuest': 'Continue as Guest',
+    'signInToPost': 'Sign in to post',
     
     // Search
     'searchFor': 'Search for products or services...',
@@ -197,6 +232,7 @@ const translations: Record<string, Record<string, string>> = {
     'loading': 'Loading...',
     'processing': 'Processing...',
     'submitting': 'Submitting...',
+    'publishing': 'Publishing...',
     
     // Filters
     'priceRange': 'Price Range',
@@ -209,6 +245,7 @@ const translations: Record<string, Record<string, string>> = {
     'allCities': 'All Cities',
     'moreOptions': 'More options',
     'lessOptions': 'Less options',
+    'advancedSearch': 'Advanced Search',
     
     // Misc
     'active': 'Active',
@@ -236,6 +273,23 @@ const translations: Record<string, Record<string, string>> = {
     'success': 'Success',
     'error': 'Error',
     'required': 'Required',
+    
+    // Website description
+    'siteDescription': 'A Syrian classified ads platform that allows users to buy and sell products and services easily and safely.',
+    'siteCategories': 'Ad Categories',
+    'siteHowToSell': 'How to Sell',
+    'siteFeatured': 'Featured Listings',
+    'siteSupport': 'Customer Support',
+    'siteFaq': 'FAQ',
+    'siteContact': 'Contact Us',
+    'sitePrivacy': 'Privacy Policy',
+    'siteTerms': 'Terms of Use',
+    
+    // Currency
+    'syrianPound': 'SYP',
+    'usd': 'USD',
+    'currencySymbol': '$',
+    'changeCurrency': 'Change Currency',
   },
 };
 

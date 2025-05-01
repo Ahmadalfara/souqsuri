@@ -15,7 +15,8 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import ArabicText from '../ArabicText';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Filter, X, ChevronDown, ChevronUp, DollarSign } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface ListingFiltersProps {
   onFilter: (filters: {
@@ -26,6 +27,7 @@ interface ListingFiltersProps {
     category?: string;
     condition?: string[];
     urgent?: boolean;
+    currency?: string;
   }) => void;
   className?: string;
 }
@@ -40,6 +42,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
   const [category, setCategory] = useState<string>('');
   const [condition, setCondition] = useState<string[]>([]);
   const [urgent, setUrgent] = useState<boolean>(false);
+  const [currency, setCurrency] = useState<string>('SYP');
 
   const handleConditionChange = (value: string) => {
     setCondition(prev => 
@@ -57,7 +60,8 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
       keywords,
       category,
       condition,
-      urgent
+      urgent,
+      currency
     });
   };
 
@@ -69,10 +73,12 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
     setCategory('');
     setCondition([]);
     setUrgent(false);
+    setCurrency('SYP');
     onFilter({
       priceRange: [0, 10000],
       location: '',
-      sortBy: 'newest'
+      sortBy: 'newest',
+      currency: 'SYP'
     });
   };
 
@@ -176,6 +182,36 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
           </Select>
         </div>
 
+        {/* Currency Selection */}
+        <div className="space-y-2">
+          <Label className={language === 'ar' ? 'block text-right' : ''}>
+            {language === 'ar' ? (
+              <ArabicText text="العملة" />
+            ) : (
+              "Currency"
+            )}
+          </Label>
+          <RadioGroup 
+            value={currency} 
+            onValueChange={setCurrency}
+            className="flex space-x-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="SYP" id="currency-syp" />
+              <Label htmlFor="currency-syp">
+                {language === 'ar' ? "ل.س" : "SYP"}
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="USD" id="currency-usd" />
+              <Label htmlFor="currency-usd" className="flex items-center">
+                <DollarSign className="h-4 w-4 mr-1" />
+                USD
+              </Label>
+            </div>
+          </RadioGroup>
+        </div>
+
         {/* Price Range */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
@@ -188,21 +224,39 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
             </Label>
             <div className="text-sm text-gray-500">
               {language === 'ar' ? (
-                <ArabicText text={`${priceRange[0]} - ${priceRange[1]} دولار`} />
+                <ArabicText text={`${priceRange[0]} - ${priceRange[1]} ${currency === 'USD' ? 'دولار' : 'ل.س'}`} />
               ) : (
-                `$${priceRange[0]} - $${priceRange[1]}`
+                `${currency === 'USD' ? '$' : ''}${priceRange[0]} - ${currency === 'USD' ? '$' : ''}${priceRange[1]}`
               )}
             </div>
           </div>
           
           <Slider
             defaultValue={priceRange}
+            value={priceRange}
             min={0}
-            max={10000}
-            step={100}
+            max={currency === 'USD' ? 1000 : 1000000}
+            step={currency === 'USD' ? 10 : 1000}
             onValueChange={(value) => setPriceRange(value as [number, number])}
             className="py-4"
           />
+
+          <div className="flex space-x-4 pt-2">
+            <Input
+              type="number"
+              value={priceRange[0]}
+              onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+              className="w-1/2"
+              placeholder="Min"
+            />
+            <Input
+              type="number"
+              value={priceRange[1]}
+              onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+              className="w-1/2"
+              placeholder="Max"
+            />
+          </div>
         </div>
         
         {/* Location */}

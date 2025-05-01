@@ -37,7 +37,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
       <DropdownMenuContent align="end" className={`${theme === 'dark' ? 'dark' : ''} min-w-[140px]`}>
         <DropdownMenuItem onClick={() => setLanguage('ar')} className="flex items-center justify-between">
           <span className={`flex items-center ${language === 'ar' ? 'text-syrian-green font-bold' : ''}`}>
-            <span className="mr-2 text-lg">🇸🇾</span>
+            <span className="mr-2 text-lg">🟢</span>
             العربية
             {language === 'ar' && <span className="ml-2">✓</span>}
           </span>

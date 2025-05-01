@@ -10,6 +10,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Card } from './ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 interface SearchBarProps {
   className?: string;
@@ -18,11 +19,11 @@ interface SearchBarProps {
 
 // Mock search results for immediate display
 const mockSearchData = [
-  { id: 1, title: 'هاتف آيفون مستعمل', category: 'إلكترونيات', price: '400', location: 'دمشق' },
-  { id: 2, title: 'شقة للإيجار في منطقة المزة', category: 'العقارات', price: '300', location: 'حلب' },
-  { id: 3, title: 'سيارة مرسيدس 2020', category: 'سيارات', price: '15000', location: 'حمص' },
-  { id: 4, title: 'أريكة جلدية بحالة ممتازة', category: 'أثاث', price: '250', location: 'اللاذقية' },
-  { id: 5, title: 'لابتوب ديل XPS جديد', category: 'إلكترونيات', price: '1200', location: 'دمشق' },
+  { id: 1, title: 'هاتف آيفون مستعمل', category: 'إلكترونيات', price: '400', location: 'دمشق', currency: 'USD' },
+  { id: 2, title: 'شقة للإيجار في منطقة المزة', category: 'العقارات', price: '300', location: 'حلب', currency: 'SYP' },
+  { id: 3, title: 'سيارة مرسيدس 2020', category: 'سيارات', price: '15000', location: 'حمص', currency: 'USD' },
+  { id: 4, title: 'أريكة جلدية بحالة ممتازة', category: 'أثاث', price: '250', location: 'اللاذقية', currency: 'SYP' },
+  { id: 5, title: 'لابتوب ديل XPS جديد', category: 'إلكترونيات', price: '1200', location: 'دمشق', currency: 'USD' },
 ];
 
 const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
@@ -39,6 +40,8 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
   
   // Quick filters state
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
 
   const quickCategories = [
     { id: 'all', name: language === 'ar' ? 'الكل' : 'All' },
@@ -49,9 +52,10 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
   ];
 
   useEffect(() => {
-    // Filter results based on search query and category
+    // Filter results based on search query, category, location, and currency
     if (searchQuery.trim()) {
       let filtered = mockSearchData.filter(item => {
+        // Match by title or category
         const matchesQuery = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                              item.category.toLowerCase().includes(searchQuery.toLowerCase());
         
@@ -60,7 +64,15 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
                                selectedCategory === 'all' || 
                                item.category.toLowerCase().includes(selectedCategory.toLowerCase());
         
-        return matchesQuery && matchesCategory;
+        // Apply location filter if one is selected
+        const matchesLocation = !selectedLocation || 
+                              item.location.toLowerCase().includes(selectedLocation.toLowerCase());
+        
+        // Apply currency filter if one is selected
+        const matchesCurrency = !selectedCurrency || 
+                              item.currency === selectedCurrency;
+        
+        return matchesQuery && matchesCategory && matchesLocation && matchesCurrency;
       });
       
       setSearchResults(filtered);
@@ -68,7 +80,7 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
     } else {
       setShowResults(false);
     }
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, selectedLocation, selectedCurrency]);
 
   useEffect(() => {
     // Close search results when clicking outside
@@ -92,6 +104,14 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
       
       if (selectedCategory && selectedCategory !== 'all') {
         queryParams.append('category', selectedCategory);
+      }
+      
+      if (selectedLocation) {
+        queryParams.append('location', selectedLocation);
+      }
+      
+      if (selectedCurrency) {
+        queryParams.append('currency', selectedCurrency);
       }
       
       navigate(`/search?${queryParams.toString()}`);
@@ -121,7 +141,7 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
     setSelectedCategory(categoryId === selectedCategory ? null : categoryId);
   };
 
-  // This function handles the "View all results" button click correctly
+  // Handle "View all results" button click
   const handleViewAllResults = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     
@@ -133,6 +153,14 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
         queryParams.append('category', selectedCategory);
       }
       
+      if (selectedLocation) {
+        queryParams.append('location', selectedLocation);
+      }
+      
+      if (selectedCurrency) {
+        queryParams.append('currency', selectedCurrency);
+      }
+      
       navigate(`/search?${queryParams.toString()}`);
       setShowResults(false);
     } else {
@@ -142,6 +170,11 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
         variant: "destructive",
       });
     }
+  };
+  
+  // Get currency symbol based on currency
+  const getCurrencySymbol = (currency: string) => {
+    return currency === 'USD' ? '$' : language === 'ar' ? 'ل.س' : 'SYP';
   };
 
   return (
@@ -209,7 +242,7 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
                 `}
                 onClick={() => handleCategoryClick(cat.id)}
               >
-                {cat.name}
+                {language === 'ar' ? cat.name : cat.name}
               </button>
             ))}
           </div>
@@ -226,32 +259,76 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
             <div className="space-y-3 p-2">
               <h3 className="text-md font-semibold">
                 {language === 'ar' ? (
-                  <ArabicText text="خيارات متقدمة" />
+                  <ArabicText text={t('advancedSearch')} />
                 ) : (
-                  "Advanced Options"
+                  t('advancedSearch')
                 )}
               </h3>
               
+              {/* Location Selection */}
               <div className="space-y-2">
                 <div className="text-sm font-medium">
                   {language === 'ar' ? (
-                    <ArabicText text="السعر" />
+                    <ArabicText text={t('location')} />
                   ) : (
-                    "Price"
+                    t('location')
                   )}
                 </div>
-                <div className="flex space-x-2">
-                  <Input 
-                    placeholder={language === 'ar' ? "الحد الأدنى" : "Min"} 
-                    type="number"
-                    className="w-1/2"
-                  />
-                  <Input 
-                    placeholder={language === 'ar' ? "الحد الأقصى" : "Max"} 
-                    type="number" 
-                    className="w-1/2"
-                  />
+                <Select 
+                  value={selectedLocation || ''} 
+                  onValueChange={setSelectedLocation}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={language === 'ar' ? "اختر المدينة" : "Select city"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">
+                      {language === 'ar' ? "جميع المدن" : "All Cities"}
+                    </SelectItem>
+                    <SelectItem value="damascus">
+                      {language === 'ar' ? "دمشق" : "Damascus"}
+                    </SelectItem>
+                    <SelectItem value="aleppo">
+                      {language === 'ar' ? "حلب" : "Aleppo"}
+                    </SelectItem>
+                    <SelectItem value="homs">
+                      {language === 'ar' ? "حمص" : "Homs"}
+                    </SelectItem>
+                    <SelectItem value="latakia">
+                      {language === 'ar' ? "اللاذقية" : "Latakia"}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Currency Selection */}
+              <div className="space-y-2">
+                <div className="text-sm font-medium">
+                  {language === 'ar' ? (
+                    <ArabicText text={t('currency')} />
+                  ) : (
+                    t('currency')
+                  )}
                 </div>
+                <Select 
+                  value={selectedCurrency || ''} 
+                  onValueChange={setSelectedCurrency}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={language === 'ar' ? "اختر العملة" : "Select currency"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">
+                      {language === 'ar' ? "جميع العملات" : "All Currencies"}
+                    </SelectItem>
+                    <SelectItem value="SYP">
+                      {language === 'ar' ? "ليرة سورية" : "Syrian Pound (SYP)"}
+                    </SelectItem>
+                    <SelectItem value="USD">
+                      {language === 'ar' ? "دولار أمريكي" : "US Dollar (USD)"}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               
               <div className="pt-2">
@@ -260,9 +337,9 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
                   className="w-full bg-syrian-green hover:bg-syrian-dark"
                 >
                   {language === 'ar' ? (
-                    <ArabicText text="تطبيق" />
+                    <ArabicText text={t('applyFilter')} />
                   ) : (
-                    "Apply"
+                    t('applyFilter')
                   )}
                 </Button>
               </div>
@@ -321,7 +398,9 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
                       </span>
                       <span className="text-gray-400">•</span>
                       <span>
-                        {language === 'ar' ? <ArabicText text={`${result.price} دولار`} /> : `$${result.price}`}
+                        {language === 'ar' ? 
+                          <ArabicText text={`${result.price} ${getCurrencySymbol(result.currency)}`} /> : 
+                          `${getCurrencySymbol(result.currency)}${result.price}`}
                       </span>
                       <span className="text-gray-400">•</span>
                       <span>

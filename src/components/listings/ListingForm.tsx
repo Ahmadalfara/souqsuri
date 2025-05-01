@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -15,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import ArabicText from '../ArabicText';
 import { useToast } from '@/components/ui/use-toast';
-import { Camera, X, Loader2 } from 'lucide-react';
+import { Camera, X, Loader2, DollarSign } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { addListing } from '@/services/listingService';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -38,6 +39,7 @@ const formSchema = z.object({
   category: z.string({
     required_error: "Category is required",
   }),
+  currency: z.string().default("SYP"),
 });
 
 const ListingForm = () => {
@@ -57,6 +59,7 @@ const ListingForm = () => {
       price: "",
       location: "",
       category: "",
+      currency: "SYP",
     },
   });
 
@@ -93,16 +96,7 @@ const ListingForm = () => {
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!currentUser) {
-      toast({
-        title: language === 'ar' ? "غير مسجل الدخول" : "Not Logged In",
-        description: language === 'ar' 
-          ? "يرجى تسجيل الدخول أولاً لنشر إعلان" 
-          : "Please log in first to post a listing",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Allow guest posting - no need to check for currentUser
     
     if (images.length === 0) {
       toast({
@@ -122,10 +116,11 @@ const ListingForm = () => {
         title: values.title,
         description: values.description,
         price: values.price,
+        currency: values.currency,
         location: values.location,
         category: values.category,
-        userId: currentUser.id,
-        userName: currentUser.user_metadata?.name || "Anonymous User",
+        userId: currentUser?.id || 'guest',
+        userName: currentUser?.user_metadata?.name || "Guest User",
         images: []
       };
       
@@ -236,29 +231,69 @@ const ListingForm = () => {
           )}
         />
         
-        <FormField
-          control={form.control}
-          name="price"
-          render={({ field }) => (
-            <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
-              <FormLabel>
-                {language === 'ar' ? (
-                  <ArabicText text="السعر (ل.س)" />
-                ) : (
-                  "Price (SYP)"
-                )}
-              </FormLabel>
-              <FormControl>
-                <Input 
-                  type="number" 
-                  placeholder="500000" 
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage className={language === 'ar' ? "rtl" : ""} />
-            </FormItem>
-          )}
-        />
+        <div className="flex space-x-4">
+          <FormField
+            control={form.control}
+            name="price"
+            render={({ field }) => (
+              <FormItem dir={language === 'ar' ? "rtl" : "ltr"} className="flex-1">
+                <FormLabel>
+                  {language === 'ar' ? (
+                    <ArabicText text="السعر" />
+                  ) : (
+                    "Price"
+                  )}
+                </FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    placeholder="500000" 
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage className={language === 'ar' ? "rtl" : ""} />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="currency"
+            render={({ field }) => (
+              <FormItem dir={language === 'ar' ? "rtl" : "ltr"} className="w-1/3">
+                <FormLabel>
+                  {language === 'ar' ? (
+                    <ArabicText text="العملة" />
+                  ) : (
+                    "Currency"
+                  )}
+                </FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="SYP">
+                      {language === 'ar' ? "ل.س" : "SYP"}
+                    </SelectItem>
+                    <SelectItem value="USD">
+                      <span className="flex items-center">
+                        <DollarSign className="h-4 w-4 mr-1" />
+                        USD
+                      </span>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage className={language === 'ar' ? "rtl" : ""} />
+              </FormItem>
+            )}
+          />
+        </div>
         
         <FormField
           control={form.control}
