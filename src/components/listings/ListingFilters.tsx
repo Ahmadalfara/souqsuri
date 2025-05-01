@@ -143,7 +143,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
               <SelectValue placeholder={language === 'ar' ? "اختر الفئة" : "Select category"} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">
+              <SelectItem value="all">
                 {language === 'ar' ? (
                   <ArabicText text="جميع الفئات" />
                 ) : (
@@ -273,7 +273,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
               <SelectValue placeholder={language === 'ar' ? t('selectCity') : t('selectCity')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">
+              <SelectItem value="all">
                 {language === 'ar' ? (
                   <ArabicText text={t('allCities')} />
                 ) : (

@@ -250,7 +250,7 @@ const translations: Record<string, Record<string, string>> = {
     // Misc
     'active': 'Active',
     'inactive': 'Inactive',
-    'views': 'views',
+    'views': 'Views',
     'edit': 'Edit',
     'activate': 'Activate',
     'deactivate': 'Deactivate',
@@ -304,16 +304,16 @@ export const useLanguage = () => useContext(LanguageContext);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Default to Arabic
-  const [language, setLanguageState] = useState<Language>('ar');
+  const [language, setLanguageState] = useState<Language>(() => {
+    // Check if language is saved in localStorage
+    const savedLanguage = localStorage.getItem('language') as Language;
+    return (savedLanguage && (savedLanguage === 'ar' || savedLanguage === 'en')) 
+      ? savedLanguage 
+      : 'ar';
+  });
   const direction: Direction = language === 'ar' ? 'rtl' : 'ltr';
 
   useEffect(() => {
-    // Check if language is saved in localStorage
-    const savedLanguage = localStorage.getItem('language') as Language;
-    if (savedLanguage && (savedLanguage === 'ar' || savedLanguage === 'en')) {
-      setLanguageState(savedLanguage);
-    }
-    
     // Update document direction based on language
     document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
     

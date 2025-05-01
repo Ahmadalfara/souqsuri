@@ -37,14 +37,16 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
       <DropdownMenuContent align="end" className={`${theme === 'dark' ? 'dark' : ''} min-w-[140px]`}>
         <DropdownMenuItem onClick={() => setLanguage('ar')} className="flex items-center justify-between">
           <span className={`flex items-center ${language === 'ar' ? 'text-syrian-green font-bold' : ''}`}>
-            <span className="mr-2 text-lg">🟩</span> {/* Green flag emoji for Syrian */}
+            <span className="w-5 h-3 mr-2 bg-green-600"></span>
             العربية
             {language === 'ar' && <span className="ml-2">✓</span>}
           </span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setLanguage('en')} className="flex items-center justify-between">
           <span className={`flex items-center ${language === 'en' ? 'text-syrian-green font-bold' : ''}`}>
-            <span className="mr-2 text-lg">🇺🇸</span>
+            <span className="w-5 h-3 mr-2 bg-blue-800 relative">
+              <span className="absolute inset-0 flex items-center justify-center text-[8px] text-white">US</span>
+            </span>
             English
             {language === 'en' && <span className="ml-2">✓</span>}
           </span>
