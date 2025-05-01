@@ -12,6 +12,13 @@ import ListingDetails from "./pages/ListingDetails";
 import UserProfile from "./pages/UserProfile";
 import SearchResults from "./pages/SearchResults";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import HowToSell from "./pages/HowToSell";
+import FeaturedListings from "./pages/FeaturedListings";
+import CustomerSupport from "./pages/CustomerSupport";
+import FAQ from "./pages/FAQ";
+import ContactUs from "./pages/ContactUs";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +40,16 @@ const App = () => (
               } />
               <Route path="/category/:categoryName" element={<Index />} />
               <Route path="/search" element={<SearchResults />} />
+              
+              {/* New Pages */}
+              <Route path="/how-to-sell" element={<HowToSell />} />
+              <Route path="/featured-listings" element={<FeaturedListings />} />
+              <Route path="/customer-support" element={<CustomerSupport />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/contact" element={<ContactUs />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
+              
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
