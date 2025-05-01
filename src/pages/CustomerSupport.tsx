@@ -185,7 +185,7 @@ const CustomerSupport = () => {
                               className="min-h-32" 
                               {...field} 
                             />
-                          </Control>
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
