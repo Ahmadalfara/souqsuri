@@ -3,23 +3,27 @@ import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import SearchBar from './SearchBar';
 import LanguageSwitcher from './LanguageSwitcher';
+import ThemeSwitcher from './ThemeSwitcher';
 import Logo from './header/Logo';
 import Categories from './header/Categories';
 import AuthButtons from './header/AuthButtons';
 import MobileMenu from './header/MobileMenu';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { theme } = useTheme();
   
   return (
-    <header className="flex flex-col py-4 px-6 bg-white border-b border-syrian-green/20 shadow-sm sticky top-0 z-20">
+    <header className={`flex flex-col py-4 px-6 bg-white border-b border-syrian-green/20 shadow-sm sticky top-0 z-20
+                       dark:bg-gray-900 dark:border-gray-800 dark:text-white transition-colors duration-300`}>
       {/* Upper header with logo, language switcher and auth buttons */}
       <div className="flex items-center justify-between mb-4">
         <Logo />
 
         {/* Mobile menu toggle */}
         <button 
-          className="md:hidden text-syrian-dark p-1"
+          className="md:hidden text-syrian-dark dark:text-white p-1"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
         >
@@ -27,6 +31,7 @@ const Header = () => {
         </button>
         
         <div className="hidden md:flex items-center space-x-4">
+          <ThemeSwitcher />
           <LanguageSwitcher />
           <AuthButtons />
         </div>

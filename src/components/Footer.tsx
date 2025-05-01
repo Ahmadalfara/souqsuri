@@ -3,47 +3,49 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import ArabicText from './ArabicText';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const Footer = () => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
+  const { theme } = useTheme();
 
   const links = [
     {
-      title: language === 'ar' ? 'تصفح' : 'Browse',
+      title: t('categories'),
       items: [
-        { name: language === 'ar' ? 'الصفحة الرئيسية' : 'Home', href: '/' },
-        { name: language === 'ar' ? 'إعلانات مميزة' : 'Featured Listings', href: '/featured-listings' },
-        { name: language === 'ar' ? 'الفئات' : 'Categories', href: '/' },
-        { name: language === 'ar' ? 'أحدث الإعلانات' : 'Latest Listings', href: '/' },
+        { name: t('home'), href: '/' },
+        { name: t('realEstate'), href: '/category/real-estate' },
+        { name: t('cars'), href: '/category/cars' },
+        { name: t('electronics'), href: '/category/electronics' },
       ],
     },
     {
-      title: language === 'ar' ? 'مساعدة' : 'Help',
+      title: t('help'),
       items: [
-        { name: language === 'ar' ? 'كيفية البيع' : 'How To Sell', href: '/how-to-sell' },
-        { name: language === 'ar' ? 'الأسئلة الشائعة' : 'FAQ', href: '/faq' },
-        { name: language === 'ar' ? 'دعم العملاء' : 'Customer Support', href: '/customer-support' },
-        { name: language === 'ar' ? 'اتصل بنا' : 'Contact Us', href: '/contact' },
+        { name: t('howToSell'), href: '/how-to-sell' },
+        { name: t('faq'), href: '/faq' },
+        { name: t('customerSupport'), href: '/customer-support' },
+        { name: t('contactUs'), href: '/contact' },
       ],
     },
     {
-      title: language === 'ar' ? 'قانوني' : 'Legal',
+      title: t('legal'),
       items: [
-        { name: language === 'ar' ? 'شروط الاستخدام' : 'Terms of Service', href: '/terms-of-service' },
-        { name: language === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy', href: '/privacy-policy' },
+        { name: t('termsOfService'), href: '/terms-of-service' },
+        { name: t('privacyPolicy'), href: '/privacy-policy' },
       ],
     },
   ];
 
   return (
-    <footer className="bg-white border-t border-syrian-green/10">
+    <footer className={`bg-white border-t border-syrian-green/10 transition-colors duration-300 dark:bg-gray-900 dark:border-gray-800`}>
       <div className="container mx-auto py-8 px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center">
               <img src="/placeholder.svg" alt="Logo" className="h-10 w-10 mr-2" />
               <div>
-                <h3 className="font-bold text-lg text-syrian-dark">
+                <h3 className={`font-bold text-lg text-syrian-dark dark:text-white`}>
                   {language === 'ar' ? (
                     <ArabicText text="إعلانات سوريا" />
                   ) : (
@@ -53,7 +55,7 @@ const Footer = () => {
               </div>
             </div>
 
-            <p className="mt-4 text-sm text-gray-600">
+            <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">
               {language === 'ar' ? (
                 <ArabicText text="منصة إعلانات مبوبة متكاملة تساعدك على شراء وبيع أي شيء بسهولة." />
               ) : (
@@ -64,7 +66,7 @@ const Footer = () => {
             <div className="mt-4 flex space-x-4">
               <a 
                 href="#" 
-                className="text-syrian-dark hover:text-syrian-green"
+                className="text-syrian-dark hover:text-syrian-green dark:text-gray-300 dark:hover:text-syrian-green"
                 aria-label="Facebook"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -73,7 +75,7 @@ const Footer = () => {
               </a>
               <a 
                 href="#" 
-                className="text-syrian-dark hover:text-syrian-green"
+                className="text-syrian-dark hover:text-syrian-green dark:text-gray-300 dark:hover:text-syrian-green"
                 aria-label="Twitter"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -82,7 +84,7 @@ const Footer = () => {
               </a>
               <a 
                 href="#" 
-                className="text-syrian-dark hover:text-syrian-green"
+                className="text-syrian-dark hover:text-syrian-green dark:text-gray-300 dark:hover:text-syrian-green"
                 aria-label="Instagram"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -93,8 +95,8 @@ const Footer = () => {
           </div>
 
           {links.map((group, index) => (
-            <div key={index} className="text-right">
-              <h3 className="font-bold text-syrian-dark mb-4">
+            <div key={index} className={`text-right ${language === 'en' ? 'text-left' : ''}`}>
+              <h3 className="font-bold text-syrian-dark dark:text-white mb-4">
                 {language === 'ar' ? (
                   <ArabicText text={group.title} />
                 ) : (
@@ -106,7 +108,7 @@ const Footer = () => {
                   <li key={linkIndex}>
                     <Link 
                       to={link.href} 
-                      className="text-gray-600 hover:text-syrian-green transition-colors"
+                      className="text-gray-600 hover:text-syrian-green transition-colors dark:text-gray-300"
                     >
                       {language === 'ar' ? (
                         <ArabicText text={link.name} />
@@ -121,8 +123,8 @@ const Footer = () => {
           ))}
         </div>
 
-        <div className="mt-8 pt-4 border-t border-syrian-green/10 flex flex-col md:flex-row justify-between items-center">
-          <div className="text-gray-500 text-sm mb-4 md:mb-0">
+        <div className="mt-8 pt-4 border-t border-syrian-green/10 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center">
+          <div className="text-gray-500 dark:text-gray-400 text-sm mb-4 md:mb-0">
             {language === 'ar' ? (
               <ArabicText text={`© ${new Date().getFullYear()} إعلانات سوريا. جميع الحقوق محفوظة.`} />
             ) : (

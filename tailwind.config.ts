@@ -107,13 +107,18 @@ export default {
         'pulse-subtle': {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.8' }
+        },
+        'shimmer': {
+          '0%': { backgroundPosition: '-1000px 0' },
+          '100%': { backgroundPosition: '1000px 0' },
         }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
         'float': 'float 6s ease-in-out infinite',
-        'pulse-subtle': 'pulse-subtle 4s ease-in-out infinite'
+        'pulse-subtle': 'pulse-subtle 4s ease-in-out infinite',
+        'shimmer': 'shimmer 2s infinite linear'
 			},
       fontFamily: {
         'arabic': ['Scheherazade New', 'serif'],

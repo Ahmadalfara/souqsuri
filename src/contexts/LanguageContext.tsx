@@ -64,6 +64,27 @@ const translations: Record<string, Record<string, string>> = {
     'accountSettings': 'إعدادات الحساب',
     'member': 'عضو منذ',
     
+    // Footer pages
+    'termsOfService': 'شروط الخدمة',
+    'privacyPolicy': 'سياسة الخصوصية',
+    'contactUs': 'اتصل بنا',
+    'aboutUs': 'من نحن',
+    'help': 'المساعدة',
+    'howToSell': 'كيفية البيع',
+    'faq': 'الأسئلة الشائعة',
+    'customerSupport': 'دعم العملاء',
+    
+    // Settings
+    'darkMode': 'الوضع الداكن',
+    'lightMode': 'الوضع المضيء',
+    'language': 'اللغة',
+    'settings': 'الإعدادات',
+    
+    // Loading
+    'loading': 'جاري التحميل...',
+    'processing': 'جاري المعالجة...',
+    'submitting': 'جاري الإرسال...',
+    
     // Misc
     'active': 'نشط',
     'inactive': 'غير نشط',
@@ -72,6 +93,24 @@ const translations: Record<string, Record<string, string>> = {
     'activate': 'تنشيط',
     'deactivate': 'إيقاف',
     'seller': 'البائع',
+    'yes': 'نعم',
+    'no': 'لا',
+    'cancel': 'إلغاء',
+    'save': 'حفظ',
+    'select': 'اختر',
+    'confirm': 'تأكيد',
+    'delete': 'حذف',
+    'update': 'تحديث',
+    'all': 'الكل',
+    'filter': 'تصفية',
+    'sort': 'ترتيب',
+    'newest': 'الأحدث',
+    'oldest': 'الأقدم',
+    'priceLowToHigh': 'السعر من الأقل للأعلى',
+    'priceHighToLow': 'السعر من الأعلى للأقل',
+    'success': 'تم بنجاح',
+    'error': 'حدث خطأ',
+    'required': 'مطلوب',
   },
   en: {
     // Navigation
@@ -124,6 +163,27 @@ const translations: Record<string, Record<string, string>> = {
     'accountSettings': 'Account Settings',
     'member': 'Member since',
     
+    // Footer pages
+    'termsOfService': 'Terms of Service',
+    'privacyPolicy': 'Privacy Policy',
+    'contactUs': 'Contact Us',
+    'aboutUs': 'About Us',
+    'help': 'Help',
+    'howToSell': 'How to Sell',
+    'faq': 'FAQ',
+    'customerSupport': 'Customer Support',
+    
+    // Settings
+    'darkMode': 'Dark Mode',
+    'lightMode': 'Light Mode',
+    'language': 'Language',
+    'settings': 'Settings',
+    
+    // Loading
+    'loading': 'Loading...',
+    'processing': 'Processing...',
+    'submitting': 'Submitting...',
+    
     // Misc
     'active': 'Active',
     'inactive': 'Inactive',
@@ -132,6 +192,24 @@ const translations: Record<string, Record<string, string>> = {
     'activate': 'Activate',
     'deactivate': 'Deactivate',
     'seller': 'Seller',
+    'yes': 'Yes',
+    'no': 'No',
+    'cancel': 'Cancel',
+    'save': 'Save',
+    'select': 'Select',
+    'confirm': 'Confirm',
+    'delete': 'Delete',
+    'update': 'Update',
+    'all': 'All',
+    'filter': 'Filter',
+    'sort': 'Sort',
+    'newest': 'Newest',
+    'oldest': 'Oldest',
+    'priceLowToHigh': 'Price: Low to High',
+    'priceHighToLow': 'Price: High to Low',
+    'success': 'Success',
+    'error': 'Error',
+    'required': 'Required',
   },
 };
 
@@ -158,7 +236,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     
     // Update document direction based on language
     document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
-  }, [language]);
+  }, []);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
