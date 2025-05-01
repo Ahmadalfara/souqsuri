@@ -21,6 +21,7 @@ import ContactUs from "./pages/ContactUs";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import LoadingScreen from "./components/LoadingScreen";
+import AIChatWidget from "./components/chat/AIChatWidget";
 import { useState, useEffect } from "react";
 
 const queryClient = new QueryClient();
@@ -65,6 +66,7 @@ const AppContent = () => {
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <AIChatWidget />
     </BrowserRouter>
   );
 };

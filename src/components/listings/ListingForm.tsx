@@ -22,20 +22,16 @@ import { addListing } from '@/services/listingService';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 
-// Modified schema to remove minimum length requirements
+// Removed minimum length requirements to fix form submission
 const formSchema = z.object({
   title: z.string().nonempty({
     message: "Title is required",
   }),
-  description: z.string().nonempty({
-    message: "Description is required",
-  }),
+  description: z.string(),  // No minimum length requirement
   price: z.string().nonempty({
     message: "Price is required",
   }),
-  location: z.string().nonempty({
-    message: "Location is required",
-  }),
+  location: z.string(),  // No minimum length requirement
   category: z.string({
     required_error: "Category is required",
   }),
@@ -96,33 +92,27 @@ const ListingForm = () => {
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Allow guest posting - no need to check for currentUser
-    
-    if (images.length === 0) {
-      toast({
-        title: language === 'ar' ? "لا توجد صور" : "No Images",
-        description: language === 'ar' 
-          ? "الرجاء إضافة صورة واحدة على الأقل" 
-          : "Please add at least one image",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Dispatch custom event to set submitting state in parent component
+    document.dispatchEvent(new CustomEvent('set-submitting', { 
+      detail: { submitting: true }
+    }));
     
     setIsSubmitting(true);
     
     try {
       const listingData = {
         title: values.title,
-        description: values.description,
+        description: values.description || " ", // Provide a space if empty
         price: values.price,
         currency: values.currency,
-        location: values.location,
+        location: values.location || " ", // Provide a space if empty
         category: values.category,
         userId: currentUser?.id || 'guest',
         userName: currentUser?.user_metadata?.name || "Guest User",
         images: []
       };
+      
+      console.log("Submitting listing data:", listingData);
       
       const listingId = await addListing(listingData, images);
       
@@ -155,6 +145,10 @@ const ListingForm = () => {
       });
     } finally {
       setIsSubmitting(false);
+      // Dispatch custom event to reset submitting state in parent component
+      document.dispatchEvent(new CustomEvent('set-submitting', { 
+        detail: { submitting: false }
+      }));
     }
   }
 

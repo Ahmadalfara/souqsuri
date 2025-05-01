@@ -18,23 +18,33 @@ const CreateListingSheet = ({ children }: CreateListingSheetProps) => {
   const { language, t } = useLanguage();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Handle close sheet event from ListingForm
   useEffect(() => {
     const handleCloseSheet = () => {
       setOpen(false);
+      setIsSubmitting(false); // Reset submission state when closing
+    };
+
+    const handleSetSubmitting = (e: CustomEvent) => {
+      setIsSubmitting(e.detail.submitting);
     };
 
     document.addEventListener('close-sheet', handleCloseSheet);
+    document.addEventListener('set-submitting', handleSetSubmitting as EventListener);
+    
     return () => {
       document.removeEventListener('close-sheet', handleCloseSheet);
+      document.removeEventListener('set-submitting', handleSetSubmitting as EventListener);
     };
   }, []);
 
-  // No need to prevent opening if user is not logged in
-  // We'll show the login prompt inside the sheet instead
   const handleOpen = (openState: boolean) => {
     setOpen(openState);
+    if (!openState) {
+      setIsSubmitting(false); // Reset when closing
+    }
   };
 
   const handleContinueAsGuest = () => {
