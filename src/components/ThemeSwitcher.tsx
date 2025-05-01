@@ -7,9 +7,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface ThemeSwitcherProps {
   className?: string;
+  id?: string; // Add id prop to the interface
 }
 
-const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ className }) => {
+const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ className, id }) => {
   const { theme, toggleTheme } = useTheme();
 
   return (
@@ -19,6 +20,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ className }) => {
       onClick={toggleTheme}
       className={`relative overflow-hidden ${className}`}
       aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+      id={id} // Add id prop to the Button
     >
       <div className="relative w-5 h-5">
         <AnimatePresence mode="wait" initial={false}>
