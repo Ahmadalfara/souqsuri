@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -125,8 +124,8 @@ const ListingForm = () => {
         price: values.price,
         location: values.location,
         category: values.category,
-        userId: currentUser.uid,
-        userName: currentUser.displayName || "Anonymous User",
+        userId: currentUser.id, // Changed from uid to id
+        userName: currentUser.user_metadata?.name || "Anonymous User", // Changed from displayName to user_metadata?.name
         images: [] // This will be populated in the service
       };
       

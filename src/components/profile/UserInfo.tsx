@@ -42,9 +42,9 @@ const UserInfo = ({ userData }: UserInfoProps) => {
         </div>
         <h2 className="text-xl font-bold">
           {language === 'ar' ? (
-            <ArabicText text={userData?.name || currentUser?.displayName || "مستخدم"} />
+            <ArabicText text={userData?.name || currentUser?.user_metadata?.name || "مستخدم"} />
           ) : (
-            <span>{userData?.name || currentUser?.displayName || "User"}</span>
+            <span>{userData?.name || currentUser?.user_metadata?.name || "User"}</span>
           )}
         </h2>
         <p className="text-sm opacity-90">

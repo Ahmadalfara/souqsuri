@@ -4,8 +4,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUserListings, Listing } from '@/services/listingService';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface UserData {
   name: string;
@@ -29,14 +28,21 @@ export const useUserProfile = () => {
 
       try {
         setLoading(true);
-        // Get user data
-        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-        if (userDoc.exists()) {
-          setUserData(userDoc.data() as UserData);
+        // Get user data from Supabase profiles table
+        const { data: profileData, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', currentUser.id) // Changed from uid to id
+          .single();
+          
+        if (error) throw error;
+        
+        if (profileData) {
+          setUserData(profileData as UserData);
         }
 
         // Get user listings
-        const listings = await getUserListings(currentUser.uid);
+        const listings = await getUserListings(currentUser.id); // Changed from uid to id
         setUserListings(listings);
       } catch (error) {
         console.error("Error fetching user data:", error);
