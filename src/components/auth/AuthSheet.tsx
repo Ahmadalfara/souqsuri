@@ -4,9 +4,11 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
+import ResetPasswordForm from './ResetPasswordForm';
 import ArabicText from '../ArabicText';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Button } from "@/components/ui/button";
 
 interface AuthSheetProps {
   children: React.ReactNode;
@@ -17,6 +19,7 @@ const AuthSheet = ({ children, side = "right" }: AuthSheetProps) => {
   const { currentUser } = useAuth();
   const { language } = useLanguage();
   const [open, setOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("login");
 
   // Close the sheet when a user logs in
   useEffect(() => {
@@ -24,6 +27,14 @@ const AuthSheet = ({ children, side = "right" }: AuthSheetProps) => {
       setOpen(false);
     }
   }, [currentUser, open]);
+
+  const handleForgotPassword = () => {
+    setActiveTab("reset");
+  };
+
+  const handleBackToLogin = () => {
+    setActiveTab("login");
+  };
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -42,30 +53,45 @@ const AuthSheet = ({ children, side = "right" }: AuthSheetProps) => {
         </SheetHeader>
         
         <div className="mt-6">
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">
-                {language === 'ar' ? (
-                  <ArabicText text="تسجيل الدخول" />
-                ) : (
-                  "Sign In"
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="register">
-                {language === 'ar' ? (
-                  <ArabicText text="إنشاء حساب" />
-                ) : (
-                  "Sign Up"
-                )}
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="login" className="mt-4">
-              <LoginForm />
-            </TabsContent>
-            <TabsContent value="register" className="mt-4">
-              <RegisterForm />
-            </TabsContent>
-          </Tabs>
+          {activeTab === "reset" ? (
+            <div>
+              <ResetPasswordForm />
+              <div className="mt-4 text-center">
+                <Button variant="link" onClick={handleBackToLogin}>
+                  {language === 'ar' ? (
+                    <ArabicText text="العودة إلى تسجيل الدخول" />
+                  ) : (
+                    "Back to Login"
+                  )}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="login">
+                  {language === 'ar' ? (
+                    <ArabicText text="تسجيل الدخول" />
+                  ) : (
+                    "Sign In"
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="register">
+                  {language === 'ar' ? (
+                    <ArabicText text="إنشاء حساب" />
+                  ) : (
+                    "Sign Up"
+                  )}
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="login" className="mt-4">
+                <LoginForm onForgotPassword={handleForgotPassword} />
+              </TabsContent>
+              <TabsContent value="register" className="mt-4">
+                <RegisterForm />
+              </TabsContent>
+            </Tabs>
+          )}
         </div>
       </SheetContent>
     </Sheet>

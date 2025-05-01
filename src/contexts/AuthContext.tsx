@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../integrations/supabase/client';
@@ -13,6 +12,8 @@ interface AuthContextType {
   register: (name: string, email: string, password: string, phone: string) => Promise<User>;
   logout: () => Promise<void>;
   updateUserProfile: (data: {[key: string]: any}) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  updatePassword: (newPassword: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -194,6 +195,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
   
+  // New password reset functionality
+  const resetPassword = async (email: string): Promise<void> => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      
+      if (error) {
+        toast({
+          title: t('error'),
+          description: error.message || t('resetPasswordFailed'),
+          variant: "destructive"
+        });
+        throw error;
+      }
+      
+      toast({
+        title: t('resetPasswordEmailSent'),
+        description: t('checkEmailForInstructions'),
+      });
+    } catch (error: any) {
+      toast({
+        title: t('error'),
+        description: error.message || t('resetPasswordFailed'),
+        variant: "destructive"
+      });
+      throw error;
+    }
+  };
+  
+  // Update password for authenticated users
+  const updatePassword = async (newPassword: string): Promise<void> => {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+      
+      if (error) {
+        toast({
+          title: t('error'),
+          description: error.message || t('passwordUpdateFailed'),
+          variant: "destructive"
+        });
+        throw error;
+      }
+      
+      toast({
+        title: t('success'),
+        description: t('passwordUpdateSuccess'),
+      });
+    } catch (error: any) {
+      toast({
+        title: t('error'),
+        description: error.message || t('passwordUpdateFailed'),
+        variant: "destructive"
+      });
+      throw error;
+    }
+  };
+  
   const value = {
     currentUser,
     session,
@@ -201,7 +262,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     login,
     register,
     logout,
-    updateUserProfile
+    updateUserProfile,
+    resetPassword,
+    updatePassword
   };
   
   return (
