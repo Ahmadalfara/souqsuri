@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -97,6 +98,22 @@ const ListingForm = () => {
     setIsSubmitting(true);
     
     try {
+      // Make sure the category is not empty
+      if (!values.category) {
+        toast({
+          title: language === 'ar' ? "خطأ" : "Error",
+          description: language === 'ar' 
+            ? "يرجى اختيار فئة للإعلان" 
+            : "Please select a category for your listing",
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        document.dispatchEvent(new CustomEvent('set-submitting', { 
+          detail: { submitting: false }
+        }));
+        return;
+      }
+      
       const listingData = {
         title: values.title,
         description: values.description || " ", // Provide a space if empty
@@ -263,7 +280,7 @@ const ListingForm = () => {
                 </FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  defaultValue={field.value || "SYP"}
                 >
                   <FormControl>
                     <SelectTrigger>

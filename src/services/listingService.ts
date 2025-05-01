@@ -1,3 +1,4 @@
+
 import { 
   collection, 
   addDoc, 
@@ -15,6 +16,7 @@ import {
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../lib/firebase';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface Listing {
   id?: string;
@@ -56,6 +58,24 @@ export const addListing = async (listing: Omit<Listing, 'id' | 'createdAt' | 'ac
       views: 0,
       currency: listing.currency || 'SYP'
     };
+    
+    // Try to save user's phone number from profile if available
+    try {
+      if (listing.userId && listing.userId !== 'guest') {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('phone')
+          .eq('id', listing.userId)
+          .single();
+          
+        if (profileData?.phone) {
+          listingData.userPhone = profileData.phone;
+        }
+      }
+    } catch (profileError) {
+      console.log('Could not fetch user phone from profile:', profileError);
+      // Continue without the phone number
+    }
     
     const docRef = await addDoc(collection(db, 'listings'), listingData);
     return docRef.id;
