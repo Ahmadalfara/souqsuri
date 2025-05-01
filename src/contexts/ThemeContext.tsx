@@ -1,6 +1,7 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type Theme = 'light' | 'dark';
 
@@ -24,18 +25,19 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Check for system dark mode preference
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const systemTheme: Theme = prefersDarkMode ? 'dark' : 'light';
+  const isMobile = useIsMobile();
   
   const [theme, setThemeState] = useState<Theme>(() => {
     // Check if theme preference is saved in localStorage
     const savedTheme = localStorage.getItem('theme') as Theme;
     
-    // If user has a saved preference, use it; otherwise use system preference
+    // If user has a saved preference, use it
     if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
       return savedTheme;
     }
     
-    // Use system preference as default
-    return systemTheme;
+    // Always default to light theme, regardless of system preference
+    return 'light';
   });
 
   useEffect(() => {
@@ -50,14 +52,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  // Update theme if system preference changes
-  useEffect(() => {
-    // Only update if the user hasn't explicitly chosen a theme
-    if (!localStorage.getItem('theme')) {
-      setThemeState(systemTheme);
-    }
-  }, [systemTheme]);
-
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
     localStorage.setItem('theme', newTheme);
@@ -66,6 +60,18 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   };
+  
+  // If on mobile and dark mode isn't available, make it available
+  useEffect(() => {
+    if (isMobile) {
+      // Make dark mode available, but don't switch to it automatically
+      // The user can still choose dark mode if they prefer
+      const darkModeBtn = document.getElementById('dark-mode-toggle');
+      if (darkModeBtn) {
+        darkModeBtn.classList.remove('hidden');
+      }
+    }
+  }, [isMobile]);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, systemTheme }}>

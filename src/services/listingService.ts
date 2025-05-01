@@ -35,6 +35,7 @@ export interface Listing {
   views: number;
   condition?: string; // new, used
   urgent?: boolean;
+  language?: string; // Add language field to track listing language
 }
 
 export const addListing = async (listing: Omit<Listing, 'id' | 'createdAt' | 'active' | 'views'>, imageFiles: File[]): Promise<string> => {
@@ -56,7 +57,8 @@ export const addListing = async (listing: Omit<Listing, 'id' | 'createdAt' | 'ac
       createdAt: serverTimestamp(),
       active: true,
       views: 0,
-      currency: listing.currency || 'SYP'
+      currency: listing.currency || 'SYP',
+      language: localStorage.getItem('language') || 'ar' // Store current language with listing
     };
     
     // Try to save user's phone number from profile if available
@@ -187,11 +189,11 @@ export const searchListings = async (params: {
       where('active', '==', true)
     ];
     
-    if (params.category) {
+    if (params.category && params.category !== 'all') {
       constraints.push(where('category', '==', params.category));
     }
     
-    if (params.location) {
+    if (params.location && params.location !== 'all') {
       constraints.push(where('location', '==', params.location));
     }
     
@@ -266,6 +268,23 @@ export const searchListings = async (params: {
     if (params.currency) {
       results = results.filter(listing => listing.currency === params.currency);
     }
+    
+    // Get current language
+    const currentLanguage = localStorage.getItem('language') || 'ar';
+    
+    // Sort results to show listings in current language first
+    results.sort((a, b) => {
+      // If both have same language or no language specified, maintain previous sort order
+      if ((!a.language && !b.language) || (a.language === b.language)) {
+        return 0;
+      }
+      
+      // Push listings in current language to the top
+      if (a.language === currentLanguage) return -1;
+      if (b.language === currentLanguage) return 1;
+      
+      return 0;
+    });
     
     return results;
   } catch (error) {

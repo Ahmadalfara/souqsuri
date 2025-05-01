@@ -1,13 +1,15 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, LogOut } from 'lucide-react';
+import { User, LogOut, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ArabicText from '@/components/ArabicText';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import ThemeSwitcher from '@/components/ThemeSwitcher';
 import AuthSheet from '@/components/auth/AuthSheet';
 import CreateListingSheet from '@/components/listings/CreateListingSheet';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface MobileMenuProps {
@@ -17,6 +19,7 @@ interface MobileMenuProps {
 const MobileMenu = ({ isOpen }: MobileMenuProps) => {
   const { language, t } = useLanguage();
   const { currentUser, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -33,7 +36,10 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
   return (
     <div className="md:hidden py-4 border-t border-syrian-green/10">
       <div className="flex flex-col space-y-4">
-        <LanguageSwitcher className="self-start" />
+        <div className="flex justify-between">
+          <LanguageSwitcher className="self-start" />
+          <ThemeSwitcher id="dark-mode-toggle" className="self-start" />
+        </div>
         
         {currentUser ? (
           <>

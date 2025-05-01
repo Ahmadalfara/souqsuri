@@ -96,6 +96,33 @@ const translations: Record<string, Record<string, string>> = {
     'lessOptions': 'عرض أقل',
     'advancedSearch': 'بحث متقدم',
     
+    // Syrian Governorates
+    'damascus': 'دمشق',
+    'damascusCountryside': 'ريف دمشق',
+    'aleppo': 'حلب',
+    'homs': 'حمص',
+    'hama': 'حماة',
+    'latakia': 'اللاذقية',
+    'tartus': 'طرطوس',
+    'idlib': 'إدلب',
+    'raqqa': 'الرقة',
+    'deirEzzor': 'دير الزور',
+    'hasaka': 'الحسكة',
+    'daraa': 'درعا',
+    'sweida': 'السويداء',
+    'quneitra': 'القنيطرة',
+    'otherLocation': 'مناطق أخرى',
+    
+    // Areas
+    'selectArea': 'اختر المنطقة',
+    'allAreas': 'جميع المناطق',
+    'cityCenter': 'وسط المدينة',
+    'northernArea': 'المنطقة الشمالية',
+    'southernArea': 'المنطقة الجنوبية',
+    'easternArea': 'المنطقة الشرقية',
+    'westernArea': 'المنطقة الغربية',
+    'suburbs': 'الضواحي',
+    
     // Misc
     'active': 'نشط',
     'inactive': 'غير نشط',
@@ -122,6 +149,8 @@ const translations: Record<string, Record<string, string>> = {
     'success': 'تم بنجاح',
     'error': 'حدث خطأ',
     'required': 'مطلوب',
+    'successfullyPublished': 'تم نشر الإعلان بنجاح!',
+    'errorPublishing': 'حدث خطأ أثناء نشر الإعلان',
     
     // Website description
     'siteDescription': 'منصة إعلانات مبوبة سورية تتيح للمستخدمين بيع وشراء المنتجات والخدمات بسهولة وأمان.',
@@ -243,6 +272,33 @@ const translations: Record<string, Record<string, string>> = {
     'lessOptions': 'Less options',
     'advancedSearch': 'Advanced Search',
     
+    // Syrian Governorates
+    'damascus': 'Damascus',
+    'damascusCountryside': 'Damascus Countryside',
+    'aleppo': 'Aleppo',
+    'homs': 'Homs',
+    'hama': 'Hama',
+    'latakia': 'Latakia',
+    'tartus': 'Tartus',
+    'idlib': 'Idlib',
+    'raqqa': 'Raqqa',
+    'deirEzzor': 'Deir ez-Zor',
+    'hasaka': 'Hasaka',
+    'daraa': 'Daraa',
+    'sweida': 'Sweida',
+    'quneitra': 'Quneitra',
+    'otherLocation': 'Other Locations',
+    
+    // Areas
+    'selectArea': 'Select Area',
+    'allAreas': 'All Areas',
+    'cityCenter': 'City Center',
+    'northernArea': 'Northern Area',
+    'southernArea': 'Southern Area',
+    'easternArea': 'Eastern Area',
+    'westernArea': 'Western Area',
+    'suburbs': 'Suburbs',
+    
     // Misc
     'active': 'Active',
     'inactive': 'Inactive',
@@ -269,6 +325,8 @@ const translations: Record<string, Record<string, string>> = {
     'success': 'Success',
     'error': 'Error',
     'required': 'Required',
+    'successfullyPublished': 'Listing successfully published!',
+    'errorPublishing': 'Error publishing listing',
     
     // Website description
     'siteDescription': 'A Syrian classified ads platform that allows users to buy and sell products and services easily and safely.',

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,11 +17,13 @@ import ArabicText from '../ArabicText';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Filter, X, ChevronDown, ChevronUp, DollarSign } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ListingFiltersProps {
   onFilter: (filters: {
     priceRange: [number, number];
     location: string;
+    area?: string;
     sortBy: string;
     keywords?: string;
     category?: string;
@@ -34,15 +36,41 @@ interface ListingFiltersProps {
 
 const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
   const { language, t } = useLanguage();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const isMobile = useIsMobile();
+  const [isExpanded, setIsExpanded] = useState(!isMobile);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [location, setLocation] = useState<string>('');
+  const [area, setArea] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('newest');
   const [keywords, setKeywords] = useState<string>('');
   const [category, setCategory] = useState<string>('');
   const [condition, setCondition] = useState<string[]>([]);
   const [urgent, setUrgent] = useState<boolean>(false);
   const [currency, setCurrency] = useState<string>('SYP');
+  const [availableAreas, setAvailableAreas] = useState<string[]>([]);
+
+  // Update areas when governorate changes
+  useEffect(() => {
+    if (location && location !== 'all') {
+      // In a real app, this would come from an API or a more comprehensive dataset
+      // Here we're just using some sample areas for different governorates
+      const areasByGovernorate: Record<string, string[]> = {
+        'damascus': ['cityCenter', 'easternArea', 'westernArea', 'southernArea', 'northernArea'],
+        'damascusCountryside': ['douma', 'harasta', 'ghouta', 'zabadani', 'bludan'],
+        'aleppo': ['cityCenter', 'azaz', 'afrin', 'jarabulus', 'albab'],
+        'homs': ['cityCenter', 'talkalakh', 'qusayr', 'palmyra'],
+        'hama': ['cityCenter', 'salamiyah', 'masyaf', 'mahardeh'],
+        'latakia': ['cityCenter', 'jableh', 'qardaha', 'kasab'],
+        'tartus': ['cityCenter', 'banyas', 'safita', 'arwad'],
+      };
+      
+      // Set available areas based on governorate
+      setAvailableAreas(areasByGovernorate[location] || []);
+    } else {
+      setAvailableAreas([]);
+      setArea('');
+    }
+  }, [location]);
 
   const handleConditionChange = (value: string) => {
     setCondition(prev => 
@@ -56,6 +84,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
     onFilter({
       priceRange,
       location,
+      area,
       sortBy,
       keywords,
       category,
@@ -68,6 +97,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
   const handleResetFilters = () => {
     setPriceRange([0, 10000]);
     setLocation('');
+    setArea('');
     setSortBy('newest');
     setKeywords('');
     setCategory('');
@@ -88,31 +118,33 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
         <h3 className="font-bold text-syrian-dark flex items-center">
           <Filter className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
           {language === 'ar' ? (
-            <ArabicText text="فلترة النتائج" />
+            <ArabicText text={t('filterResults')} />
           ) : (
             t('filterResults')
           )}
         </h3>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="text-sm flex items-center"
-        >
-          {isExpanded ? (
-            <ChevronUp className="h-4 w-4 mr-1" />
-          ) : (
-            <ChevronDown className="h-4 w-4 mr-1" />
-          )}
-          {language === 'ar' ? (
-            <ArabicText text={isExpanded ? t('lessOptions') : t('moreOptions')} />
-          ) : (
-            isExpanded ? t('lessOptions') : t('moreOptions')
-          )}
-        </Button>
+        {isMobile && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-sm flex items-center"
+          >
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4 mr-1" />
+            ) : (
+              <ChevronDown className="h-4 w-4 mr-1" />
+            )}
+            {language === 'ar' ? (
+              <ArabicText text={isExpanded ? t('lessOptions') : t('moreOptions')} />
+            ) : (
+              isExpanded ? t('lessOptions') : t('moreOptions')
+            )}
+          </Button>
+        )}
       </div>
 
-      <div className={`p-4 space-y-6 ${isExpanded ? 'block' : 'block'}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+      <div className={`p-4 space-y-6 ${isExpanded ? 'block' : (isMobile ? 'hidden' : 'block')}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
         {/* Keywords */}
         <div className="space-y-2">
           <Label className={language === 'ar' ? 'block text-right' : ''}>
@@ -145,37 +177,51 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
             <SelectContent>
               <SelectItem value="all">
                 {language === 'ar' ? (
-                  <ArabicText text="جميع الفئات" />
+                  <ArabicText text={t('allCategories')} />
                 ) : (
                   "All Categories"
                 )}
               </SelectItem>
               <SelectItem value="real_estate">
                 {language === 'ar' ? (
-                  <ArabicText text="عقارات" />
+                  <ArabicText text={t('realEstate')} />
                 ) : (
-                  "Real Estate"
+                  t('realEstate')
                 )}
               </SelectItem>
               <SelectItem value="cars">
                 {language === 'ar' ? (
-                  <ArabicText text="سيارات" />
+                  <ArabicText text={t('cars')} />
                 ) : (
-                  "Cars"
+                  t('cars')
                 )}
               </SelectItem>
               <SelectItem value="electronics">
                 {language === 'ar' ? (
-                  <ArabicText text="إلكترونيات" />
+                  <ArabicText text={t('electronics')} />
                 ) : (
-                  "Electronics"
+                  t('electronics')
                 )}
               </SelectItem>
               <SelectItem value="furniture">
                 {language === 'ar' ? (
-                  <ArabicText text="أثاث" />
+                  <ArabicText text={t('furniture')} />
                 ) : (
-                  "Furniture"
+                  t('furniture')
+                )}
+              </SelectItem>
+              <SelectItem value="jobs">
+                {language === 'ar' ? (
+                  <ArabicText text={t('jobs')} />
+                ) : (
+                  t('jobs')
+                )}
+              </SelectItem>
+              <SelectItem value="services">
+                {language === 'ar' ? (
+                  <ArabicText text={t('services')} />
+                ) : (
+                  t('services')
                 )}
               </SelectItem>
             </SelectContent>
@@ -186,26 +232,26 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
         <div className="space-y-2">
           <Label className={language === 'ar' ? 'block text-right' : ''}>
             {language === 'ar' ? (
-              <ArabicText text="العملة" />
+              <ArabicText text={t('currency')} />
             ) : (
-              "Currency"
+              t('currency')
             )}
           </Label>
           <RadioGroup 
             value={currency} 
             onValueChange={setCurrency}
-            className="flex space-x-4"
+            className="flex space-x-4 rtl:space-x-reverse"
           >
-            <div className="flex items-center space-x-2">
+            <div className={`flex items-center ${language === 'ar' ? 'space-x-reverse' : ''} space-x-2`}>
               <RadioGroupItem value="SYP" id="currency-syp" />
               <Label htmlFor="currency-syp">
-                {language === 'ar' ? "ل.س" : "SYP"}
+                {language === 'ar' ? t('syrianPound') : t('syrianPound')}
               </Label>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className={`flex items-center ${language === 'ar' ? 'space-x-reverse' : ''} space-x-2`}>
               <RadioGroupItem value="USD" id="currency-usd" />
               <Label htmlFor="currency-usd" className="flex items-center">
-                <DollarSign className="h-4 w-4 mr-1" />
+                <DollarSign className={`h-4 w-4 ${language === 'ar' ? 'ml-1' : 'mr-1'}`} />
                 USD
               </Label>
             </div>
@@ -241,7 +287,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
             className="py-4"
           />
 
-          <div className="flex space-x-4 pt-2">
+          <div className={`flex ${language === 'ar' ? 'space-x-reverse' : ''} space-x-4 pt-2`}>
             <Input
               type="number"
               value={priceRange[0]}
@@ -259,7 +305,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
           </div>
         </div>
         
-        {/* Location */}
+        {/* Location - Governorate */}
         <div className="space-y-2">
           <Label className={language === 'ar' ? 'block text-right' : ''}>
             {language === 'ar' ? (
@@ -282,35 +328,141 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
               </SelectItem>
               <SelectItem value="damascus">
                 {language === 'ar' ? (
-                  <ArabicText text="دمشق" />
+                  <ArabicText text={t('damascus')} />
                 ) : (
-                  "Damascus"
+                  t('damascus')
+                )}
+              </SelectItem>
+              <SelectItem value="damascusCountryside">
+                {language === 'ar' ? (
+                  <ArabicText text={t('damascusCountryside')} />
+                ) : (
+                  t('damascusCountryside')
                 )}
               </SelectItem>
               <SelectItem value="aleppo">
                 {language === 'ar' ? (
-                  <ArabicText text="حلب" />
+                  <ArabicText text={t('aleppo')} />
                 ) : (
-                  "Aleppo"
+                  t('aleppo')
                 )}
               </SelectItem>
               <SelectItem value="homs">
                 {language === 'ar' ? (
-                  <ArabicText text="حمص" />
+                  <ArabicText text={t('homs')} />
                 ) : (
-                  "Homs"
+                  t('homs')
+                )}
+              </SelectItem>
+              <SelectItem value="hama">
+                {language === 'ar' ? (
+                  <ArabicText text={t('hama')} />
+                ) : (
+                  t('hama')
                 )}
               </SelectItem>
               <SelectItem value="latakia">
                 {language === 'ar' ? (
-                  <ArabicText text="اللاذقية" />
+                  <ArabicText text={t('latakia')} />
                 ) : (
-                  "Latakia"
+                  t('latakia')
+                )}
+              </SelectItem>
+              <SelectItem value="tartus">
+                {language === 'ar' ? (
+                  <ArabicText text={t('tartus')} />
+                ) : (
+                  t('tartus')
+                )}
+              </SelectItem>
+              <SelectItem value="idlib">
+                {language === 'ar' ? (
+                  <ArabicText text={t('idlib')} />
+                ) : (
+                  t('idlib')
+                )}
+              </SelectItem>
+              <SelectItem value="raqqa">
+                {language === 'ar' ? (
+                  <ArabicText text={t('raqqa')} />
+                ) : (
+                  t('raqqa')
+                )}
+              </SelectItem>
+              <SelectItem value="deirEzzor">
+                {language === 'ar' ? (
+                  <ArabicText text={t('deirEzzor')} />
+                ) : (
+                  t('deirEzzor')
+                )}
+              </SelectItem>
+              <SelectItem value="hasaka">
+                {language === 'ar' ? (
+                  <ArabicText text={t('hasaka')} />
+                ) : (
+                  t('hasaka')
+                )}
+              </SelectItem>
+              <SelectItem value="daraa">
+                {language === 'ar' ? (
+                  <ArabicText text={t('daraa')} />
+                ) : (
+                  t('daraa')
+                )}
+              </SelectItem>
+              <SelectItem value="sweida">
+                {language === 'ar' ? (
+                  <ArabicText text={t('sweida')} />
+                ) : (
+                  t('sweida')
+                )}
+              </SelectItem>
+              <SelectItem value="quneitra">
+                {language === 'ar' ? (
+                  <ArabicText text={t('quneitra')} />
+                ) : (
+                  t('quneitra')
                 )}
               </SelectItem>
             </SelectContent>
           </Select>
         </div>
+        
+        {/* Area - only show if governorate is selected */}
+        {location && location !== 'all' && availableAreas.length > 0 && (
+          <div className="space-y-2">
+            <Label className={language === 'ar' ? 'block text-right' : ''}>
+              {language === 'ar' ? (
+                <ArabicText text={t('selectArea')} />
+              ) : (
+                t('selectArea')
+              )}
+            </Label>
+            <Select value={area} onValueChange={setArea}>
+              <SelectTrigger>
+                <SelectValue placeholder={language === 'ar' ? "اختر المنطقة" : "Select area"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">
+                  {language === 'ar' ? (
+                    <ArabicText text={t('allAreas')} />
+                  ) : (
+                    t('allAreas')
+                  )}
+                </SelectItem>
+                {availableAreas.map(areaOption => (
+                  <SelectItem key={areaOption} value={areaOption}>
+                    {language === 'ar' ? (
+                      <ArabicText text={t(areaOption)} />
+                    ) : (
+                      t(areaOption)
+                    )}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         
         {/* Sort By */}
         <div className="space-y-2">
@@ -364,13 +516,13 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
             <div className="space-y-2">
               <Label className={language === 'ar' ? 'block text-right' : ''}>
                 {language === 'ar' ? (
-                  <ArabicText text="الحالة" />
+                  <ArabicText text={t('condition')} />
                 ) : (
-                  "Condition"
+                  t('condition')
                 )}
               </Label>
               <div className="space-y-2">
-                <div className="flex items-center space-x-2">
+                <div className={`flex items-center ${language === 'ar' ? 'space-x-reverse' : ''} space-x-2`}>
                   <Checkbox 
                     id="condition-new" 
                     checked={condition.includes('new')}
@@ -381,13 +533,13 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
                     {language === 'ar' ? (
-                      <ArabicText text="جديد" />
+                      <ArabicText text={t('new')} />
                     ) : (
-                      "New"
+                      t('new')
                     )}
                   </label>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className={`flex items-center ${language === 'ar' ? 'space-x-reverse' : ''} space-x-2`}>
                   <Checkbox 
                     id="condition-used" 
                     checked={condition.includes('used')}
@@ -398,9 +550,9 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
                     {language === 'ar' ? (
-                      <ArabicText text="مستعمل" />
+                      <ArabicText text={t('used')} />
                     ) : (
-                      "Used"
+                      t('used')
                     )}
                   </label>
                 </div>
@@ -408,7 +560,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
             </div>
             
             {/* Urgent checkbox */}
-            <div className="flex items-center space-x-2">
+            <div className={`flex items-center ${language === 'ar' ? 'space-x-reverse' : ''} space-x-2`}>
               <Checkbox 
                 id="urgent" 
                 checked={urgent}
@@ -428,7 +580,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
           </>
         )}
         
-        <div className="pt-2 flex flex-wrap gap-2">
+        <div className={`pt-2 flex flex-wrap gap-2 ${language === 'ar' ? 'space-x-reverse' : ''}`}>
           <Button 
             onClick={handleApplyFilters}
             className="flex-1 bg-syrian-green hover:bg-syrian-dark"
@@ -445,7 +597,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
             onClick={handleResetFilters}
             className="flex items-center"
           >
-            <X className="h-4 w-4 mr-1" />
+            <X className={`h-4 w-4 ${language === 'ar' ? 'ml-1' : 'mr-1'}`} />
             {language === 'ar' ? (
               <ArabicText text={t('reset')} />
             ) : (

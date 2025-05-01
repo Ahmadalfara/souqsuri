@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,6 +21,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { addListing } from '@/services/listingService';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
+import { Checkbox } from "@/components/ui/checkbox";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Define the form schema with more relaxed validation
 const formSchema = z.object({
@@ -32,10 +34,13 @@ const formSchema = z.object({
     message: "Price is required",
   }),
   location: z.string().optional(),
+  area: z.string().optional(),
   category: z.string({
     required_error: "Category is required",
   }),
   currency: z.string().default("SYP"),
+  condition: z.enum(['new', 'used']).optional(),
+  urgent: z.boolean().default(false),
 });
 
 const ListingForm = () => {
@@ -43,9 +48,12 @@ const ListingForm = () => {
   const { currentUser } = useAuth();
   const { language, t } = useLanguage();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [images, setImages] = useState<File[]>([]);
   const [imagePreview, setImagePreview] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedGovernorate, setSelectedGovernorate] = useState<string>("");
+  const [availableAreas, setAvailableAreas] = useState<string[]>([]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,10 +62,42 @@ const ListingForm = () => {
       description: "",
       price: "",
       location: "",
+      area: "",
       category: "",
       currency: "SYP",
+      condition: undefined,
+      urgent: false,
     },
   });
+
+  // Update areas when governorate changes
+  useEffect(() => {
+    if (selectedGovernorate) {
+      // In a real app, this would come from an API or a more comprehensive dataset
+      // Here we're just using some sample areas for different governorates
+      const areasByGovernorate: Record<string, string[]> = {
+        'damascus': ['cityCenter', 'easternArea', 'westernArea', 'southernArea', 'northernArea'],
+        'damascusCountryside': ['douma', 'harasta', 'ghouta', 'zabadani', 'bludan'],
+        'aleppo': ['cityCenter', 'azaz', 'afrin', 'jarabulus', 'albab'],
+        'homs': ['cityCenter', 'talkalakh', 'qusayr', 'palmyra'],
+        'hama': ['cityCenter', 'salamiyah', 'masyaf', 'mahardeh'],
+        'latakia': ['cityCenter', 'jableh', 'qardaha', 'kasab'],
+        'tartus': ['cityCenter', 'banyas', 'safita', 'arwad'],
+      };
+      
+      // Set available areas based on governorate
+      setAvailableAreas(areasByGovernorate[selectedGovernorate] || []);
+      
+      // Set the location field
+      form.setValue('location', selectedGovernorate);
+    } else {
+      setAvailableAreas([]);
+      form.setValue('location', '');
+    }
+    
+    // Clear area field when governorate changes
+    form.setValue('area', '');
+  }, [selectedGovernorate, form]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -114,15 +154,22 @@ const ListingForm = () => {
         return;
       }
       
+      // Build full location with area if available
+      const fullLocation = values.area 
+        ? `${values.location}${values.area ? ' - ' + t(values.area) : ''}`
+        : values.location;
+      
       const listingData = {
         title: values.title,
         description: values.description || " ", // Provide a space if empty
         price: values.price,
         currency: values.currency || "SYP", // Ensure currency has a default value
-        location: values.location || " ", // Provide a space if empty
+        location: fullLocation || " ", // Provide a space if empty
         category: values.category,
         userId: currentUser?.id || 'guest',
         userName: currentUser?.user_metadata?.name || "Guest User",
+        condition: values.condition,
+        urgent: values.urgent,
         images: []
       };
       
@@ -131,10 +178,10 @@ const ListingForm = () => {
       const listingId = await addListing(listingData, images);
       
       toast({
-        title: language === 'ar' ? "تم إضافة الإعلان" : "Listing Added",
+        title: language === 'ar' ? t('success') : t('success'),
         description: language === 'ar' 
-          ? "تم إضافة إعلانك بنجاح" 
-          : "Your listing has been added successfully",
+          ? t('successfullyPublished')
+          : t('successfullyPublished'),
       });
       
       // Reset form
@@ -153,10 +200,10 @@ const ListingForm = () => {
     } catch (error) {
       console.error('Error creating listing:', error);
       toast({
-        title: language === 'ar' ? "خطأ" : "Error",
+        title: language === 'ar' ? t('error') : t('error'),
         description: language === 'ar' 
-          ? "حدث خطأ أثناء إضافة الإعلان. حاول مرة أخرى" 
-          : "An error occurred while adding your listing. Please try again",
+          ? t('errorPublishing')
+          : t('errorPublishing'),
         variant: "destructive"
       });
     } finally {
@@ -178,9 +225,9 @@ const ListingForm = () => {
             <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
               <FormLabel>
                 {language === 'ar' ? (
-                  <ArabicText text="عنوان الإعلان" />
+                  <ArabicText text={t('listingTitle')} />
                 ) : (
-                  "Listing Title"
+                  t('listingTitle')
                 )}
               </FormLabel>
               <FormControl>
@@ -201,9 +248,9 @@ const ListingForm = () => {
             <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
               <FormLabel>
                 {language === 'ar' ? (
-                  <ArabicText text="الفئة" />
+                  <ArabicText text={t('category')} />
                 ) : (
-                  "Category"
+                  t('category')
                 )}
               </FormLabel>
               <Select
@@ -217,22 +264,22 @@ const ListingForm = () => {
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="real_estate">
-                    {language === 'ar' ? "عقارات" : "Real Estate"}
+                    {language === 'ar' ? t('realEstate') : t('realEstate')}
                   </SelectItem>
                   <SelectItem value="cars">
-                    {language === 'ar' ? "سيارات" : "Cars"}
+                    {language === 'ar' ? t('cars') : t('cars')}
                   </SelectItem>
                   <SelectItem value="electronics">
-                    {language === 'ar' ? "إلكترونيات" : "Electronics"}
+                    {language === 'ar' ? t('electronics') : t('electronics')}
                   </SelectItem>
                   <SelectItem value="furniture">
-                    {language === 'ar' ? "أثاث" : "Furniture"}
+                    {language === 'ar' ? t('furniture') : t('furniture')}
                   </SelectItem>
                   <SelectItem value="jobs">
-                    {language === 'ar' ? "وظائف" : "Jobs"}
+                    {language === 'ar' ? t('jobs') : t('jobs')}
                   </SelectItem>
                   <SelectItem value="services">
-                    {language === 'ar' ? "خدمات" : "Services"}
+                    {language === 'ar' ? t('services') : t('services')}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -241,17 +288,120 @@ const ListingForm = () => {
           )}
         />
         
-        <div className="flex space-x-4">
+        {/* Location - Governorate selection */}
+        <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
+          <FormLabel>
+            {language === 'ar' ? (
+              <ArabicText text={t('location')} />
+            ) : (
+              t('location')
+            )}
+          </FormLabel>
+          <Select
+            value={selectedGovernorate}
+            onValueChange={setSelectedGovernorate}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={language === 'ar' ? "اختر المحافظة" : "Select governorate"} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="damascus">
+                {language === 'ar' ? t('damascus') : t('damascus')}
+              </SelectItem>
+              <SelectItem value="damascusCountryside">
+                {language === 'ar' ? t('damascusCountryside') : t('damascusCountryside')}
+              </SelectItem>
+              <SelectItem value="aleppo">
+                {language === 'ar' ? t('aleppo') : t('aleppo')}
+              </SelectItem>
+              <SelectItem value="homs">
+                {language === 'ar' ? t('homs') : t('homs')}
+              </SelectItem>
+              <SelectItem value="hama">
+                {language === 'ar' ? t('hama') : t('hama')}
+              </SelectItem>
+              <SelectItem value="latakia">
+                {language === 'ar' ? t('latakia') : t('latakia')}
+              </SelectItem>
+              <SelectItem value="tartus">
+                {language === 'ar' ? t('tartus') : t('tartus')}
+              </SelectItem>
+              <SelectItem value="idlib">
+                {language === 'ar' ? t('idlib') : t('idlib')}
+              </SelectItem>
+              <SelectItem value="raqqa">
+                {language === 'ar' ? t('raqqa') : t('raqqa')}
+              </SelectItem>
+              <SelectItem value="deirEzzor">
+                {language === 'ar' ? t('deirEzzor') : t('deirEzzor')}
+              </SelectItem>
+              <SelectItem value="hasaka">
+                {language === 'ar' ? t('hasaka') : t('hasaka')}
+              </SelectItem>
+              <SelectItem value="daraa">
+                {language === 'ar' ? t('daraa') : t('daraa')}
+              </SelectItem>
+              <SelectItem value="sweida">
+                {language === 'ar' ? t('sweida') : t('sweida')}
+              </SelectItem>
+              <SelectItem value="quneitra">
+                {language === 'ar' ? t('quneitra') : t('quneitra')}
+              </SelectItem>
+              <SelectItem value="otherLocation">
+                {language === 'ar' ? t('otherLocation') : t('otherLocation')}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </FormItem>
+
+        {/* Area selection - only show if governorate is selected */}
+        {selectedGovernorate && availableAreas.length > 0 && (
+          <FormField
+            control={form.control}
+            name="area"
+            render={({ field }) => (
+              <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
+                <FormLabel>
+                  {language === 'ar' ? (
+                    <ArabicText text={t('selectArea')} />
+                  ) : (
+                    t('selectArea')
+                  )}
+                </FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={language === 'ar' ? "اختر المنطقة" : "Select area"} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {availableAreas.map(area => (
+                      <SelectItem key={area} value={area}>
+                        {language === 'ar' ? t(area) : t(area)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage className={language === 'ar' ? "rtl" : ""} />
+              </FormItem>
+            )}
+          />
+        )}
+        
+        <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'space-x-4'}`}>
           <FormField
             control={form.control}
             name="price"
             render={({ field }) => (
-              <FormItem dir={language === 'ar' ? "rtl" : "ltr"} className="flex-1">
+              <FormItem dir={language === 'ar' ? "rtl" : "ltr"} className={isMobile ? "w-full" : "flex-1"}>
                 <FormLabel>
                   {language === 'ar' ? (
-                    <ArabicText text="السعر" />
+                    <ArabicText text={t('price')} />
                   ) : (
-                    "Price"
+                    t('price')
                   )}
                 </FormLabel>
                 <FormControl>
@@ -270,12 +420,12 @@ const ListingForm = () => {
             control={form.control}
             name="currency"
             render={({ field }) => (
-              <FormItem dir={language === 'ar' ? "rtl" : "ltr"} className="w-1/3">
+              <FormItem dir={language === 'ar' ? "rtl" : "ltr"} className={isMobile ? "w-full" : "w-1/3"}>
                 <FormLabel>
                   {language === 'ar' ? (
-                    <ArabicText text="العملة" />
+                    <ArabicText text={t('currency')} />
                   ) : (
-                    "Currency"
+                    t('currency')
                   )}
                 </FormLabel>
                 <Select
@@ -289,7 +439,7 @@ const ListingForm = () => {
                   </FormControl>
                   <SelectContent>
                     <SelectItem value="SYP">
-                      {language === 'ar' ? "ل.س" : "SYP"}
+                      {language === 'ar' ? t('syrianPound') : t('syrianPound')}
                     </SelectItem>
                     <SelectItem value="USD">
                       <span className="flex items-center">
@@ -312,9 +462,9 @@ const ListingForm = () => {
             <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
               <FormLabel>
                 {language === 'ar' ? (
-                  <ArabicText text="وصف الإعلان" />
+                  <ArabicText text={t('description')} />
                 ) : (
-                  "Description"
+                  t('description')
                 )}
               </FormLabel>
               <FormControl>
@@ -328,36 +478,76 @@ const ListingForm = () => {
             </FormItem>
           )}
         />
-        
-        <FormField
-          control={form.control}
-          name="location"
-          render={({ field }) => (
-            <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
-              <FormLabel>
-                {language === 'ar' ? (
-                  <ArabicText text="الموقع" />
-                ) : (
-                  "Location"
-                )}
-              </FormLabel>
-              <FormControl>
-                <Input 
-                  placeholder={language === 'ar' ? "المدينة، المنطقة" : "City, Area"} 
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage className={language === 'ar' ? "rtl" : ""} />
-            </FormItem>
-          )}
-        />
+
+        <div className="space-y-4" dir={language === 'ar' ? "rtl" : "ltr"}>
+          <FormField
+            control={form.control}
+            name="condition"
+            render={({ field }) => (
+              <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
+                <FormLabel>
+                  {language === 'ar' ? (
+                    <ArabicText text={t('condition')} />
+                  ) : (
+                    t('condition')
+                  )}
+                </FormLabel>
+                <div className="flex space-x-4">
+                  <Select
+                    onValueChange={(value) => field.onChange(value as 'new' | 'used')}
+                    value={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={language === 'ar' ? "اختر الحالة" : "Select condition"} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="new">
+                        {language === 'ar' ? t('new') : t('new')}
+                      </SelectItem>
+                      <SelectItem value="used">
+                        {language === 'ar' ? t('used') : t('used')}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <FormMessage className={language === 'ar' ? "rtl" : ""} />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="urgent"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>
+                    {language === 'ar' ? (
+                      <ArabicText text={t('urgent')} />
+                    ) : (
+                      t('urgent')
+                    )}
+                  </FormLabel>
+                </div>
+              </FormItem>
+            )}
+          />
+        </div>
         
         <div className="space-y-2" dir={language === 'ar' ? "rtl" : "ltr"}>
           <FormLabel>
             {language === 'ar' ? (
-              <ArabicText text="صور الإعلان" />
+              <ArabicText text={t('images')} />
             ) : (
-              "Listing Images"
+              t('images')
             )}
           </FormLabel>
           
@@ -385,9 +575,9 @@ const ListingForm = () => {
                   <Camera className="h-6 w-6 text-syrian-green" />
                   <span className="text-xs mt-1">
                     {language === 'ar' ? (
-                      <ArabicText text="أضف صورة" />
+                      <ArabicText text={t('addImage')} />
                     ) : (
-                      "Add Image"
+                      t('addImage')
                     )}
                   </span>
                 </div>
@@ -411,16 +601,16 @@ const ListingForm = () => {
             <>
               <Loader2 className="animate-spin h-4 w-4 mr-2" />
               {language === 'ar' ? (
-                <ArabicText text="جاري النشر..." />
+                <ArabicText text={t('publishing')} />
               ) : (
-                "Publishing..."
+                t('publishing')
               )}
             </>
           ) : (
             language === 'ar' ? (
-              <ArabicText text="نشر الإعلان" />
+              <ArabicText text={t('publish')} />
             ) : (
-              "Publish Listing"
+              t('publish')
             )
           )}
         </Button>
