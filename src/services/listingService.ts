@@ -62,13 +62,15 @@ export const addListing = async (listing: Omit<Listing, 'id' | 'createdAt' | 'ac
     // Try to save user's phone number from profile if available
     try {
       if (listing.userId && listing.userId !== 'guest') {
-        const { data: profileData } = await supabase
+        const { data: profileData, error } = await supabase
           .from('profiles')
           .select('phone')
           .eq('id', listing.userId)
           .single();
           
-        if (profileData?.phone) {
+        if (error) {
+          console.log('Error fetching user profile:', error);
+        } else if (profileData?.phone) {
           listingData.userPhone = profileData.phone;
         }
       }

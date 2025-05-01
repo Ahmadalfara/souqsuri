@@ -118,7 +118,7 @@ const ListingForm = () => {
         title: values.title,
         description: values.description || " ", // Provide a space if empty
         price: values.price,
-        currency: values.currency,
+        currency: values.currency || "SYP", // Ensure currency has a default value
         location: values.location || " ", // Provide a space if empty
         category: values.category,
         userId: currentUser?.id || 'guest',
