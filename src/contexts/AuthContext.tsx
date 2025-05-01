@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../integrations/supabase/client';
@@ -68,10 +69,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const login = async (email: string, password: string): Promise<User> => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      // Determine if login is using email or phone
+      const isPhone = email.includes('@phone.user');
+      
+      let authResponse;
+      if (isPhone) {
+        // Extract phone from email format (phone@phone.user)
+        const phone = email.split('@')[0];
+        // Log in with phone number
+        authResponse = await supabase.auth.signInWithPassword({
+          phone: phone,
+          password,
+        });
+      } else {
+        // Log in with email
+        authResponse = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+      }
+      
+      const { data, error } = authResponse;
       
       if (error) {
         let errorMessage = t('loginFailed');
@@ -105,16 +123,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const register = async (name: string, email: string, password: string, phone: string): Promise<User> => {
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name,
-            phone
+      // Determine if registration is using email or phone
+      const isPhoneRegistration = email.includes('@phone.user');
+      
+      let authResponse;
+      if (isPhoneRegistration) {
+        // Extract phone from email format
+        const phoneNumber = email.split('@')[0];
+        
+        // Register with phone number
+        authResponse = await supabase.auth.signUp({
+          phone: phoneNumber,
+          password,
+          options: {
+            data: {
+              name,
+              phone: phoneNumber
+            }
           }
-        }
-      });
+        });
+      } else {
+        // Register with email
+        authResponse = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              name,
+              phone
+            }
+          }
+        });
+      }
+      
+      const { data, error } = authResponse;
       
       if (error) {
         let errorMessage = t('registrationFailed');
