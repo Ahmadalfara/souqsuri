@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -86,6 +85,22 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
   const clearSearch = () => {
     setSearchQuery('');
     setShowResults(false);
+  };
+
+  // This function handles the "View all results" button click correctly
+  const handleViewAllResults = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setShowResults(false);
+    } else {
+      toast({
+        title: language === 'ar' ? 'خطأ في البحث' : 'Search Error',
+        description: language === 'ar' ? 'الرجاء إدخال كلمة للبحث' : 'Please enter a search term',
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -205,10 +220,7 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
             <Button 
               variant="link" 
               className="text-syrian-green text-sm"
-              onClick={(e) => {
-                e.preventDefault();
-                handleSearch(e as React.FormEvent<HTMLFormElement>);
-              }}
+              onClick={handleViewAllResults}
             >
               {language === 'ar' ? (
                 <ArabicText text="عرض كل النتائج" />
