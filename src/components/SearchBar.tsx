@@ -282,7 +282,7 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
                     <SelectValue placeholder={language === 'ar' ? "اختر المدينة" : "Select city"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">
+                    <SelectItem value="all">
                       {language === 'ar' ? "جميع المدن" : "All Cities"}
                     </SelectItem>
                     <SelectItem value="damascus">
@@ -318,7 +318,7 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
                     <SelectValue placeholder={language === 'ar' ? "اختر العملة" : "Select currency"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">
+                    <SelectItem value="all">
                       {language === 'ar' ? "جميع العملات" : "All Currencies"}
                     </SelectItem>
                     <SelectItem value="SYP">
