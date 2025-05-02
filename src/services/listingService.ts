@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Database, Listing, ListingWithRelations } from '@/types/supabase';
 import { PostgrestError } from '@supabase/supabase-js';
@@ -381,8 +382,11 @@ export const getUserFavorites = async (userId: string): Promise<ListingWithRelat
       throw error;
     }
     
-    // Fix type conversion
-    const listings = data?.map(item => item.listing).filter(Boolean) as ListingWithRelations[];
+    // Filter out any null listings and properly extract the listing data
+    const listings = data
+      ?.map(item => item.listing)
+      .filter(Boolean) as ListingWithRelations[];
+      
     return listings || [];
   } catch (error) {
     console.error('Error getting user favorites:', error);
