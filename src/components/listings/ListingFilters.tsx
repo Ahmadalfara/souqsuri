@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ScrollArea } from '../ui/scroll-area';
 
 interface ListingFiltersProps {
   onFilter: (filters: {
@@ -168,56 +169,58 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
             <SelectTrigger>
               <SelectValue placeholder={language === 'ar' ? "اختر الفئة" : "Select category"} />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">
-                {language === 'ar' ? (
-                  <ArabicText text={t('allCategories')} />
-                ) : (
-                  "All Categories"
-                )}
-              </SelectItem>
-              <SelectItem value="real_estate">
-                {language === 'ar' ? (
-                  <ArabicText text={t('realEstate')} />
-                ) : (
-                  t('realEstate')
-                )}
-              </SelectItem>
-              <SelectItem value="cars">
-                {language === 'ar' ? (
-                  <ArabicText text={t('cars')} />
-                ) : (
-                  t('cars')
-                )}
-              </SelectItem>
-              <SelectItem value="electronics">
-                {language === 'ar' ? (
-                  <ArabicText text={t('electronics')} />
-                ) : (
-                  t('electronics')
-                )}
-              </SelectItem>
-              <SelectItem value="furniture">
-                {language === 'ar' ? (
-                  <ArabicText text={t('furniture')} />
-                ) : (
-                  t('furniture')
-                )}
-              </SelectItem>
-              <SelectItem value="jobs">
-                {language === 'ar' ? (
-                  <ArabicText text={t('jobs')} />
-                ) : (
-                  t('jobs')
-                )}
-              </SelectItem>
-              <SelectItem value="services">
-                {language === 'ar' ? (
-                  <ArabicText text={t('services')} />
-                ) : (
-                  t('services')
-                )}
-              </SelectItem>
+            <SelectContent className="max-h-[300px] overflow-auto">
+              <ScrollArea className="h-[200px] w-full overflow-auto overscroll-contain touch-pan-y">
+                <SelectItem value="all">
+                  {language === 'ar' ? (
+                    <ArabicText text={t('allCategories')} />
+                  ) : (
+                    "All Categories"
+                  )}
+                </SelectItem>
+                <SelectItem value="real_estate">
+                  {language === 'ar' ? (
+                    <ArabicText text={t('realEstate')} />
+                  ) : (
+                    t('realEstate')
+                  )}
+                </SelectItem>
+                <SelectItem value="cars">
+                  {language === 'ar' ? (
+                    <ArabicText text={t('cars')} />
+                  ) : (
+                    t('cars')
+                  )}
+                </SelectItem>
+                <SelectItem value="electronics">
+                  {language === 'ar' ? (
+                    <ArabicText text={t('electronics')} />
+                  ) : (
+                    t('electronics')
+                  )}
+                </SelectItem>
+                <SelectItem value="furniture">
+                  {language === 'ar' ? (
+                    <ArabicText text={t('furniture')} />
+                  ) : (
+                    t('furniture')
+                  )}
+                </SelectItem>
+                <SelectItem value="jobs">
+                  {language === 'ar' ? (
+                    <ArabicText text={t('jobs')} />
+                  ) : (
+                    t('jobs')
+                  )}
+                </SelectItem>
+                <SelectItem value="services">
+                  {language === 'ar' ? (
+                    <ArabicText text={t('services')} />
+                  ) : (
+                    t('services')
+                  )}
+                </SelectItem>
+              </ScrollArea>
             </SelectContent>
           </Select>
         </div>
@@ -287,7 +290,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
           </div>
         </div>
         
-        {/* Location Selector Component */}
+        {/* Location Selector Component - Now with improved scrolling */}
         <div className="space-y-2">
           <Label className={language === 'ar' ? 'block text-right' : ''}>
             {language === 'ar' ? (

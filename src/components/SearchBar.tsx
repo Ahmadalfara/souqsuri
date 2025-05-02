@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -43,26 +42,18 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
 
-  const quickCategories = [
-    { id: 'all', name: language === 'ar' ? 'الكل' : 'All' },
-    { id: 'real_estate', name: language === 'ar' ? 'عقارات' : 'Real Estate' },
-    { id: 'cars', name: language === 'ar' ? 'سيارات' : 'Cars' },
-    { id: 'electronics', name: language === 'ar' ? 'إلكترونيات' : 'Electronics' },
-    { id: 'furniture', name: language === 'ar' ? 'أثاث' : 'Furniture' },
-  ];
-
   useEffect(() => {
     // Filter results based on search query, category, location, and currency
     if (searchQuery.trim()) {
       let filtered = mockSearchData.filter(item => {
         // Match by title or category
         const matchesQuery = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                             item.category.toLowerCase().includes(searchQuery.toLowerCase());
+                            item.category.toLowerCase().includes(searchQuery.toLowerCase());
         
         // Apply category filter if one is selected
         const matchesCategory = !selectedCategory || 
-                               selectedCategory === 'all' || 
-                               item.category.toLowerCase().includes(selectedCategory.toLowerCase());
+                              selectedCategory === 'all' || 
+                              item.category.toLowerCase().includes(selectedCategory.toLowerCase());
         
         // Apply location filter if one is selected
         const matchesLocation = !selectedLocation || 
@@ -135,10 +126,6 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
   const clearSearch = () => {
     setSearchQuery('');
     setShowResults(false);
-  };
-
-  const handleCategoryClick = (categoryId: string) => {
-    setSelectedCategory(categoryId === selectedCategory ? null : categoryId);
   };
 
   // Handle "View all results" button click
@@ -227,25 +214,7 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
             />
           </div>
           
-          {/* Quick Category Filters */}
-          <div className="flex mt-2 space-x-2 overflow-x-auto pb-1 no-scrollbar">
-            {quickCategories.map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                className={`
-                  text-xs py-1 px-2 rounded-full whitespace-nowrap transition-colors
-                  ${selectedCategory === cat.id 
-                    ? 'bg-syrian-green text-white' 
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }
-                `}
-                onClick={() => handleCategoryClick(cat.id)}
-              >
-                {language === 'ar' ? cat.name : cat.name}
-              </button>
-            ))}
-          </div>
+          {/* Removed the Quick Category Filters section */}
         </div>
 
         {/* Advanced Filter Button */}

@@ -107,7 +107,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
 
   return (
     <div className="space-y-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Governorate Selector */}
+      {/* Governorate Selector with improved scrolling */}
       <div className="space-y-2">
         <Label className={language === 'ar' ? 'text-right block' : ''}>
           {language === 'ar' ? (
@@ -124,8 +124,8 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           <SelectTrigger className="w-full">
             <SelectValue placeholder={language === 'ar' ? "اختر المحافظة" : "Select governorate"} />
           </SelectTrigger>
-          <SelectContent>
-            <ScrollArea className="h-72">
+          <SelectContent className="overflow-auto max-h-[300px]">
+            <ScrollArea className="h-72 w-full overflow-auto overscroll-contain touch-pan-y">
               <SelectGroup>
                 <SelectLabel>
                   {language === 'ar' ? (
@@ -145,7 +145,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         </Select>
       </div>
 
-      {/* District Selector - only show if governorate is selected */}
+      {/* District Selector with improved scrolling */}
       {selectedGovernorate && (
         <div className="space-y-2">
           <Label className={language === 'ar' ? 'text-right block' : ''}>
@@ -163,8 +163,8 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
             <SelectTrigger className="w-full">
               <SelectValue placeholder={language === 'ar' ? "اختر المنطقة" : "Select district"} />
             </SelectTrigger>
-            <SelectContent>
-              <ScrollArea className="h-72">
+            <SelectContent className="overflow-auto max-h-[300px]">
+              <ScrollArea className="h-72 w-full overflow-auto overscroll-contain touch-pan-y">
                 <SelectGroup>
                   <SelectLabel>
                     {language === 'ar' ? (
