@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Database, Listing, ListingWithRelations } from '@/types/supabase';
 import { PostgrestError } from '@supabase/supabase-js';
@@ -383,8 +384,11 @@ export const getUserFavorites = async (userId: string): Promise<ListingWithRelat
     
     // Properly extract and type the listing data
     const listings = data
-      ?.filter(item => item.listing) // Filter out any null listings
-      .map(item => item.listing as ListingWithRelations); // Use direct casting to correct type
+      ?.filter(item => item.listing !== null) // Filter out any null listings
+      .map(item => {
+        // First cast to unknown, then to the correct type
+        return item.listing as unknown as ListingWithRelations;
+      });
       
     return listings || [];
   } catch (error) {
