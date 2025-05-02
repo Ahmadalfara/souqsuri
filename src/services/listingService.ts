@@ -382,15 +382,18 @@ export const getUserFavorites = async (userId: string): Promise<ListingWithRelat
       throw error;
     }
     
-    // Properly extract and type the listing data
-    const listings = data
-      ?.filter(item => item.listing !== null) // Filter out any null listings
-      .map(item => {
-        // First cast to unknown, then to the correct type
-        return item.listing as unknown as ListingWithRelations;
-      });
+    // Extract listings correctly with proper type safety
+    const listings: ListingWithRelations[] = [];
+    
+    // Process each favorite and safely extract the listing
+    data?.forEach(item => {
+      if (item.listing && typeof item.listing === 'object' && !Array.isArray(item.listing)) {
+        // Type guard to ensure we're dealing with an object not an array
+        listings.push(item.listing as unknown as ListingWithRelations);
+      }
+    });
       
-    return listings || [];
+    return listings;
   } catch (error) {
     console.error('Error getting user favorites:', error);
     throw error;
