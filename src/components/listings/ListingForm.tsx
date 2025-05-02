@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -22,6 +23,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { Checkbox } from "@/components/ui/checkbox";
 import { useIsMobile } from '@/hooks/use-mobile';
+import LocationSelector from './LocationSelector';
 
 // Define the form schema with more relaxed validation
 const formSchema = z.object({
@@ -32,8 +34,6 @@ const formSchema = z.object({
   price: z.string().nonempty({
     message: "Price is required",
   }),
-  location: z.string().optional(),
-  area: z.string().optional(),
   category: z.string({
     required_error: "Category is required",
   }),
@@ -51,8 +51,9 @@ const ListingForm = () => {
   const [images, setImages] = useState<File[]>([]);
   const [imagePreview, setImagePreview] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedGovernorate, setSelectedGovernorate] = useState<string>("");
-  const [availableAreas, setAvailableAreas] = useState<string[]>([]);
+  const [governorateId, setGovernorateId] = useState<string>("");
+  const [districtId, setDistrictId] = useState<string>("");
+  const [customArea, setCustomArea] = useState<string>("");
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -60,43 +61,12 @@ const ListingForm = () => {
       title: "",
       description: "",
       price: "",
-      location: "",
-      area: "",
       category: "",
       currency: "SYP",
       condition: undefined,
       urgent: false,
     },
   });
-
-  // Update areas when governorate changes
-  useEffect(() => {
-    if (selectedGovernorate) {
-      // In a real app, this would come from an API or a more comprehensive dataset
-      // Here we're just using some sample areas for different governorates
-      const areasByGovernorate: Record<string, string[]> = {
-        'damascus': ['cityCenter', 'easternArea', 'westernArea', 'southernArea', 'northernArea'],
-        'damascusCountryside': ['douma', 'harasta', 'ghouta', 'zabadani', 'bludan'],
-        'aleppo': ['cityCenter', 'azaz', 'afrin', 'jarabulus', 'albab'],
-        'homs': ['cityCenter', 'talkalakh', 'qusayr', 'palmyra'],
-        'hama': ['cityCenter', 'salamiyah', 'masyaf', 'mahardeh'],
-        'latakia': ['cityCenter', 'jableh', 'qardaha', 'kasab'],
-        'tartus': ['cityCenter', 'banyas', 'safita', 'arwad'],
-      };
-      
-      // Set available areas based on governorate
-      setAvailableAreas(areasByGovernorate[selectedGovernorate] || []);
-      
-      // Set the location field
-      form.setValue('location', selectedGovernorate);
-    } else {
-      setAvailableAreas([]);
-      form.setValue('location', '');
-    }
-    
-    // Clear area field when governorate changes
-    form.setValue('area', '');
-  }, [selectedGovernorate, form]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -153,18 +123,29 @@ const ListingForm = () => {
         return;
       }
       
-      // Build full location with area if available
-      const fullLocation = values.area 
-        ? `${values.location}${values.area ? ' - ' + t(values.area) : ''}`
-        : values.location;
+      // Check if location is selected
+      if (!governorateId) {
+        toast({
+          title: language === 'ar' ? "خطأ" : "Error",
+          description: language === 'ar' 
+            ? "يرجى اختيار المحافظة" 
+            : "Please select a governorate",
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        document.dispatchEvent(new CustomEvent('set-submitting', { 
+          detail: { submitting: false }
+        }));
+        return;
+      }
       
       const listingData = {
         title: values.title,
         description: values.description || " ", // Provide a space if empty
         price: Number(values.price), // Ensure price is a number
         currency: values.currency || "SYP", // Ensure currency has a default value
-        governorate_id: values.location || null,
-        district_id: values.area || null,
+        governorate_id: governorateId || null,
+        district_id: districtId || null,
         category: values.category,
         user_id: currentUser?.id || 'guest',
         condition: values.condition,
@@ -188,6 +169,9 @@ const ListingForm = () => {
       form.reset();
       setImages([]);
       setImagePreview([]);
+      setGovernorateId("");
+      setDistrictId("");
+      setCustomArea("");
       
       // Close the sheet
       const closeEvent = new CustomEvent('close-sheet');
@@ -288,108 +272,21 @@ const ListingForm = () => {
           )}
         />
         
-        {/* Location - Governorate selection */}
-        <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
-          <FormLabel>
+        {/* Location Selector */}
+        <div dir={language === 'ar' ? "rtl" : "ltr"}>
+          <FormLabel className="block mb-2">
             {language === 'ar' ? (
               <ArabicText text={t('location')} />
             ) : (
               t('location')
             )}
           </FormLabel>
-          <Select
-            value={selectedGovernorate}
-            onValueChange={setSelectedGovernorate}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={language === 'ar' ? "اختر المحافظة" : "Select governorate"} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="damascus">
-                {language === 'ar' ? t('damascus') : t('damascus')}
-              </SelectItem>
-              <SelectItem value="damascusCountryside">
-                {language === 'ar' ? t('damascusCountryside') : t('damascusCountryside')}
-              </SelectItem>
-              <SelectItem value="aleppo">
-                {language === 'ar' ? t('aleppo') : t('aleppo')}
-              </SelectItem>
-              <SelectItem value="homs">
-                {language === 'ar' ? t('homs') : t('homs')}
-              </SelectItem>
-              <SelectItem value="hama">
-                {language === 'ar' ? t('hama') : t('hama')}
-              </SelectItem>
-              <SelectItem value="latakia">
-                {language === 'ar' ? t('latakia') : t('latakia')}
-              </SelectItem>
-              <SelectItem value="tartus">
-                {language === 'ar' ? t('tartus') : t('tartus')}
-              </SelectItem>
-              <SelectItem value="idlib">
-                {language === 'ar' ? t('idlib') : t('idlib')}
-              </SelectItem>
-              <SelectItem value="raqqa">
-                {language === 'ar' ? t('raqqa') : t('raqqa')}
-              </SelectItem>
-              <SelectItem value="deirEzzor">
-                {language === 'ar' ? t('deirEzzor') : t('deirEzzor')}
-              </SelectItem>
-              <SelectItem value="hasaka">
-                {language === 'ar' ? t('hasaka') : t('hasaka')}
-              </SelectItem>
-              <SelectItem value="daraa">
-                {language === 'ar' ? t('daraa') : t('daraa')}
-              </SelectItem>
-              <SelectItem value="sweida">
-                {language === 'ar' ? t('sweida') : t('sweida')}
-              </SelectItem>
-              <SelectItem value="quneitra">
-                {language === 'ar' ? t('quneitra') : t('quneitra')}
-              </SelectItem>
-              <SelectItem value="otherLocation">
-                {language === 'ar' ? t('otherLocation') : t('otherLocation')}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </FormItem>
-
-        {/* Area selection - only show if governorate is selected */}
-        {selectedGovernorate && availableAreas.length > 0 && (
-          <FormField
-            control={form.control}
-            name="area"
-            render={({ field }) => (
-              <FormItem dir={language === 'ar' ? "rtl" : "ltr"}>
-                <FormLabel>
-                  {language === 'ar' ? (
-                    <ArabicText text={t('selectArea')} />
-                  ) : (
-                    t('selectArea')
-                  )}
-                </FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder={language === 'ar' ? "اختر المنطقة" : "Select area"} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {availableAreas.map(area => (
-                      <SelectItem key={area} value={area}>
-                        {language === 'ar' ? t(area) : t(area)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage className={language === 'ar' ? "rtl" : ""} />
-              </FormItem>
-            )}
+          <LocationSelector
+            onGovernorateChange={setGovernorateId}
+            onDistrictChange={setDistrictId}
+            onCustomAreaChange={setCustomArea}
           />
-        )}
+        </div>
         
         <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'space-x-4'}`}>
           <FormField

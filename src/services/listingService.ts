@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database, Listing, ListingWithRelations } from '@/types/supabase';
 import { PostgrestError } from '@supabase/supabase-js';
@@ -267,9 +266,6 @@ export const searchListings = async (filters: ListingFilters): Promise<ListingWi
     // Get current language for sorting by language preference
     const currentLanguage = localStorage.getItem('language') || 'ar';
     
-    // Sort by current language (this would need a language field in the listing that we don't currently have)
-    // Could be added later if needed
-    
     return results;
   } catch (error) {
     console.error('Error searching listings:', error);
@@ -388,7 +384,6 @@ export const getUserFavorites = async (userId: string): Promise<ListingWithRelat
     // Process each favorite and safely extract the listing
     data?.forEach(item => {
       if (item.listing && typeof item.listing === 'object' && !Array.isArray(item.listing)) {
-        // Type guard to ensure we're dealing with an object not an array
         listings.push(item.listing as unknown as ListingWithRelations);
       }
     });
@@ -454,6 +449,37 @@ export const getDistricts = async (governorateId: string): Promise<Database['pub
   } catch (error) {
     console.error('Error getting districts:', error);
     throw error;
+  }
+};
+
+export const getLocationNameByIds = async (
+  governorateId: string | null, 
+  districtId: string | null, 
+  language = 'ar'
+): Promise<string> => {
+  try {
+    let locationParts: string[] = [];
+    
+    // Get district name if provided
+    if (districtId) {
+      const district = await getDistrictById(districtId);
+      if (district) {
+        locationParts.push(language === 'ar' ? district.name_ar : district.name_en);
+      }
+    }
+    
+    // Get governorate name if provided
+    if (governorateId) {
+      const governorate = await getGovernorateById(governorateId);
+      if (governorate) {
+        locationParts.push(language === 'ar' ? governorate.name_ar : governorate.name_en);
+      }
+    }
+    
+    return locationParts.join(', ');
+  } catch (error) {
+    console.error('Error getting location name by IDs:', error);
+    return '';
   }
 };
 

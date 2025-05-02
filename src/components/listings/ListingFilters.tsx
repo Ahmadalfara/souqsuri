@@ -3,14 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import ArabicText from '../ArabicText';
@@ -18,12 +10,20 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Filter, X, ChevronDown, ChevronUp, DollarSign } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useIsMobile } from '@/hooks/use-mobile';
+import LocationSelector from './LocationSelector';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface ListingFiltersProps {
   onFilter: (filters: {
     priceRange: [number, number];
-    location: string;
-    area?: string;
+    governorate_id?: string;
+    district_id?: string;
     sortBy: string;
     keywords?: string;
     category?: string;
@@ -39,38 +39,31 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
   const isMobile = useIsMobile();
   const [isExpanded, setIsExpanded] = useState(!isMobile);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
-  const [location, setLocation] = useState<string>('');
-  const [area, setArea] = useState<string>('');
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(10000);
+  const [governorateId, setGovernorateId] = useState<string>('');
+  const [districtId, setDistrictId] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('newest');
   const [keywords, setKeywords] = useState<string>('');
   const [category, setCategory] = useState<string>('');
   const [condition, setCondition] = useState<string[]>([]);
   const [urgent, setUrgent] = useState<boolean>(false);
   const [currency, setCurrency] = useState<string>('SYP');
-  const [availableAreas, setAvailableAreas] = useState<string[]>([]);
 
-  // Update areas when governorate changes
+  // Update price range when min/max inputs change
   useEffect(() => {
-    if (location && location !== 'all') {
-      // In a real app, this would come from an API or a more comprehensive dataset
-      // Here we're just using some sample areas for different governorates
-      const areasByGovernorate: Record<string, string[]> = {
-        'damascus': ['cityCenter', 'easternArea', 'westernArea', 'southernArea', 'northernArea'],
-        'damascusCountryside': ['douma', 'harasta', 'ghouta', 'zabadani', 'bludan'],
-        'aleppo': ['cityCenter', 'azaz', 'afrin', 'jarabulus', 'albab'],
-        'homs': ['cityCenter', 'talkalakh', 'qusayr', 'palmyra'],
-        'hama': ['cityCenter', 'salamiyah', 'masyaf', 'mahardeh'],
-        'latakia': ['cityCenter', 'jableh', 'qardaha', 'kasab'],
-        'tartus': ['cityCenter', 'banyas', 'safita', 'arwad'],
-      };
-      
-      // Set available areas based on governorate
-      setAvailableAreas(areasByGovernorate[location] || []);
+    setPriceRange([minPrice, maxPrice]);
+  }, [minPrice, maxPrice]);
+
+  // Adjust max price range based on currency
+  useEffect(() => {
+    if (currency === 'USD') {
+      setMaxPrice(prev => prev > 1000 ? 1000 : prev);
     } else {
-      setAvailableAreas([]);
-      setArea('');
+      // For SYP, allow higher values
+      setMaxPrice(prev => prev < 10000 ? 1000000 : prev);
     }
-  }, [location]);
+  }, [currency]);
 
   const handleConditionChange = (value: string) => {
     setCondition(prev => 
@@ -82,9 +75,9 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
 
   const handleApplyFilters = () => {
     onFilter({
-      priceRange,
-      location,
-      area,
+      priceRange: [minPrice, maxPrice],
+      governorate_id: governorateId || undefined,
+      district_id: districtId || undefined,
       sortBy,
       keywords,
       category,
@@ -95,18 +88,19 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
   };
 
   const handleResetFilters = () => {
-    setPriceRange([0, 10000]);
-    setLocation('');
-    setArea('');
+    setMinPrice(0);
+    setMaxPrice(currency === 'USD' ? 1000 : 1000000);
+    setGovernorateId('');
+    setDistrictId('');
     setSortBy('newest');
     setKeywords('');
     setCategory('');
     setCondition([]);
     setUrgent(false);
     setCurrency('SYP');
+    
     onFilter({
-      priceRange: [0, 10000],
-      location: '',
+      priceRange: [0, currency === 'USD' ? 1000 : 1000000],
       sortBy: 'newest',
       currency: 'SYP'
     });
@@ -239,7 +233,12 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
           </Label>
           <RadioGroup 
             value={currency} 
-            onValueChange={setCurrency}
+            onValueChange={(value) => {
+              setCurrency(value);
+              // Reset price range when currency changes
+              setMinPrice(0);
+              setMaxPrice(value === 'USD' ? 1000 : 1000000);
+            }}
             className="flex space-x-4 rtl:space-x-reverse"
           >
             <div className={`flex items-center ${language === 'ar' ? 'space-x-reverse' : ''} space-x-2`}>
@@ -268,44 +267,27 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
                 t('priceRange')
               )}
             </Label>
-            <div className="text-sm text-gray-500">
-              {language === 'ar' ? (
-                <ArabicText text={`${priceRange[0]} - ${priceRange[1]} ${currency === 'USD' ? 'دولار' : 'ل.س'}`} />
-              ) : (
-                `${currency === 'USD' ? '$' : ''}${priceRange[0]} - ${currency === 'USD' ? '$' : ''}${priceRange[1]}`
-              )}
-            </div>
           </div>
-          
-          <Slider
-            defaultValue={priceRange}
-            value={priceRange}
-            min={0}
-            max={currency === 'USD' ? 1000 : 1000000}
-            step={currency === 'USD' ? 10 : 1000}
-            onValueChange={(value) => setPriceRange(value as [number, number])}
-            className="py-4"
-          />
 
           <div className={`flex ${language === 'ar' ? 'space-x-reverse' : ''} space-x-4 pt-2`}>
             <Input
               type="number"
-              value={priceRange[0]}
-              onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+              value={minPrice}
+              onChange={(e) => setMinPrice(Number(e.target.value))}
               className="w-1/2"
               placeholder="Min"
             />
             <Input
               type="number"
-              value={priceRange[1]}
-              onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(Number(e.target.value))}
               className="w-1/2"
               placeholder="Max"
             />
           </div>
         </div>
         
-        {/* Location - Governorate */}
+        {/* Location Selector Component */}
         <div className="space-y-2">
           <Label className={language === 'ar' ? 'block text-right' : ''}>
             {language === 'ar' ? (
@@ -314,155 +296,11 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
               t('location')
             )}
           </Label>
-          <Select value={location} onValueChange={setLocation}>
-            <SelectTrigger>
-              <SelectValue placeholder={language === 'ar' ? t('selectCity') : t('selectCity')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">
-                {language === 'ar' ? (
-                  <ArabicText text={t('allCities')} />
-                ) : (
-                  t('allCities')
-                )}
-              </SelectItem>
-              <SelectItem value="damascus">
-                {language === 'ar' ? (
-                  <ArabicText text={t('damascus')} />
-                ) : (
-                  t('damascus')
-                )}
-              </SelectItem>
-              <SelectItem value="damascusCountryside">
-                {language === 'ar' ? (
-                  <ArabicText text={t('damascusCountryside')} />
-                ) : (
-                  t('damascusCountryside')
-                )}
-              </SelectItem>
-              <SelectItem value="aleppo">
-                {language === 'ar' ? (
-                  <ArabicText text={t('aleppo')} />
-                ) : (
-                  t('aleppo')
-                )}
-              </SelectItem>
-              <SelectItem value="homs">
-                {language === 'ar' ? (
-                  <ArabicText text={t('homs')} />
-                ) : (
-                  t('homs')
-                )}
-              </SelectItem>
-              <SelectItem value="hama">
-                {language === 'ar' ? (
-                  <ArabicText text={t('hama')} />
-                ) : (
-                  t('hama')
-                )}
-              </SelectItem>
-              <SelectItem value="latakia">
-                {language === 'ar' ? (
-                  <ArabicText text={t('latakia')} />
-                ) : (
-                  t('latakia')
-                )}
-              </SelectItem>
-              <SelectItem value="tartus">
-                {language === 'ar' ? (
-                  <ArabicText text={t('tartus')} />
-                ) : (
-                  t('tartus')
-                )}
-              </SelectItem>
-              <SelectItem value="idlib">
-                {language === 'ar' ? (
-                  <ArabicText text={t('idlib')} />
-                ) : (
-                  t('idlib')
-                )}
-              </SelectItem>
-              <SelectItem value="raqqa">
-                {language === 'ar' ? (
-                  <ArabicText text={t('raqqa')} />
-                ) : (
-                  t('raqqa')
-                )}
-              </SelectItem>
-              <SelectItem value="deirEzzor">
-                {language === 'ar' ? (
-                  <ArabicText text={t('deirEzzor')} />
-                ) : (
-                  t('deirEzzor')
-                )}
-              </SelectItem>
-              <SelectItem value="hasaka">
-                {language === 'ar' ? (
-                  <ArabicText text={t('hasaka')} />
-                ) : (
-                  t('hasaka')
-                )}
-              </SelectItem>
-              <SelectItem value="daraa">
-                {language === 'ar' ? (
-                  <ArabicText text={t('daraa')} />
-                ) : (
-                  t('daraa')
-                )}
-              </SelectItem>
-              <SelectItem value="sweida">
-                {language === 'ar' ? (
-                  <ArabicText text={t('sweida')} />
-                ) : (
-                  t('sweida')
-                )}
-              </SelectItem>
-              <SelectItem value="quneitra">
-                {language === 'ar' ? (
-                  <ArabicText text={t('quneitra')} />
-                ) : (
-                  t('quneitra')
-                )}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <LocationSelector 
+            onGovernorateChange={setGovernorateId}
+            onDistrictChange={setDistrictId}
+          />
         </div>
-        
-        {/* Area - only show if governorate is selected */}
-        {location && location !== 'all' && availableAreas.length > 0 && (
-          <div className="space-y-2">
-            <Label className={language === 'ar' ? 'block text-right' : ''}>
-              {language === 'ar' ? (
-                <ArabicText text={t('selectArea')} />
-              ) : (
-                t('selectArea')
-              )}
-            </Label>
-            <Select value={area} onValueChange={setArea}>
-              <SelectTrigger>
-                <SelectValue placeholder={language === 'ar' ? "اختر المنطقة" : "Select area"} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">
-                  {language === 'ar' ? (
-                    <ArabicText text={t('allAreas')} />
-                  ) : (
-                    t('allAreas')
-                  )}
-                </SelectItem>
-                {availableAreas.map(areaOption => (
-                  <SelectItem key={areaOption} value={areaOption}>
-                    {language === 'ar' ? (
-                      <ArabicText text={t(areaOption)} />
-                    ) : (
-                      t(areaOption)
-                    )}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
         
         {/* Sort By */}
         <div className="space-y-2">
