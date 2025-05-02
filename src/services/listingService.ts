@@ -382,10 +382,10 @@ export const getUserFavorites = async (userId: string): Promise<ListingWithRelat
       throw error;
     }
     
-    // Filter out any null listings and properly extract the listing data
+    // Properly extract and type the listing data
     const listings = data
-      ?.map(item => item.listing)
-      .filter(Boolean) as ListingWithRelations[];
+      ?.filter(item => item.listing) // Filter out any null listings
+      .map(item => item.listing as ListingWithRelations); // Explicitly cast to ListingWithRelations
       
     return listings || [];
   } catch (error) {
