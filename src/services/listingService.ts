@@ -384,10 +384,7 @@ export const getUserFavorites = async (userId: string): Promise<ListingWithRelat
     // Properly extract and type the listing data
     const listings = data
       ?.filter(item => item.listing) // Filter out any null listings
-      .map(item => {
-        // Explicitly cast each item.listing to the correct type
-        return item.listing as unknown as ListingWithRelations;
-      });
+      .map(item => item.listing as ListingWithRelations); // Use direct casting to correct type
       
     return listings || [];
   } catch (error) {
