@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -162,14 +161,15 @@ const ListingForm = () => {
       const listingData = {
         title: values.title,
         description: values.description || " ", // Provide a space if empty
-        price: values.price,
+        price: Number(values.price), // Ensure price is a number
         currency: values.currency || "SYP", // Ensure currency has a default value
-        location: fullLocation || " ", // Provide a space if empty
+        governorate_id: values.location || null,
+        district_id: values.area || null,
         category: values.category,
-        userId: currentUser?.id || 'guest',
-        userName: currentUser?.user_metadata?.name || "Guest User",
+        user_id: currentUser?.id || 'guest',
         condition: values.condition,
-        urgent: values.urgent,
+        status: 'active' as const,
+        is_featured: values.urgent,
         images: []
       };
       

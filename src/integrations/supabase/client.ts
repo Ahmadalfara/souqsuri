@@ -17,11 +17,14 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   }
 });
 
-// Initialize storage buckets
+// Initialize storage buckets - we're disabling automatic bucket creation
+// and assuming the buckets are created in the SQL migration
+// or by an admin in the Supabase dashboard
 import { ensureStorageBucketsExist } from '@/utils/supabaseStorage';
 (async () => {
   try {
-    await ensureStorageBucketsExist();
+    // Comment this out as it requires admin privileges
+    // await ensureStorageBucketsExist();
   } catch (error) {
     console.error('Failed to initialize storage buckets:', error);
   }

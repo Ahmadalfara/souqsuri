@@ -18,6 +18,16 @@ const FeaturedListings = () => {
     queryFn: () => getFeaturedListings(12)
   });
 
+  // Helper function to get location display string
+  const getLocationString = (listing: any) => {
+    if (listing.governorate && listing.district) {
+      return `${listing.governorate.name_ar} - ${listing.district.name_ar}`;
+    } else if (listing.governorate) {
+      return listing.governorate.name_ar;
+    }
+    return '';
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-syrian-light">
       <GeometricPattern className="flex-grow">
@@ -54,7 +64,7 @@ const FeaturedListings = () => {
             <>
               {listings && listings.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {listings.map((listing: Listing) => (
+                  {listings.map((listing: any) => (
                     <Card 
                       key={listing.id}
                       className="overflow-hidden border border-syrian-gold/30 hover:border-syrian-gold transition-colors hover:shadow-lg"
@@ -79,7 +89,7 @@ const FeaturedListings = () => {
                           <ArabicText text={listing.description} />
                         </p>
                         <p className="text-syrian-green font-bold mt-2 text-right">
-                          <ArabicText text={`${listing.price} دولار`} />
+                          <ArabicText text={`${listing.price} ${listing.currency || 'دولار'}`} />
                         </p>
                       </CardContent>
                       <CardFooter className="p-4 pt-0 flex justify-between items-center">
@@ -90,7 +100,7 @@ const FeaturedListings = () => {
                           <ArabicText text="التفاصيل" />
                         </Button>
                         <div className="text-sm text-gray-500">
-                          <ArabicText text={listing.location} />
+                          <ArabicText text={getLocationString(listing)} />
                         </div>
                       </CardFooter>
                     </Card>

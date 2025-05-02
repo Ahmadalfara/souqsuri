@@ -34,17 +34,18 @@ const UserListings = ({ userListings, setUserListings }: UserListingsProps) => {
   const [deletingListingId, setDeletingListingId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleToggleListingStatus = async (listingId: string, currentStatus: boolean) => {
+  const handleToggleListingStatus = async (listingId: string, currentStatus: string) => {
     try {
-      await toggleListingStatus(listingId, !currentStatus);
+      const newStatus = currentStatus === 'active' ? 'pending' : 'active';
+      await toggleListingStatus(listingId, newStatus);
       setUserListings(prevListings => 
         prevListings.map(listing => 
-          listing.id === listingId ? { ...listing, active: !currentStatus } : listing
+          listing.id === listingId ? { ...listing, status: newStatus } : listing
         )
       );
       toast({
-        title: !currentStatus ? t('listingActivated') : t('listingDeactivated'),
-        description: !currentStatus ? t('listingNowVisible') : t('listingNowHidden'),
+        title: newStatus === 'active' ? t('listingActivated') : t('listingDeactivated'),
+        description: newStatus === 'active' ? t('listingNowVisible') : t('listingNowHidden'),
       });
     } catch (error) {
       console.error("Error toggling listing status:", error);
@@ -84,6 +85,11 @@ const UserListings = ({ userListings, setUserListings }: UserListingsProps) => {
       setDeletingListingId(null);
       setIsDialogOpen(false);
     }
+  };
+
+  // Helper function to check if a listing is active
+  const isListingActive = (listing: Listing): boolean => {
+    return listing.status === 'active';
   };
 
   return (
@@ -128,11 +134,11 @@ const UserListings = ({ userListings, setUserListings }: UserListingsProps) => {
                         listing.title
                       )}
                     </h4>
-                    <Badge className={listing.active ? "bg-green-500" : "bg-gray-500"}>
+                    <Badge className={isListingActive(listing) ? "bg-green-500" : "bg-gray-500"}>
                       {language === 'ar' ? (
-                        <ArabicText text={listing.active ? "نشط" : "غير نشط"} />
+                        <ArabicText text={isListingActive(listing) ? "نشط" : "غير نشط"} />
                       ) : (
-                        listing.active ? "Active" : "Inactive"
+                        isListingActive(listing) ? "Active" : "Inactive"
                       )}
                     </Badge>
                   </div>
@@ -169,13 +175,13 @@ const UserListings = ({ userListings, setUserListings }: UserListingsProps) => {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className={listing.active ? "text-red-600" : "text-green-600"}
-                      onClick={() => handleToggleListingStatus(listing.id!, listing.active)}
+                      className={isListingActive(listing) ? "text-red-600" : "text-green-600"}
+                      onClick={() => handleToggleListingStatus(listing.id!, isListingActive(listing) ? 'active' : 'pending')}
                     >
                       {language === 'ar' ? (
-                        <ArabicText text={listing.active ? "إيقاف" : "تنشيط"} size="small" />
+                        <ArabicText text={isListingActive(listing) ? "إيقاف" : "تنشيط"} size="small" />
                       ) : (
-                        listing.active ? "Deactivate" : "Activate"
+                        isListingActive(listing) ? "Deactivate" : "Activate"
                       )}
                     </Button>
                     <Button 
