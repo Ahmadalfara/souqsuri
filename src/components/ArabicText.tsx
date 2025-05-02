@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -8,9 +7,11 @@ interface ArabicTextProps {
   className?: string;
   size?: 'small' | 'normal' | 'large' | 'xl' | '2xl' | '3xl';
   translateKey?: string;
+  textAr?: string; // Added for bilingual content from DB
+  textEn?: string; // Added for bilingual content from DB
 }
 
-const ArabicText = ({ text, className, size = 'normal', translateKey }: ArabicTextProps) => {
+const ArabicText = ({ text, className, size = 'normal', translateKey, textAr, textEn }: ArabicTextProps) => {
   const { language, t } = useLanguage();
   
   const sizeClasses = {
@@ -22,15 +23,18 @@ const ArabicText = ({ text, className, size = 'normal', translateKey }: ArabicTe
     '3xl': 'text-3xl md:text-4xl lg:text-5xl'
   };
   
-  // If a translation key is provided, use it
-  const displayText = translateKey ? t(translateKey) : text;
+  // Determine which text to display based on the available options and current language
+  let displayText = text; // Default to the provided text
   
-  // If the current language is English and no translation key was provided, 
-  // we should try to find the translation for the Arabic text
-  const finalText = language === 'en' && !translateKey ? 
-    // Try to find an English translation for this Arabic text
-    displayText : 
-    displayText;
+  // If we have explicit Arabic and English versions, use those based on language
+  if (textAr && textEn) {
+    displayText = language === 'ar' ? textAr : textEn;
+  }
+  // Otherwise, if a translation key is provided, use it
+  else if (translateKey) {
+    displayText = t(translateKey);
+  }
+  // The default case is to just use the provided text, already set above
 
   return (
     <span className={cn(
@@ -39,7 +43,7 @@ const ArabicText = ({ text, className, size = 'normal', translateKey }: ArabicTe
       sizeClasses[size],
       className
     )}>
-      {finalText}
+      {displayText}
     </span>
   );
 };

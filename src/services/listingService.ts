@@ -1,88 +1,73 @@
 
-import { 
-  collection, 
-  addDoc, 
-  updateDoc, 
-  doc, 
-  getDoc, 
-  getDocs, 
-  query, 
-  where, 
-  orderBy, 
-  limit,
-  serverTimestamp,
-  QueryConstraint,
-  deleteDoc
-} from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../lib/firebase';
 import { supabase } from '@/integrations/supabase/client';
+import { Database, Listing, ListingWithRelations } from '@/types/supabase';
+import { PostgrestError } from '@supabase/supabase-js';
 
-export interface Listing {
-  id?: string;
-  title: string;
-  description: string;
-  price: string;
-  currency?: string;
-  location: string;
-  category: string;
-  images: string[];
-  userId: string;
-  userName: string;
-  userPhone?: string;
-  createdAt?: any;
-  active: boolean;
-  views: number;
-  condition?: string; // new, used
+export type { Listing, ListingWithRelations } from '@/types/supabase';
+
+interface ListingFilters {
+  query?: string;
+  category?: string;
+  governorate_id?: string;
+  district_id?: string;
+  priceMin?: number;
+  priceMax?: number;
+  condition?: string[];
+  sortBy?: string;
   urgent?: boolean;
-  language?: string; // Add language field to track listing language
+  currency?: string;
 }
 
-export const addListing = async (listing: Omit<Listing, 'id' | 'createdAt' | 'active' | 'views'>, imageFiles: File[]): Promise<string> => {
+export const addListing = async (
+  listing: Omit<Database['public']['Tables']['listings']['Insert'], 'id' | 'created_at' | 'views'>, 
+  imageFiles: File[]
+): Promise<string | null> => {
   try {
-    // Upload images first
+    // First upload images to Supabase storage
     const imageUrls: string[] = [];
     
     for (const file of imageFiles) {
-      const storageRef = ref(storage, `listings/${Date.now()}_${file.name}`);
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadUrl = await getDownloadURL(snapshot.ref);
-      imageUrls.push(downloadUrl);
-    }
-    
-    // Create listing document
-    const listingData = {
-      ...listing,
-      images: imageUrls,
-      createdAt: serverTimestamp(),
-      active: true,
-      views: 0,
-      currency: listing.currency || 'SYP',
-      language: localStorage.getItem('language') || 'ar' // Store current language with listing
-    };
-    
-    // Try to save user's phone number from profile if available
-    try {
-      if (listing.userId && listing.userId !== 'guest') {
-        const { data: profileData, error } = await supabase
-          .from('profiles')
-          .select('phone')
-          .eq('id', listing.userId)
-          .single();
-          
-        if (error) {
-          console.log('Error fetching user profile:', error);
-        } else if (profileData?.phone) {
-          listingData.userPhone = profileData.phone;
-        }
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `listings/${fileName}`;
+      
+      const { data: uploadData, error: uploadError } = await supabase
+        .storage
+        .from('listings')
+        .upload(filePath, file);
+      
+      if (uploadError) {
+        console.error('Error uploading image:', uploadError);
+        continue;
       }
-    } catch (profileError) {
-      console.log('Could not fetch user phone from profile:', profileError);
-      // Continue without the phone number
+      
+      // Get the public URL for the uploaded file
+      const { data: urlData } = await supabase
+        .storage
+        .from('listings')
+        .getPublicUrl(filePath);
+        
+      if (urlData) {
+        imageUrls.push(urlData.publicUrl);
+      }
     }
     
-    const docRef = await addDoc(collection(db, 'listings'), listingData);
-    return docRef.id;
+    // Create the listing with image URLs
+    const { data, error } = await supabase
+      .from('listings')
+      .insert({
+        ...listing,
+        images: imageUrls,
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+      
+    if (error) {
+      throw error;
+    }
+    
+    return data?.id || null;
   } catch (error) {
     console.error('Error adding listing:', error);
     throw error;
@@ -91,200 +76,199 @@ export const addListing = async (listing: Omit<Listing, 'id' | 'createdAt' | 'ac
 
 export const getUserListings = async (userId: string): Promise<Listing[]> => {
   try {
-    const q = query(
-      collection(db, 'listings'),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
-    );
+    const { data, error } = await supabase
+      .from('listings')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+      
+    if (error) {
+      throw error;
+    }
     
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as Listing));
+    return data || [];
   } catch (error) {
     console.error('Error getting user listings:', error);
     throw error;
   }
 };
 
-export const getFeaturedListings = async (count = 8): Promise<Listing[]> => {
+export const getFeaturedListings = async (count = 8): Promise<ListingWithRelations[]> => {
   try {
-    const q = query(
-      collection(db, 'listings'),
-      where('active', '==', true),
-      orderBy('createdAt', 'desc'),
-      limit(count)
-    );
+    const { data, error } = await supabase
+      .from('listings')
+      .select(`
+        *,
+        governorate:governorate_id(*),
+        district:district_id(*),
+        user:user_id(*)
+      `)
+      .eq('is_featured', true)
+      .eq('status', 'active')
+      .order('created_at', { ascending: false })
+      .limit(count);
+      
+    if (error) {
+      throw error;
+    }
     
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as Listing));
+    return data || [];
   } catch (error) {
     console.error('Error getting featured listings:', error);
     throw error;
   }
 };
 
-export const getListingsByCategory = async (category: string, count = 12): Promise<Listing[]> => {
+export const getListingsByCategory = async (category: string, count = 12): Promise<ListingWithRelations[]> => {
   try {
-    const q = query(
-      collection(db, 'listings'),
-      where('active', '==', true),
-      where('category', '==', category),
-      orderBy('createdAt', 'desc'),
-      limit(count)
-    );
+    const { data, error } = await supabase
+      .from('listings')
+      .select(`
+        *,
+        governorate:governorate_id(*),
+        district:district_id(*),
+        user:user_id(*)
+      `)
+      .eq('category', category)
+      .eq('status', 'active')
+      .order('created_at', { ascending: false })
+      .limit(count);
+      
+    if (error) {
+      throw error;
+    }
     
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as Listing));
+    return data || [];
   } catch (error) {
     console.error('Error getting listings by category:', error);
     throw error;
   }
 };
 
-export const getListing = async (id: string): Promise<Listing | null> => {
+export const getListing = async (id: string): Promise<ListingWithRelations | null> => {
   try {
-    const docRef = doc(db, 'listings', id);
-    const docSnap = await getDoc(docRef);
+    // First get the listing
+    const { data, error } = await supabase
+      .from('listings')
+      .select(`
+        *,
+        governorate:governorate_id(*),
+        district:district_id(*),
+        user:user_id(*)
+      `)
+      .eq('id', id)
+      .single();
     
-    if (docSnap.exists()) {
-      // Update view count
-      await updateDoc(docRef, {
-        views: (docSnap.data().views || 0) + 1
-      });
-      
-      return {
-        id: docSnap.id,
-        ...docSnap.data()
-      } as Listing;
-    } else {
+    if (error) {
+      throw error;
+    }
+    
+    if (!data) {
       return null;
     }
+    
+    // Update view count
+    const { error: updateError } = await supabase
+      .from('listings')
+      .update({ views: (data.views || 0) + 1 })
+      .eq('id', id);
+      
+    if (updateError) {
+      console.error('Error updating view count:', updateError);
+    }
+    
+    return data;
   } catch (error) {
     console.error('Error getting listing:', error);
     throw error;
   }
 };
 
-export const searchListings = async (params: {
-  query?: string,
-  category?: string,
-  location?: string,
-  priceMin?: number,
-  priceMax?: number,
-  condition?: string[],
-  sortBy?: string,
-  urgent?: boolean,
-  currency?: string
-}): Promise<Listing[]> => {
+export const searchListings = async (filters: ListingFilters): Promise<ListingWithRelations[]> => {
   try {
-    const constraints: QueryConstraint[] = [
-      where('active', '==', true)
-    ];
+    let query = supabase
+      .from('listings')
+      .select(`
+        *,
+        governorate:governorate_id(*),
+        district:district_id(*),
+        user:user_id(*)
+      `)
+      .eq('status', 'active');
     
-    if (params.category && params.category !== 'all') {
-      constraints.push(where('category', '==', params.category));
+    // Apply filters
+    if (filters.category && filters.category !== 'all') {
+      query = query.eq('category', filters.category);
     }
     
-    if (params.location && params.location !== 'all') {
-      constraints.push(where('location', '==', params.location));
+    if (filters.governorate_id) {
+      query = query.eq('governorate_id', filters.governorate_id);
     }
     
-    if (params.urgent === true) {
-      constraints.push(where('urgent', '==', true));
+    if (filters.district_id) {
+      query = query.eq('district_id', filters.district_id);
     }
     
-    if (params.condition && params.condition.length > 0) {
-      constraints.push(where('condition', 'in', params.condition));
+    if (filters.urgent === true) {
+      query = query.eq('is_featured', true);
     }
     
-    // Default sort order
-    let sortField = 'createdAt';
-    let sortDirection: 'asc' | 'desc' = 'desc';
+    if (filters.currency) {
+      query = query.eq('currency', filters.currency);
+    }
     
-    if (params.sortBy) {
-      switch (params.sortBy) {
+    // Apply price range filters
+    if (filters.priceMin !== undefined) {
+      query = query.gte('price', filters.priceMin);
+    }
+    
+    if (filters.priceMax !== undefined) {
+      query = query.lte('price', filters.priceMax);
+    }
+    
+    // Apply sorting
+    if (filters.sortBy) {
+      switch (filters.sortBy) {
         case 'price_asc':
-          sortField = 'price';
-          sortDirection = 'asc';
+          query = query.order('price', { ascending: true });
           break;
         case 'price_desc':
-          sortField = 'price';
-          sortDirection = 'desc';
+          query = query.order('price', { ascending: false });
           break;
         case 'views':
-          sortField = 'views';
-          sortDirection = 'desc';
+          query = query.order('views', { ascending: false });
           break;
         default:
-          // Keep default
+          query = query.order('created_at', { ascending: false });
           break;
       }
+    } else {
+      query = query.order('created_at', { ascending: false });
     }
     
-    constraints.push(orderBy(sortField, sortDirection));
+    // Execute query
+    const { data, error } = await query;
     
-    const q = query(collection(db, 'listings'), ...constraints);
-    const querySnapshot = await getDocs(q);
+    if (error) {
+      throw error;
+    }
     
-    let results = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as Listing));
+    let results = data || [];
     
-    // Client-side filtering for text search and price range
-    if (params.query) {
-      const searchQuery = params.query.toLowerCase();
+    // Client-side filtering for text search
+    if (filters.query) {
+      const searchQuery = filters.query.toLowerCase();
       results = results.filter(listing => 
         listing.title.toLowerCase().includes(searchQuery) ||
         listing.description.toLowerCase().includes(searchQuery)
       );
     }
     
-    if (params.priceMin !== undefined || params.priceMax !== undefined) {
-      results = results.filter(listing => {
-        const price = parseFloat(listing.price);
-        
-        if (params.priceMin !== undefined && params.priceMax !== undefined) {
-          return price >= params.priceMin && price <= params.priceMax;
-        } else if (params.priceMin !== undefined) {
-          return price >= params.priceMin;
-        } else if (params.priceMax !== undefined) {
-          return price <= params.priceMax;
-        }
-        
-        return true;
-      });
-    }
-    
-    // Filter by currency if specified
-    if (params.currency) {
-      results = results.filter(listing => listing.currency === params.currency);
-    }
-    
-    // Get current language
+    // Get current language for sorting by language preference
     const currentLanguage = localStorage.getItem('language') || 'ar';
     
-    // Sort results to show listings in current language first
-    results.sort((a, b) => {
-      // If both have same language or no language specified, maintain previous sort order
-      if ((!a.language && !b.language) || (a.language === b.language)) {
-        return 0;
-      }
-      
-      // Push listings in current language to the top
-      if (a.language === currentLanguage) return -1;
-      if (b.language === currentLanguage) return 1;
-      
-      return 0;
-    });
+    // Sort by current language (this would need a language field in the listing that we don't currently have)
+    // Could be added later if needed
     
     return results;
   } catch (error) {
@@ -295,18 +279,36 @@ export const searchListings = async (params: {
 
 export const updateListing = async (id: string, data: Partial<Listing>): Promise<void> => {
   try {
-    const listingRef = doc(db, 'listings', id);
-    await updateDoc(listingRef, data);
+    const { error } = await supabase
+      .from('listings')
+      .update({
+        ...data,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id);
+      
+    if (error) {
+      throw error;
+    }
   } catch (error) {
     console.error('Error updating listing:', error);
     throw error;
   }
 };
 
-export const toggleListingStatus = async (id: string, active: boolean): Promise<void> => {
+export const toggleListingStatus = async (id: string, status: 'active' | 'sold' | 'pending'): Promise<void> => {
   try {
-    const listingRef = doc(db, 'listings', id);
-    await updateDoc(listingRef, { active });
+    const { error } = await supabase
+      .from('listings')
+      .update({ 
+        status,
+        updated_at: new Date().toISOString() 
+      })
+      .eq('id', id);
+      
+    if (error) {
+      throw error;
+    }
   } catch (error) {
     console.error('Error toggling listing status:', error);
     throw error;
@@ -315,10 +317,150 @@ export const toggleListingStatus = async (id: string, active: boolean): Promise<
 
 export const deleteListing = async (id: string): Promise<void> => {
   try {
-    const listingRef = doc(db, 'listings', id);
-    await deleteDoc(listingRef);
+    const { error } = await supabase
+      .from('listings')
+      .delete()
+      .eq('id', id);
+      
+    if (error) {
+      throw error;
+    }
   } catch (error) {
     console.error('Error deleting listing:', error);
+    throw error;
+  }
+};
+
+export const addListingToFavorites = async (userId: string, listingId: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('favorites')
+      .insert({ user_id: userId, listing_id: listingId });
+    
+    if (error) {
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error adding listing to favorites:', error);
+    throw error;
+  }
+};
+
+export const removeListingFromFavorites = async (userId: string, listingId: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('favorites')
+      .delete()
+      .eq('user_id', userId)
+      .eq('listing_id', listingId);
+      
+    if (error) {
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error removing listing from favorites:', error);
+    throw error;
+  }
+};
+
+export const getUserFavorites = async (userId: string): Promise<ListingWithRelations[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('favorites')
+      .select(`
+        listing_id,
+        listing:listing_id(
+          *,
+          governorate:governorate_id(*),
+          district:district_id(*),
+          user:user_id(*)
+        )
+      `)
+      .eq('user_id', userId);
+    
+    if (error) {
+      throw error;
+    }
+    
+    return data?.map(item => item.listing) || [];
+  } catch (error) {
+    console.error('Error getting user favorites:', error);
+    throw error;
+  }
+};
+
+export const isListingFavorited = async (userId: string, listingId: string): Promise<boolean> => {
+  try {
+    const { data, error } = await supabase
+      .from('favorites')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('listing_id', listingId)
+      .maybeSingle();
+      
+    if (error) {
+      throw error;
+    }
+    
+    return !!data;
+  } catch (error) {
+    console.error('Error checking if listing is favorited:', error);
+    throw error;
+  }
+};
+
+export const getGovernorates = async (): Promise<Database['public']['Tables']['governorates']['Row'][]> => {
+  try {
+    const { data, error } = await supabase
+      .from('governorates')
+      .select('*')
+      .order('name_ar', { ascending: true });
+      
+    if (error) {
+      throw error;
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error('Error getting governorates:', error);
+    throw error;
+  }
+};
+
+export const getDistricts = async (governorateId: string): Promise<Database['public']['Tables']['districts']['Row'][]> => {
+  try {
+    const { data, error } = await supabase
+      .from('districts')
+      .select('*')
+      .eq('governorate_id', governorateId)
+      .order('name_ar', { ascending: true });
+      
+    if (error) {
+      throw error;
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error('Error getting districts:', error);
+    throw error;
+  }
+};
+
+export const reportListing = async (userId: string, listingId: string, reason: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('reports')
+      .insert({
+        user_id: userId,
+        listing_id: listingId,
+        reason
+      });
+      
+    if (error) {
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error reporting listing:', error);
     throw error;
   }
 };

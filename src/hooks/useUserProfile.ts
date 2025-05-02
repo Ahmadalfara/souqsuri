@@ -4,7 +4,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUserListings, Listing } from '@/services/listingService';
-import { supabase } from '@/integrations/supabase/client';
+import { getUserProfile } from '@/services/userService';
+import { Profile } from '@/types/supabase';
 
 export interface UserData {
   name: string;
@@ -12,6 +13,7 @@ export interface UserData {
   phone: string;
   location: string;
   createdAt: string;
+  profilePicture?: string;
 }
 
 export const useUserProfile = () => {
@@ -29,23 +31,17 @@ export const useUserProfile = () => {
       try {
         setLoading(true);
         // Get user data from Supabase profiles table
-        // This will automatically respect RLS policies since we're using the authenticated client
-        const { data: profileData, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', currentUser.id)
-          .single();
+        const profileData = await getUserProfile(currentUser.id);
           
-        if (error) throw error;
-        
         if (profileData) {
           // Map the Supabase profile data to our UserData interface
           setUserData({
-            name: profileData.name,
-            email: profileData.email,
+            name: profileData.full_name || profileData.username || '',
+            email: profileData.email || '',
             phone: profileData.phone || '',
             location: profileData.location || '',
-            createdAt: profileData.created_at
+            createdAt: profileData.created_at || '',
+            profilePicture: profileData.profile_picture || profileData.avatar_url || ''
           });
         }
 

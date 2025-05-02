@@ -9,6 +9,195 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      districts: {
+        Row: {
+          created_at: string
+          governorate_id: string
+          id: string
+          name_ar: string
+          name_en: string
+        }
+        Insert: {
+          created_at?: string
+          governorate_id: string
+          id?: string
+          name_ar: string
+          name_en: string
+        }
+        Update: {
+          created_at?: string
+          governorate_id?: string
+          id?: string
+          name_ar?: string
+          name_en?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "districts_governorate_id_fkey"
+            columns: ["governorate_id"]
+            isOneToOne: false
+            referencedRelation: "governorates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      favorites: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      governorates: {
+        Row: {
+          created_at: string
+          id: string
+          name_ar: string
+          name_en: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name_ar: string
+          name_en: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name_ar?: string
+          name_en?: string
+        }
+        Relationships: []
+      }
+      listings: {
+        Row: {
+          category: Database["public"]["Enums"]["listing_category"]
+          created_at: string
+          currency: string
+          description: string
+          district_id: string | null
+          governorate_id: string | null
+          id: string
+          images: string[] | null
+          is_featured: boolean
+          price: number
+          status: Database["public"]["Enums"]["listing_status"]
+          title: string
+          updated_at: string
+          user_id: string
+          views: number
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["listing_category"]
+          created_at?: string
+          currency?: string
+          description: string
+          district_id?: string | null
+          governorate_id?: string | null
+          id?: string
+          images?: string[] | null
+          is_featured?: boolean
+          price: number
+          status?: Database["public"]["Enums"]["listing_status"]
+          title: string
+          updated_at?: string
+          user_id: string
+          views?: number
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["listing_category"]
+          created_at?: string
+          currency?: string
+          description?: string
+          district_id?: string | null
+          governorate_id?: string | null
+          id?: string
+          images?: string[] | null
+          is_featured?: boolean
+          price?: number
+          status?: Database["public"]["Enums"]["listing_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listings_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "districts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listings_governorate_id_fkey"
+            columns: ["governorate_id"]
+            isOneToOne: false
+            referencedRelation: "governorates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          listing_id: string | null
+          read: boolean
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          read?: boolean
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          read?: boolean
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -17,6 +206,7 @@ export type Database = {
           location: string | null
           name: string
           phone: string | null
+          profile_picture: string | null
           updated_at: string | null
         }
         Insert: {
@@ -26,6 +216,7 @@ export type Database = {
           location?: string | null
           name: string
           phone?: string | null
+          profile_picture?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -35,9 +226,45 @@ export type Database = {
           location?: string | null
           name?: string
           phone?: string | null
+          profile_picture?: string | null
           updated_at?: string | null
         }
         Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          reason: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          reason: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          reason?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -47,7 +274,18 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      listing_category:
+        | "electronics"
+        | "vehicles"
+        | "real_estate"
+        | "furniture"
+        | "clothing"
+        | "jobs"
+        | "services"
+        | "pets"
+        | "hobbies"
+        | "other"
+      listing_status: "active" | "sold" | "pending"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -162,6 +400,20 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      listing_category: [
+        "electronics",
+        "vehicles",
+        "real_estate",
+        "furniture",
+        "clothing",
+        "jobs",
+        "services",
+        "pets",
+        "hobbies",
+        "other",
+      ],
+      listing_status: ["active", "sold", "pending"],
+    },
   },
 } as const
