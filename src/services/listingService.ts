@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Database, Listing, ListingWithRelations } from '@/types/supabase';
 import { PostgrestError } from '@supabase/supabase-js';
+import { getDistrictById, getGovernorateById } from '@/services/locationService';
 
 export type { Listing, ListingWithRelations } from '@/types/supabase';
 
