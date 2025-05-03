@@ -45,8 +45,7 @@ const Header = () => {
         <SearchBar className="max-w-4xl mx-auto" />
       </div>
       
-      {/* Categories menu */}
-      <Categories />
+      {/* Categories menu - removed from here as per request */}
     </header>
   );
 };

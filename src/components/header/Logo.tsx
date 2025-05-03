@@ -9,11 +9,11 @@ const Logo = () => {
   return (
     <div className="flex items-center">
       <Link to="/">
-        <div className="w-12 h-12 flex items-center justify-center">
+        <div className="w-16 h-16 flex items-center justify-center">
           <img 
-            src="/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png" 
+            src="/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png" 
             alt="Syria Market" 
-            className="w-12 h-12 object-contain" 
+            className="w-16 h-16 object-contain" 
           />
         </div>
       </Link>
