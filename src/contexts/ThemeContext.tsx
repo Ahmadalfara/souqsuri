@@ -27,18 +27,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const systemTheme: Theme = prefersDarkMode ? 'dark' : 'light';
   const isMobile = useIsMobile();
   
-  const [theme, setThemeState] = useState<Theme>(() => {
-    // Check if theme preference is saved in localStorage
-    const savedTheme = localStorage.getItem('theme') as Theme;
-    
-    // If user has a saved preference, use it
-    if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
-      return savedTheme;
-    }
-    
-    // Always default to light theme, regardless of system preference
-    return 'light';
-  });
+  // Always initialize with light mode
+  const [theme, setThemeState] = useState<Theme>('light');
 
   useEffect(() => {
     // Update document theme class based on selected theme
