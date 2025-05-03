@@ -32,7 +32,7 @@ const Header = () => {
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
         
-        <div className={`hidden md:flex items-center space-x-4 ${language === 'ar' ? 'flex-row-reverse space-x-reverse' : ''}`}>
+        <div className={`hidden md:flex items-center space-x-4 ${language === 'ar' ? 'space-x-reverse flex-row-reverse' : ''}`}>
           <ThemeSwitcher />
           <LanguageSwitcher />
           <AuthButtons />
@@ -47,7 +47,8 @@ const Header = () => {
         <SearchBar className="max-w-4xl mx-auto" />
       </div>
       
-      {/* Categories menu - removed from here as per request */}
+      {/* Categories menu - restoring as per refactoring */}
+      <Categories />
     </header>
   );
 };
