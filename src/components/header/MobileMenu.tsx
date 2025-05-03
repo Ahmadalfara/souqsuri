@@ -34,9 +34,9 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="md:hidden py-4 border-t border-syrian-green/10">
+    <div className={`md:hidden py-4 border-t border-syrian-green/10 ${language === 'ar' ? 'rtl' : ''}`}>
       <div className="flex flex-col space-y-4">
-        <div className="flex justify-between">
+        <div className={`flex justify-between ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
           <LanguageSwitcher className="self-start" />
           <ThemeSwitcher id="dark-mode-toggle" className="self-start" />
         </div>

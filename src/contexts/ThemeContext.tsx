@@ -2,6 +2,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 type Theme = 'light' | 'dark';
 
@@ -26,6 +27,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const systemTheme: Theme = prefersDarkMode ? 'dark' : 'light';
   const isMobile = useIsMobile();
+  const { language } = useLanguage();
   
   // Always initialize with light mode
   const [theme, setThemeState] = useState<Theme>('light');

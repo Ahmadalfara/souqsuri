@@ -56,7 +56,7 @@ const UserMenu = () => {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align={language === 'ar' ? "start" : "end"} className={`w-56 ${language === 'ar' ? 'rtl' : ''}`}>
         <DropdownMenuLabel>
           {language === 'ar' ? (
             <ArabicText text="حسابي" />
@@ -66,7 +66,7 @@ const UserMenu = () => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate('/profile')}>
-          <User className="mr-2 h-4 w-4" />
+          <User className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
           {language === 'ar' ? (
             <ArabicText text="الملف الشخصي" />
           ) : (
@@ -74,7 +74,7 @@ const UserMenu = () => {
           )}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleLogout}>
-          <LogOut className="mr-2 h-4 w-4" />
+          <LogOut className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
           {language === 'ar' ? (
             <ArabicText text="تسجيل الخروج" />
           ) : (

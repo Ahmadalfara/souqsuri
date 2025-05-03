@@ -29,7 +29,7 @@ const Categories = () => {
   ];
   
   return (
-    <div className={`flex justify-center space-x-1 md:space-x-6 overflow-x-auto pb-2 ${language === 'ar' ? 'rtl' : ''}`}>
+    <div className={`flex justify-center ${language === 'ar' ? 'space-x-reverse rtl' : 'space-x-1'} md:space-x-6 overflow-x-auto pb-2`}>
       {categories.map((category) => (
         <Link 
           key={category.name}

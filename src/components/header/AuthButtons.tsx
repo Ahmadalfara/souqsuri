@@ -14,9 +14,9 @@ const AuthButtons = () => {
   const { currentUser } = useAuth();
 
   return (
-    <div className="hidden md:flex items-center space-x-4">
+    <div className={`hidden md:flex items-center ${language === 'ar' ? 'space-x-reverse space-x-4 flex-row-reverse' : 'space-x-4'}`}>
       {currentUser ? (
-        <div className="flex items-center space-x-4">
+        <div className={`flex items-center ${language === 'ar' ? 'space-x-reverse space-x-4 flex-row-reverse' : 'space-x-4'}`}>
           <UserMenu />
           
           <CreateListingSheet>

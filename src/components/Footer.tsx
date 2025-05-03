@@ -11,28 +11,28 @@ const Footer = () => {
 
   const links = [
     {
-      title: t('categories'),
+      title: language === 'ar' ? 'الفئات' : t('categories'),
       items: [
-        { name: t('home'), href: '/' },
-        { name: t('realEstate'), href: '/category/real-estate' },
-        { name: t('cars'), href: '/category/cars' },
-        { name: t('electronics'), href: '/category/electronics' },
+        { name: language === 'ar' ? 'الرئيسية' : t('home'), href: '/' },
+        { name: language === 'ar' ? 'العقارات' : t('realEstate'), href: '/category/real-estate' },
+        { name: language === 'ar' ? 'سيارات' : t('cars'), href: '/category/cars' },
+        { name: language === 'ar' ? 'إلكترونيات' : t('electronics'), href: '/category/electronics' },
       ],
     },
     {
-      title: t('help'),
+      title: language === 'ar' ? 'المساعدة' : t('help'),
       items: [
-        { name: t('howToSell'), href: '/how-to-sell' },
-        { name: t('faq'), href: '/faq' },
-        { name: t('customerSupport'), href: '/customer-support' },
-        { name: t('contactUs'), href: '/contact' },
+        { name: language === 'ar' ? 'كيفية البيع' : t('howToSell'), href: '/how-to-sell' },
+        { name: language === 'ar' ? 'الأسئلة الشائعة' : t('faq'), href: '/faq' },
+        { name: language === 'ar' ? 'دعم العملاء' : t('customerSupport'), href: '/customer-support' },
+        { name: language === 'ar' ? 'اتصل بنا' : t('contactUs'), href: '/contact' },
       ],
     },
     {
-      title: t('legal'),
+      title: language === 'ar' ? 'القانونية' : t('legal'),
       items: [
-        { name: t('termsOfService'), href: '/terms-of-service' },
-        { name: t('privacyPolicy'), href: '/privacy-policy' },
+        { name: language === 'ar' ? 'شروط الخدمة' : t('termsOfService'), href: '/terms-of-service' },
+        { name: language === 'ar' ? 'سياسة الخصوصية' : t('privacyPolicy'), href: '/privacy-policy' },
       ],
     },
   ];
@@ -41,9 +41,9 @@ const Footer = () => {
     <footer className={`bg-white border-t border-syrian-green/10 transition-colors duration-300 dark:bg-gray-900 dark:border-gray-800`}>
       <div className="container mx-auto py-8 px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center">
-              <img src="/placeholder.svg" alt="Logo" className="h-10 w-10 mr-2" />
+          <div className={`col-span-2 md:col-span-1 ${language === 'ar' ? 'text-right' : ''}`}>
+            <div className={`flex items-center ${language === 'ar' ? 'flex-row-reverse justify-end' : ''}`}>
+              <img src="/placeholder.svg" alt="Logo" className={`h-10 w-10 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
               <div>
                 <h3 className={`font-bold text-lg text-syrian-dark dark:text-white`}>
                   {language === 'ar' ? (
@@ -55,7 +55,7 @@ const Footer = () => {
               </div>
             </div>
 
-            <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">
+            <p className={`mt-4 text-sm text-gray-600 dark:text-gray-300 ${language === 'ar' ? 'text-right' : ''}`}>
               {language === 'ar' ? (
                 <ArabicText text="منصة إعلانات مبوبة متكاملة تساعدك على شراء وبيع أي شيء بسهولة." />
               ) : (
@@ -63,7 +63,7 @@ const Footer = () => {
               )}
             </p>
 
-            <div className="mt-4 flex space-x-4">
+            <div className={`mt-4 flex ${language === 'ar' ? 'justify-end space-x-reverse' : ''} space-x-4`}>
               <a 
                 href="#" 
                 className="text-syrian-dark hover:text-syrian-green dark:text-gray-300 dark:hover:text-syrian-green"
@@ -95,7 +95,7 @@ const Footer = () => {
           </div>
 
           {links.map((group, index) => (
-            <div key={index} className={`text-right ${language === 'en' ? 'text-left' : ''}`}>
+            <div key={index} className={`${language === 'ar' ? 'text-right' : 'text-left'}`}>
               <h3 className="font-bold text-syrian-dark dark:text-white mb-4">
                 {language === 'ar' ? (
                   <ArabicText text={group.title} />
@@ -124,7 +124,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-8 pt-4 border-t border-syrian-green/10 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center">
-          <div className="text-gray-500 dark:text-gray-400 text-sm mb-4 md:mb-0">
+          <div className={`text-gray-500 dark:text-gray-400 text-sm mb-4 md:mb-0 ${language === 'ar' ? 'text-right w-full' : ''}`}>
             {language === 'ar' ? (
               <ArabicText text={`© ${new Date().getFullYear()} إعلانات سوريا. جميع الحقوق محفوظة.`} />
             ) : (

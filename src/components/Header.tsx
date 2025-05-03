@@ -9,16 +9,18 @@ import Categories from './header/Categories';
 import AuthButtons from './header/AuthButtons';
 import MobileMenu from './header/MobileMenu';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme } = useTheme();
+  const { language } = useLanguage();
   
   return (
     <header className={`flex flex-col py-4 px-6 bg-white border-b border-syrian-green/20 shadow-sm sticky top-0 z-20
                        dark:bg-gray-900 dark:border-gray-800 dark:text-white transition-colors duration-300`}>
       {/* Upper header with logo, language switcher and auth buttons */}
-      <div className="flex items-center justify-between mb-4">
+      <div className={`flex items-center justify-between mb-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
         <Logo />
 
         {/* Mobile menu toggle */}
@@ -30,7 +32,7 @@ const Header = () => {
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
         
-        <div className="hidden md:flex items-center space-x-4">
+        <div className={`hidden md:flex items-center space-x-4 ${language === 'ar' ? 'flex-row-reverse space-x-reverse' : ''}`}>
           <ThemeSwitcher />
           <LanguageSwitcher />
           <AuthButtons />
