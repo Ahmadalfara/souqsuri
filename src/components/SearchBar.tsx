@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { Card } from './ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { ScrollArea } from './ui/scroll-area';
 
 interface SearchBarProps {
   className?: string;
@@ -23,6 +25,24 @@ const mockSearchData = [
   { id: 3, title: 'سيارة مرسيدس 2020', category: 'سيارات', price: '15000', location: 'حمص', currency: 'USD' },
   { id: 4, title: 'أريكة جلدية بحالة ممتازة', category: 'أثاث', price: '250', location: 'اللاذقية', currency: 'SYP' },
   { id: 5, title: 'لابتوب ديل XPS جديد', category: 'إلكترونيات', price: '1200', location: 'دمشق', currency: 'USD' },
+];
+
+// قائمة المحافظات السورية
+const syrianGovernorates = [
+  { id: 'damascus', nameAr: 'دمشق', nameEn: 'Damascus' },
+  { id: 'aleppo', nameAr: 'حلب', nameEn: 'Aleppo' },
+  { id: 'homs', nameAr: 'حمص', nameEn: 'Homs' },
+  { id: 'hama', nameAr: 'حماة', nameEn: 'Hama' },
+  { id: 'latakia', nameAr: 'اللاذقية', nameEn: 'Latakia' },
+  { id: 'tartus', nameAr: 'طرطوس', nameEn: 'Tartus' },
+  { id: 'daraa', nameAr: 'درعا', nameEn: 'Daraa' },
+  { id: 'idlib', nameAr: 'إدلب', nameEn: 'Idlib' },
+  { id: 'alhasakah', nameAr: 'الحسكة', nameEn: 'Al-Hasakah' },
+  { id: 'deirezZor', nameAr: 'دير الزور', nameEn: 'Deir ez-Zor' },
+  { id: 'quneitra', nameAr: 'القنيطرة', nameEn: 'Quneitra' },
+  { id: 'alraqqa', nameAr: 'الرقة', nameEn: 'Al-Raqqah' },
+  { id: 'assuwaida', nameAr: 'السويداء', nameEn: 'As-Suwayda' },
+  { id: 'ruraldamascus', nameAr: 'ريف دمشق', nameEn: 'Rural Damascus' },
 ];
 
 const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
@@ -213,8 +233,6 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
               size={variant === 'default' ? 20 : 16}
             />
           </div>
-          
-          {/* Removed the Quick Category Filters section */}
         </div>
 
         {/* Advanced Filter Button */}
@@ -234,7 +252,7 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
                 )}
               </h3>
               
-              {/* Location Selection */}
+              {/* Location Selection - Now with all Syrian governorates */}
               <div className="space-y-2">
                 <div className="text-sm font-medium">
                   {language === 'ar' ? (
@@ -248,24 +266,19 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
                   onValueChange={setSelectedLocation}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={language === 'ar' ? "اختر المدينة" : "Select city"} />
+                    <SelectValue placeholder={language === 'ar' ? "اختر المحافظة" : "Select governorate"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">
-                      {language === 'ar' ? "جميع المدن" : "All Cities"}
-                    </SelectItem>
-                    <SelectItem value="damascus">
-                      {language === 'ar' ? "دمشق" : "Damascus"}
-                    </SelectItem>
-                    <SelectItem value="aleppo">
-                      {language === 'ar' ? "حلب" : "Aleppo"}
-                    </SelectItem>
-                    <SelectItem value="homs">
-                      {language === 'ar' ? "حمص" : "Homs"}
-                    </SelectItem>
-                    <SelectItem value="latakia">
-                      {language === 'ar' ? "اللاذقية" : "Latakia"}
-                    </SelectItem>
+                    <ScrollArea className="h-60 w-full">
+                      <SelectItem value="all">
+                        {language === 'ar' ? "جميع المحافظات" : "All Governorates"}
+                      </SelectItem>
+                      {syrianGovernorates.map((governorate) => (
+                        <SelectItem key={governorate.id} value={governorate.id}>
+                          {language === 'ar' ? governorate.nameAr : governorate.nameEn}
+                        </SelectItem>
+                      ))}
+                    </ScrollArea>
                   </SelectContent>
                 </Select>
               </div>

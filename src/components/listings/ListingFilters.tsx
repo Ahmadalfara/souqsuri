@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,6 +33,24 @@ interface ListingFiltersProps {
   }) => void;
   className?: string;
 }
+
+// قائمة المحافظات السورية
+const syrianGovernorates = [
+  { id: 'damascus', nameAr: 'دمشق', nameEn: 'Damascus' },
+  { id: 'aleppo', nameAr: 'حلب', nameEn: 'Aleppo' },
+  { id: 'homs', nameAr: 'حمص', nameEn: 'Homs' },
+  { id: 'hama', nameAr: 'حماة', nameEn: 'Hama' },
+  { id: 'latakia', nameAr: 'اللاذقية', nameEn: 'Latakia' },
+  { id: 'tartus', nameAr: 'طرطوس', nameEn: 'Tartus' },
+  { id: 'daraa', nameAr: 'درعا', nameEn: 'Daraa' },
+  { id: 'idlib', nameAr: 'إدلب', nameEn: 'Idlib' },
+  { id: 'alhasakah', nameAr: 'الحسكة', nameEn: 'Al-Hasakah' },
+  { id: 'deirezZor', nameAr: 'دير الزور', nameEn: 'Deir ez-Zor' },
+  { id: 'quneitra', nameAr: 'القنيطرة', nameEn: 'Quneitra' },
+  { id: 'alraqqa', nameAr: 'الرقة', nameEn: 'Al-Raqqah' },
+  { id: 'assuwaida', nameAr: 'السويداء', nameEn: 'As-Suwayda' },
+  { id: 'ruraldamascus', nameAr: 'ريف دمشق', nameEn: 'Rural Damascus' },
+];
 
 const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
   const { language, t } = useLanguage();
@@ -169,8 +186,8 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
             <SelectTrigger>
               <SelectValue placeholder={language === 'ar' ? "اختر الفئة" : "Select category"} />
             </SelectTrigger>
-            <SelectContent className="max-h-[300px] overflow-auto">
-              <ScrollArea className="h-[200px] w-full overflow-auto overscroll-contain touch-pan-y">
+            <SelectContent>
+              <ScrollArea className="h-[200px] overflow-auto">
                 <SelectItem value="all">
                   {language === 'ar' ? (
                     <ArabicText text={t('allCategories')} />
@@ -290,19 +307,35 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
           </div>
         </div>
         
-        {/* Location Selector Component - Now with improved scrolling */}
+        {/* Governorate Selection - Now with all Syrian governorates */}
         <div className="space-y-2">
           <Label className={language === 'ar' ? 'block text-right' : ''}>
             {language === 'ar' ? (
-              <ArabicText text={t('location')} />
+              <ArabicText text={t('governorate')} />
             ) : (
-              t('location')
+              t('governorate')
             )}
           </Label>
-          <LocationSelector 
-            onGovernorateChange={setGovernorateId}
-            onDistrictChange={setDistrictId}
-          />
+          <Select 
+            value={governorateId} 
+            onValueChange={setGovernorateId}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={language === 'ar' ? "اختر المحافظة" : "Select governorate"} />
+            </SelectTrigger>
+            <SelectContent>
+              <ScrollArea className="h-60 w-full">
+                <SelectItem value="">
+                  {language === 'ar' ? "جميع المحافظات" : "All Governorates"}
+                </SelectItem>
+                {syrianGovernorates.map((governorate) => (
+                  <SelectItem key={governorate.id} value={governorate.id}>
+                    {language === 'ar' ? governorate.nameAr : governorate.nameEn}
+                  </SelectItem>
+                ))}
+              </ScrollArea>
+            </SelectContent>
+          </Select>
         </div>
         
         {/* Sort By */}

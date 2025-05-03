@@ -14,11 +14,19 @@ const ScrollArea = React.forwardRef<
     ref={ref}
     className={cn("relative overflow-hidden", className)}
     {...props}
-    style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}
+    style={{ 
+      touchAction: 'pan-y', 
+      WebkitOverflowScrolling: 'touch',
+      overflowY: 'auto'
+    }}
   >
     <ScrollAreaPrimitive.Viewport 
       className="h-full w-full rounded-[inherit] overflow-auto"
-      style={{ overscrollBehavior: 'contain' }}
+      style={{ 
+        overscrollBehavior: 'contain',
+        WebkitOverflowScrolling: 'touch',
+        msOverflowStyle: '-ms-autohiding-scrollbar'
+      }}
     >
       {children}
     </ScrollAreaPrimitive.Viewport>
@@ -51,3 +59,4 @@ const ScrollBar = React.forwardRef<
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName
 
 export { ScrollArea, ScrollBar }
+
