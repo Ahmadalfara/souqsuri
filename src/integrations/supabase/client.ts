@@ -23,8 +23,17 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
 import { ensureStorageBucketsExist } from '@/utils/supabaseStorage';
 (async () => {
   try {
+    // Make sure the listings bucket exists
     // Comment this out as it requires admin privileges
     // await ensureStorageBucketsExist();
+    
+    // Check if we can access the storage
+    const { data, error } = await supabase.storage.getBucket('listings');
+    if (error) {
+      console.warn('Listings bucket might not exist:', error);
+    } else {
+      console.log('Listings bucket accessible:', data);
+    }
   } catch (error) {
     console.error('Failed to initialize storage buckets:', error);
   }

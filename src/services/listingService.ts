@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Database, Listing, ListingWithRelations } from '@/types/supabase';
 import { PostgrestError } from '@supabase/supabase-js';
@@ -23,6 +24,8 @@ export const addListing = async (
   imageFiles: File[]
 ): Promise<string | null> => {
   try {
+    console.log("Adding listing with data:", listing);
+    
     // First upload images to Supabase storage
     const imageUrls: string[] = [];
     
@@ -30,6 +33,8 @@ export const addListing = async (
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `listings/${fileName}`;
+      
+      console.log(`Uploading ${file.name} to ${filePath}`);
       
       const { data: uploadData, error: uploadError } = await supabase
         .storage
@@ -52,6 +57,8 @@ export const addListing = async (
       }
     }
     
+    console.log("Image URLs:", imageUrls);
+    
     // Create the listing with image URLs
     const { data, error } = await supabase
       .from('listings')
@@ -64,6 +71,7 @@ export const addListing = async (
       .single();
       
     if (error) {
+      console.error('Error adding listing:', error);
       throw error;
     }
     
@@ -186,6 +194,8 @@ export const getListing = async (id: string): Promise<ListingWithRelations | nul
 
 export const searchListings = async (filters: ListingFilters): Promise<ListingWithRelations[]> => {
   try {
+    console.log("Searching with filters:", filters);
+    
     let query = supabase
       .from('listings')
       .select(`
@@ -197,37 +207,45 @@ export const searchListings = async (filters: ListingFilters): Promise<ListingWi
       .eq('status', 'active');
     
     // Apply filters
-    if (filters.category && filters.category !== 'all') {
+    if (filters.category && filters.category !== 'all' && filters.category !== '') {
+      console.log("Applying category filter:", filters.category);
       query = query.eq('category', filters.category);
     }
     
     if (filters.governorate_id) {
+      console.log("Applying governorate filter:", filters.governorate_id);
       query = query.eq('governorate_id', filters.governorate_id);
     }
     
     if (filters.district_id) {
+      console.log("Applying district filter:", filters.district_id);
       query = query.eq('district_id', filters.district_id);
     }
     
     if (filters.urgent === true) {
+      console.log("Applying urgent filter");
       query = query.eq('is_featured', true);
     }
     
     if (filters.currency) {
+      console.log("Applying currency filter:", filters.currency);
       query = query.eq('currency', filters.currency);
     }
     
     // Apply price range filters
-    if (filters.priceMin !== undefined) {
+    if (filters.priceMin !== undefined && filters.priceMin > 0) {
+      console.log("Applying min price filter:", filters.priceMin);
       query = query.gte('price', filters.priceMin);
     }
     
-    if (filters.priceMax !== undefined) {
+    if (filters.priceMax !== undefined && filters.priceMax > 0) {
+      console.log("Applying max price filter:", filters.priceMax);
       query = query.lte('price', filters.priceMax);
     }
     
     // Apply sorting
     if (filters.sortBy) {
+      console.log("Applying sort filter:", filters.sortBy);
       switch (filters.sortBy) {
         case 'price_asc':
           query = query.order('price', { ascending: true });
@@ -247,25 +265,36 @@ export const searchListings = async (filters: ListingFilters): Promise<ListingWi
     }
     
     // Execute query
+    console.log("Executing search query");
     const { data, error } = await query;
     
     if (error) {
+      console.error("Search error:", error);
       throw error;
     }
     
     let results = data || [];
+    console.log("Search results before filtering:", results.length);
     
     // Client-side filtering for text search
     if (filters.query) {
       const searchQuery = filters.query.toLowerCase();
+      console.log("Applying text search filter:", searchQuery);
       results = results.filter(listing => 
         listing.title.toLowerCase().includes(searchQuery) ||
-        listing.description.toLowerCase().includes(searchQuery)
+        (listing.description && listing.description.toLowerCase().includes(searchQuery))
       );
+      console.log("Search results after text filtering:", results.length);
     }
     
-    // Get current language for sorting by language preference
-    const currentLanguage = localStorage.getItem('language') || 'ar';
+    // Client-side filtering for condition
+    if (filters.condition && filters.condition.length > 0) {
+      console.log("Applying condition filter:", filters.condition);
+      results = results.filter(listing => 
+        !listing.condition || filters.condition.includes(listing.condition)
+      );
+      console.log("Search results after condition filtering:", results.length);
+    }
     
     return results;
   } catch (error) {

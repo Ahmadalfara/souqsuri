@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,24 +34,6 @@ interface ListingFiltersProps {
   }) => void;
   className?: string;
 }
-
-// قائمة المحافظات السورية
-const syrianGovernorates = [
-  { id: 'damascus', nameAr: 'دمشق', nameEn: 'Damascus' },
-  { id: 'aleppo', nameAr: 'حلب', nameEn: 'Aleppo' },
-  { id: 'homs', nameAr: 'حمص', nameEn: 'Homs' },
-  { id: 'hama', nameAr: 'حماة', nameEn: 'Hama' },
-  { id: 'latakia', nameAr: 'اللاذقية', nameEn: 'Latakia' },
-  { id: 'tartus', nameAr: 'طرطوس', nameEn: 'Tartus' },
-  { id: 'daraa', nameAr: 'درعا', nameEn: 'Daraa' },
-  { id: 'idlib', nameAr: 'إدلب', nameEn: 'Idlib' },
-  { id: 'alhasakah', nameAr: 'الحسكة', nameEn: 'Al-Hasakah' },
-  { id: 'deirezZor', nameAr: 'دير الزور', nameEn: 'Deir ez-Zor' },
-  { id: 'quneitra', nameAr: 'القنيطرة', nameEn: 'Quneitra' },
-  { id: 'alraqqa', nameAr: 'الرقة', nameEn: 'Al-Raqqah' },
-  { id: 'assuwaida', nameAr: 'السويداء', nameEn: 'As-Suwayda' },
-  { id: 'ruraldamascus', nameAr: 'ريف دمشق', nameEn: 'Rural Damascus' },
-];
 
 const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
   const { language, t } = useLanguage();
@@ -92,13 +75,25 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
   };
 
   const handleApplyFilters = () => {
+    console.log("Applying filters", {
+      priceRange: [minPrice, maxPrice],
+      governorate_id: governorateId || undefined,
+      district_id: districtId || undefined,
+      sortBy,
+      keywords,
+      category: category || undefined,
+      condition,
+      urgent,
+      currency
+    });
+    
     onFilter({
       priceRange: [minPrice, maxPrice],
       governorate_id: governorateId || undefined,
       district_id: districtId || undefined,
       sortBy,
       keywords,
-      category,
+      category: category || undefined,
       condition,
       urgent,
       currency
@@ -188,7 +183,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
             </SelectTrigger>
             <SelectContent>
               <ScrollArea className="h-[200px] overflow-auto">
-                <SelectItem value="all">
+                <SelectItem value="">
                   {language === 'ar' ? (
                     <ArabicText text={t('allCategories')} />
                   ) : (
@@ -307,35 +302,12 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
           </div>
         </div>
         
-        {/* Governorate Selection - Now with all Syrian governorates */}
+        {/* Governorate and District Selection - Now using LocationSelector component */}
         <div className="space-y-2">
-          <Label className={language === 'ar' ? 'block text-right' : ''}>
-            {language === 'ar' ? (
-              <ArabicText text={t('governorate')} />
-            ) : (
-              t('governorate')
-            )}
-          </Label>
-          <Select 
-            value={governorateId} 
-            onValueChange={setGovernorateId}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={language === 'ar' ? "اختر المحافظة" : "Select governorate"} />
-            </SelectTrigger>
-            <SelectContent>
-              <ScrollArea className="h-60 w-full">
-                <SelectItem value="">
-                  {language === 'ar' ? "جميع المحافظات" : "All Governorates"}
-                </SelectItem>
-                {syrianGovernorates.map((governorate) => (
-                  <SelectItem key={governorate.id} value={governorate.id}>
-                    {language === 'ar' ? governorate.nameAr : governorate.nameEn}
-                  </SelectItem>
-                ))}
-              </ScrollArea>
-            </SelectContent>
-          </Select>
+          <LocationSelector 
+            onGovernorateChange={setGovernorateId}
+            onDistrictChange={setDistrictId}
+          />
         </div>
         
         {/* Sort By */}
