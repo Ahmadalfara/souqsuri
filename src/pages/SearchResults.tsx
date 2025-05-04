@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -170,7 +169,11 @@ const SearchResults = () => {
 
   // Get the listing title in the correct language
   const getListingTitle = (item: any): string => {
-    return language === 'ar' ? item.title : (item.title_en || item.title);
+    if (language === 'ar') {
+      return item.title || (item.title_ar || '');
+    } else {
+      return item.title_en || item.title || '';
+    }
   };
 
   return (
@@ -258,7 +261,7 @@ const SearchResults = () => {
                           </span>
                           <h3 className={`font-bold ${language === 'ar' ? 'text-right' : 'text-left'} flex-grow ml-2 dark:text-white`}>
                             {language === 'ar' ? (
-                              <ArabicText text={item.title} />
+                              <ArabicText text={item.title} textAr={item.title} textEn={item.title_en} />
                             ) : (
                               item.title_en || item.title
                             )}
@@ -275,7 +278,7 @@ const SearchResults = () => {
                       <CardFooter className="p-4 pt-0 flex justify-between items-center">
                         <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
                           <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ${language === 'ar' ? 'ml-1' : 'mr-1'} text-syrian-green`} viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                           </svg>
                           {getLocationName(item)}
                         </span>

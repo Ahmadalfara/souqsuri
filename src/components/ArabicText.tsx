@@ -27,8 +27,10 @@ const ArabicText = ({ text, className, size = 'normal', translateKey, textAr, te
   let displayText = text; // Default to the provided text
   
   // If we have explicit Arabic and English versions, use those based on language
-  if (textAr && textEn) {
-    displayText = language === 'ar' ? textAr : textEn;
+  if (language === 'ar' && textAr) {
+    displayText = textAr;
+  } else if (language === 'en' && textEn) {
+    displayText = textEn;
   }
   // Otherwise, if a translation key is provided, use it
   else if (translateKey) {
