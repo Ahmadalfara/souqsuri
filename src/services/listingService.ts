@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Database, Listing, ListingWithRelations } from '@/types/supabase';
 import { PostgrestError } from '@supabase/supabase-js';
@@ -128,6 +129,7 @@ export const getFeaturedListings = async (count = 8): Promise<ListingWithRelatio
 
 export const getListingsByCategory = async (category: string, count = 12): Promise<ListingWithRelations[]> => {
   try {
+    console.log(`Fetching listings by category: ${category}`);
     let query = supabase
       .from('listings')
       .select(`
@@ -141,18 +143,23 @@ export const getListingsByCategory = async (category: string, count = 12): Promi
     
     // Only filter by category if it's not 'all'
     if (category !== 'all') {
+      console.log(`Applying category filter: ${category}`);
       query = query.eq('category', category);
+    } else {
+      console.log('Showing all categories');
     }
     
     // Add limit
     query = query.limit(count);
-      
+    
     const { data, error } = await query;
-      
+    
     if (error) {
+      console.error('Error fetching listings by category:', error);
       throw error;
     }
     
+    console.log(`Retrieved ${data?.length || 0} listings`);
     return data || [];
   } catch (error) {
     console.error('Error getting listings by category:', error);
@@ -217,6 +224,8 @@ export const searchListings = async (filters: ListingFilters): Promise<ListingWi
     if (filters.category && filters.category !== 'all' && filters.category !== '') {
       console.log("Applying category filter:", filters.category);
       query = query.eq('category', filters.category);
+    } else {
+      console.log("No category filter applied or showing all categories");
     }
     
     if (filters.governorate_id) {

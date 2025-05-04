@@ -20,7 +20,7 @@ const Categories = () => {
   }, [location]);
 
   const categories = [
-    { name: 'all', label: language === 'ar' ? 'الكل' : t('allCategories') },
+    { name: 'all', label: language === 'ar' ? 'الكل' : t('all') },
     { name: 'real_estate', label: language === 'ar' ? 'العقارات' : t('realEstate') },
     { name: 'cars', label: language === 'ar' ? 'سيارات' : t('cars') },
     { name: 'electronics', label: language === 'ar' ? 'إلكترونيات' : t('electronics') },
