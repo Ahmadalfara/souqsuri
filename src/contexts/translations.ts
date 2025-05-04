@@ -1,3 +1,4 @@
+
 const translations = {
   en: {
     allCategories: 'All Categories',
@@ -99,6 +100,10 @@ const translations = {
     babTouma: 'Bab Touma',
     babSharqi: 'Bab Sharqi',
     shaghour: 'Al-Shaghour',
+    search: 'Search',
+    searchFor: 'Search for listings...',
+    advancedSearch: 'Advanced Search',
+    all: 'All',
   },
   ar: {
     allCategories: 'كل الفئات',
@@ -200,6 +205,10 @@ const translations = {
     babTouma: 'باب توما',
     babSharqi: 'باب شرقي',
     shaghour: 'الشاغور',
+    search: 'بحث',
+    searchFor: 'ابحث عن إعلانات...',
+    advancedSearch: 'بحث متقدم',
+    all: 'الكل',
   }
 };
 

@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Database, Listing, ListingWithRelations } from '@/types/supabase';
 import { PostgrestError } from '@supabase/supabase-js';
@@ -129,7 +128,7 @@ export const getFeaturedListings = async (count = 8): Promise<ListingWithRelatio
 
 export const getListingsByCategory = async (category: string, count = 12): Promise<ListingWithRelations[]> => {
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('listings')
       .select(`
         *,
@@ -137,10 +136,18 @@ export const getListingsByCategory = async (category: string, count = 12): Promi
         district:district_id(*),
         user:user_id(*)
       `)
-      .eq('category', category)
       .eq('status', 'active')
-      .order('created_at', { ascending: false })
-      .limit(count);
+      .order('created_at', { ascending: false });
+    
+    // Only filter by category if it's not 'all'
+    if (category !== 'all') {
+      query = query.eq('category', category);
+    }
+    
+    // Add limit
+    query = query.limit(count);
+      
+    const { data, error } = await query;
       
     if (error) {
       throw error;
@@ -206,7 +213,7 @@ export const searchListings = async (filters: ListingFilters): Promise<ListingWi
       `)
       .eq('status', 'active');
     
-    // Apply filters
+    // Apply category filter only if category is specified and not 'all'
     if (filters.category && filters.category !== 'all' && filters.category !== '') {
       console.log("Applying category filter:", filters.category);
       query = query.eq('category', filters.category);

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -168,7 +167,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
           />
         </div>
         
-        {/* Category */}
+        {/* Category - Updated with "All" option */}
         <div className="space-y-2">
           <Label className={language === 'ar' ? 'block text-right' : ''}>
             {language === 'ar' ? (
@@ -187,7 +186,14 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
                   {language === 'ar' ? (
                     <ArabicText text={t('allCategories')} />
                   ) : (
-                    "All Categories"
+                    t('allCategories')
+                  )}
+                </SelectItem>
+                <SelectItem value="all">
+                  {language === 'ar' ? (
+                    <ArabicText text={t('all')} />
+                  ) : (
+                    t('all')
                   )}
                 </SelectItem>
                 <SelectItem value="real_estate">

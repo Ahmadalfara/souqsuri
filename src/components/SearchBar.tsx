@@ -20,11 +20,11 @@ interface SearchBarProps {
 
 // Mock search results for immediate display
 const mockSearchData = [
-  { id: 1, title: 'هاتف آيفون مستعمل', category: 'إلكترونيات', price: '400', location: 'دمشق', currency: 'USD' },
-  { id: 2, title: 'شقة للإيجار في منطقة المزة', category: 'العقارات', price: '300', location: 'حلب', currency: 'SYP' },
-  { id: 3, title: 'سيارة مرسيدس 2020', category: 'سيارات', price: '15000', location: 'حمص', currency: 'USD' },
-  { id: 4, title: 'أريكة جلدية بحالة ممتازة', category: 'أثاث', price: '250', location: 'اللاذقية', currency: 'SYP' },
-  { id: 5, title: 'لابتوب ديل XPS جديد', category: 'إلكترونيات', price: '1200', location: 'دمشق', currency: 'USD' },
+  { id: 1, title: 'هاتف آيفون مستعمل', title_en: 'iPhone Used', category: 'إلكترونيات', price: '400', location: 'دمشق', currency: 'USD' },
+  { id: 2, title: 'شقة للإيجار في منطقة المزة', title_en: 'Apartment for Rent in Mazzeh', category: 'العقارات', price: '300', location: 'حلب', currency: 'SYP' },
+  { id: 3, title: 'سيارة مرسيدس 2020', title_en: 'Mercedes 2020', category: 'سيارات', price: '15000', location: 'حمص', currency: 'USD' },
+  { id: 4, title: 'أريكة جلدية بحالة ممتازة', title_en: 'Leather Sofa in Excellent Condition', category: 'أثاث', price: '250', location: 'اللاذقية', currency: 'SYP' },
+  { id: 5, title: 'لابتوب ديل XPS جديد', title_en: 'Dell XPS Laptop New', category: 'إلكترونيات', price: '1200', location: 'دمشق', currency: 'USD' },
 ];
 
 // قائمة المحافظات السورية
@@ -66,8 +66,9 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
     // Filter results based on search query, category, location, and currency
     if (searchQuery.trim()) {
       let filtered = mockSearchData.filter(item => {
-        // Match by title or category
-        const matchesQuery = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        // Match by title or category - using correct language
+        const titleToCheck = language === 'ar' ? item.title : item.title_en;
+        const matchesQuery = titleToCheck.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             item.category.toLowerCase().includes(searchQuery.toLowerCase());
         
         // Apply category filter if one is selected
@@ -91,7 +92,7 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
     } else {
       setShowResults(false);
     }
-  }, [searchQuery, selectedCategory, selectedLocation, selectedCurrency]);
+  }, [searchQuery, selectedCategory, selectedLocation, selectedCurrency, language]);
 
   useEffect(() => {
     // Close search results when clicking outside
@@ -182,6 +183,11 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
   // Get currency symbol based on currency
   const getCurrencySymbol = (currency: string) => {
     return currency === 'USD' ? '$' : language === 'ar' ? 'ل.س' : 'SYP';
+  };
+
+  // Get the right title based on language
+  const getTitle = (item: any) => {
+    return language === 'ar' ? item.title : item.title_en;
   };
 
   return (
@@ -339,7 +345,7 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
           `}
         >
           {language === 'ar' ? (
-            <ArabicText text="بحث" />
+            <ArabicText text={t('search')} />
           ) : (
             <span>{t('search')}</span>
           )}
@@ -372,7 +378,10 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
                 <div className="p-3 flex justify-between items-center">
                   <div className={`flex-1 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                     <p className="font-semibold text-syrian-dark dark:text-white">
-                      {language === 'ar' ? <ArabicText text={result.title} /> : result.title}
+                      {language === 'ar' ? 
+                        <ArabicText text={result.title} /> : 
+                        <span>{result.title_en}</span>
+                      }
                     </p>
                     <div className="flex items-center mt-1 space-x-2 text-sm text-gray-500 dark:text-gray-400">
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-syrian-green/10 text-syrian-green">

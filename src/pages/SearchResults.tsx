@@ -18,13 +18,73 @@ const searchListings = async (query: string) => {
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 600));
   
-  // Mock search data
+  // Mock search data with bilingual content
   return [
-    { id: 1, title: 'iPhone Used', category: 'Electronics', price: 400, location: 'Damascus', imageUrl: 'https://images.unsplash.com/photo-1603791239531-1dda55e194a6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fGlwaG9uZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60', currency: 'USD' },
-    { id: 2, title: 'Apartment for Rent in Mazzeh', category: 'Real Estate', price: 300, location: 'Aleppo', imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60', currency: 'USD' },
-    { id: 3, title: 'Mercedes 2020', category: 'Cars', price: 15000, location: 'Homs', imageUrl: 'https://images.unsplash.com/photo-1563720223185-11003d516935?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fG1lcmNlZGVzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60', currency: 'USD' },
-    { id: 4, title: 'Leather Sofa in Excellent Condition', category: 'Furniture', price: 250, location: 'Latakia', imageUrl: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c29mYXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60', currency: 'USD' },
-    { id: 5, title: 'Dell XPS Laptop New', category: 'Electronics', price: 1200, location: 'Damascus', imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8bGFwdG9wfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60', currency: 'USD' },
+    { 
+      id: 1, 
+      title: 'هاتف آيفون مستعمل', 
+      title_en: 'iPhone Used', 
+      category: 'electronics', 
+      category_ar: 'إلكترونيات',
+      category_en: 'Electronics',
+      price: 400, 
+      location: 'Damascus', 
+      location_ar: 'دمشق',
+      imageUrl: 'https://images.unsplash.com/photo-1603791239531-1dda55e194a6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fGlwaG9uZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60', 
+      currency: 'USD' 
+    },
+    { 
+      id: 2, 
+      title: 'شقة للإيجار في منطقة المزة', 
+      title_en: 'Apartment for Rent in Mazzeh', 
+      category: 'real_estate', 
+      category_ar: 'العقارات',
+      category_en: 'Real Estate',
+      price: 300, 
+      location: 'Aleppo', 
+      location_ar: 'حلب',
+      imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60', 
+      currency: 'USD' 
+    },
+    { 
+      id: 3, 
+      title: 'سيارة مرسيدس 2020', 
+      title_en: 'Mercedes 2020', 
+      category: 'cars', 
+      category_ar: 'سيارات',
+      category_en: 'Cars',
+      price: 15000, 
+      location: 'Homs', 
+      location_ar: 'حمص',
+      imageUrl: 'https://images.unsplash.com/photo-1563720223185-11003d516935?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fG1lcmNlZGVzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60', 
+      currency: 'USD' 
+    },
+    { 
+      id: 4, 
+      title: 'أريكة جلدية بحالة ممتازة', 
+      title_en: 'Leather Sofa in Excellent Condition', 
+      category: 'furniture', 
+      category_ar: 'أثاث',
+      category_en: 'Furniture',
+      price: 250, 
+      location: 'Latakia', 
+      location_ar: 'اللاذقية',
+      imageUrl: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c29mYXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60', 
+      currency: 'USD' 
+    },
+    { 
+      id: 5, 
+      title: 'لابتوب ديل XPS جديد', 
+      title_en: 'Dell XPS Laptop New', 
+      category: 'electronics', 
+      category_ar: 'إلكترونيات',
+      category_en: 'Electronics',
+      price: 1200, 
+      location: 'Damascus', 
+      location_ar: 'دمشق',
+      imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8bGFwdG9wfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60', 
+      currency: 'USD' 
+    },
   ];
 };
 
@@ -92,6 +152,25 @@ const SearchResults = () => {
 
   const toggleCurrency = () => {
     setDisplayCurrency(prev => prev === 'SYP' ? 'USD' : 'SYP');
+  };
+
+  // Get the category name in the correct language
+  const getCategoryName = (item: any): string => {
+    if (language === 'ar') {
+      return item.category_ar || t(item.category);
+    } else {
+      return item.category_en || t(item.category);
+    }
+  };
+
+  // Get the location name in the correct language
+  const getLocationName = (item: any): string => {
+    return language === 'ar' ? (item.location_ar || item.location) : item.location;
+  };
+
+  // Get the listing title in the correct language
+  const getListingTitle = (item: any): string => {
+    return language === 'ar' ? item.title : (item.title_en || item.title);
   };
 
   return (
@@ -167,7 +246,7 @@ const SearchResults = () => {
                         <div className="h-48 overflow-hidden">
                           <img 
                             src={item.imageUrl} 
-                            alt={item.title} 
+                            alt={getListingTitle(item)} 
                             className="w-full h-full object-cover hover:scale-105 transition-transform"
                           />
                         </div>
@@ -175,18 +254,13 @@ const SearchResults = () => {
                       <CardContent className="p-4">
                         <div className="flex justify-between items-start mb-2">
                           <span className="bg-syrian-green/10 text-syrian-green px-2 py-1 rounded-full text-xs">
-                            {language === 'ar' ? (
-                              <ArabicText text={t(item.category.toLowerCase().replace(' ', ''))} />
-                            ) : (
-                              item.category
-                            )}
+                            {getCategoryName(item)}
                           </span>
                           <h3 className={`font-bold ${language === 'ar' ? 'text-right' : 'text-left'} flex-grow ml-2 dark:text-white`}>
                             {language === 'ar' ? (
-                              // We would translate the title in a real app
                               <ArabicText text={item.title} />
                             ) : (
-                              item.title
+                              item.title_en || item.title
                             )}
                           </h3>
                         </div>
@@ -203,11 +277,7 @@ const SearchResults = () => {
                           <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ${language === 'ar' ? 'ml-1' : 'mr-1'} text-syrian-green`} viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                           </svg>
-                          {language === 'ar' ? (
-                            <ArabicText text={t(item.location.toLowerCase())} />
-                          ) : (
-                            item.location
-                          )}
+                          {getLocationName(item)}
                         </span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">
                           {language === 'ar' ? (
