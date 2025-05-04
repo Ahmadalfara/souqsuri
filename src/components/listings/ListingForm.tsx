@@ -151,6 +151,7 @@ const ListingForm = () => {
         condition: values.condition,
         status: 'active' as const,
         is_featured: values.urgent,
+        updated_at: new Date().toISOString(), // Add the missing updated_at field
         images: []
       };
       

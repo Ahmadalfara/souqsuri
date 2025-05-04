@@ -54,7 +54,7 @@ export const addListing = async (
       .insert({
         ...listing,
         images: imageUrls,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString() // Ensure updated_at is set, even if provided in listing
       })
       .select()
       .single();
