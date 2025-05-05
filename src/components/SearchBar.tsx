@@ -27,7 +27,7 @@ const SearchBar = ({ className = '' }: SearchBarProps) => {
   const navigate = useNavigate();
   const { language, t } = useLanguage();
   const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState('all'); // Changed default to 'all' instead of empty string
   const [location, setLocation] = useState('');
 
   const handleSearch = (e: React.FormEvent) => {
@@ -35,7 +35,7 @@ const SearchBar = ({ className = '' }: SearchBarProps) => {
     const searchParams = new URLSearchParams();
     
     if (query) searchParams.append('query', query);
-    if (category) searchParams.append('category', category);
+    if (category && category !== 'all') searchParams.append('category', category);
     if (location) searchParams.append('location', location);
     
     navigate(`/search?${searchParams.toString()}`);
@@ -50,7 +50,7 @@ const SearchBar = ({ className = '' }: SearchBarProps) => {
   ];
   
   const categories = [
-    { id: '', name: language === 'ar' ? 'كل الفئات' : 'All categories' },
+    { id: 'all', name: language === 'ar' ? 'كل الفئات' : 'All categories' }, // Changed empty string to 'all'
     { id: 'vehicles', name: language === 'ar' ? 'سيارات' : 'Vehicles' },
     { id: 'property', name: language === 'ar' ? 'عقارات' : 'Property' },
     { id: 'electronics', name: language === 'ar' ? 'إلكترونيات' : 'Electronics' },
