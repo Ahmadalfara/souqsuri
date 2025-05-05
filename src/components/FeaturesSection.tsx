@@ -67,7 +67,8 @@ const FeaturesSection = () => {
   return (
     <section className="py-10 px-6 syrian-pattern">
       <div className="max-w-6xl mx-auto">
-        {/* Category grid section */}
+        {/* Removed the heading "تصفح حسب الفئة" as requested */}
+        
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map((category, index) => (
             <CategoryCard 

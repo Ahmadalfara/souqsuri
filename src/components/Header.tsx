@@ -5,7 +5,6 @@ import SearchBar from './SearchBar';
 import LanguageSwitcher from './LanguageSwitcher';
 import ThemeSwitcher from './ThemeSwitcher';
 import Logo from './header/Logo';
-import Categories from './header/Categories';
 import AuthButtons from './header/AuthButtons';
 import MobileMenu from './header/MobileMenu';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -43,12 +42,9 @@ const Header = () => {
       <MobileMenu isOpen={mobileMenuOpen} />
       
       {/* Search bar */}
-      <div className="mb-2">
+      <div className="mb-4">
         <SearchBar className="max-w-4xl mx-auto" />
       </div>
-      
-      {/* Categories menu - placed directly below search bar */}
-      <Categories />
     </header>
   );
 };
