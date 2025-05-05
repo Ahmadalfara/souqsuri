@@ -32,26 +32,26 @@ const Categories = () => {
   
   // Single compact view for all screens
   return (
-    <div className="flex justify-center overflow-x-auto pb-2 mt-2 mb-4">
+    <div className="flex justify-center overflow-x-auto pb-2 mb-4">
       <div className={`inline-flex ${language === 'ar' ? 'space-x-reverse rtl' : 'space-x-2'} px-2`}>
         {categories.map((category) => (
           <Link 
             key={category.name}
-            to={`/category/${category.name}`} 
+            to={category.name === 'all' ? '/' : `/category/${category.name}`}
             className={`
-              flex flex-col items-center px-2 py-1 rounded-lg transition-colors
-              ${activeCategory === category.name 
-                ? 'bg-syrian-green text-white' 
-                : 'bg-white hover:bg-syrian-green/10 border border-syrian-green/20'
+              flex flex-col items-center px-3 py-2 rounded-lg transition-colors
+              ${activeCategory === category.name || (category.name === 'all' && !activeCategory)
+                ? 'bg-syrian-green text-white shadow-md' 
+                : 'bg-white hover:bg-syrian-green/10 border border-syrian-green/20 hover:border-syrian-green/50'
               }
             `}
           >
             <category.icon 
-              size={16} 
-              className={`mb-1 ${activeCategory === category.name ? 'text-white' : 'text-syrian-green'}`} 
+              size={18} 
+              className={`mb-1 ${activeCategory === category.name || (category.name === 'all' && !activeCategory) ? 'text-white' : 'text-syrian-green'}`} 
             />
             
-            <span className="text-xs whitespace-nowrap">
+            <span className="text-xs whitespace-nowrap font-medium">
               {language === 'ar' ? (
                 <ArabicText text={category.label} />
               ) : (

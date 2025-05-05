@@ -7,6 +7,7 @@ import ThemeSwitcher from './ThemeSwitcher';
 import Logo from './header/Logo';
 import AuthButtons from './header/AuthButtons';
 import MobileMenu from './header/MobileMenu';
+import Categories from './header/Categories';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -42,9 +43,12 @@ const Header = () => {
       <MobileMenu isOpen={mobileMenuOpen} />
       
       {/* Search bar */}
-      <div className="mb-4">
+      <div className="mb-2">
         <SearchBar className="max-w-4xl mx-auto" />
       </div>
+
+      {/* Categories */}
+      <Categories />
     </header>
   );
 };
