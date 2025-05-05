@@ -43,11 +43,11 @@ const Header = () => {
       <MobileMenu isOpen={mobileMenuOpen} />
       
       {/* Search bar */}
-      <div className="mb-4">
+      <div className="mb-1">
         <SearchBar className="max-w-4xl mx-auto" />
       </div>
       
-      {/* Categories menu - restoring as per refactoring */}
+      {/* Categories menu - placed directly below search bar */}
       <Categories />
     </header>
   );

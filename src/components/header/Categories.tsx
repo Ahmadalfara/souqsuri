@@ -30,80 +30,38 @@ const Categories = () => {
     { name: 'services', label: language === 'ar' ? 'خدمات' : t('services'), icon: Wrench },
   ];
   
-  // Mobile View: Pills with icons and text
-  const renderMobileCategories = () => (
-    <div className={`flex justify-center md:hidden ${language === 'ar' ? 'space-x-reverse rtl' : 'space-x-1'} overflow-x-auto pb-2`}>
-      {categories.map((category) => (
-        <Link 
-          key={category.name}
-          to={`/category/${category.name}`} 
-          className={`
-            whitespace-nowrap px-3 py-2 rounded-full transition-colors flex items-center
-            ${activeCategory === category.name 
-              ? 'bg-syrian-green text-white font-bold' 
-              : 'text-syrian-dark hover:bg-syrian-green/10'
-            }
-          `}
-        >
-          <category.icon size={16} className="mr-1" />
-          {language === 'ar' ? (
-            <ArabicText text={category.label} />
-          ) : (
-            <span>{category.label}</span>
-          )}
-        </Link>
-      ))}
-    </div>
-  );
-
-  // Desktop View: Grid with card-style categories
-  const renderDesktopCategories = () => (
-    <div className="hidden md:grid grid-cols-7 gap-3 px-4 mt-4 mb-6">
-      {categories.map((category) => (
-        <Link 
-          key={category.name}
-          to={`/category/${category.name}`}
-          className={`
-            flex flex-col items-center justify-center p-3 rounded-lg transition-all
-            ${activeCategory === category.name 
-              ? 'bg-syrian-green text-white shadow-md transform scale-105' 
-              : 'bg-white text-syrian-dark hover:bg-syrian-green/10 hover:shadow'
-            }
-            border border-syrian-green/20
-          `}
-        >
-          <div className={`
-            p-3 rounded-full mb-2
-            ${activeCategory === category.name 
-              ? 'bg-white/20' 
-              : 'bg-syrian-green/10'
-            }
-          `}>
-            <category.icon 
-              size={24} 
-              className={activeCategory === category.name ? 'text-white' : 'text-syrian-green'} 
-            />
-          </div>
-          <div className="text-center">
-            {language === 'ar' ? (
-              <ArabicText text={category.label} />
-            ) : (
-              <span>{category.label}</span>
-            )}
-          </div>
-        </Link>
-      ))}
-    </div>
-  );
-
+  // Single compact view for all screens
   return (
-    <>
-      {/* Mobile view */}
-      {renderMobileCategories()}
-      
-      {/* Desktop view */}
-      {renderDesktopCategories()}
-    </>
+    <div className="flex justify-center overflow-x-auto pb-2 mt-2 mb-4">
+      <div className={`inline-flex ${language === 'ar' ? 'space-x-reverse rtl' : 'space-x-2'} px-2`}>
+        {categories.map((category) => (
+          <Link 
+            key={category.name}
+            to={`/category/${category.name}`} 
+            className={`
+              flex flex-col items-center px-2 py-1 rounded-lg transition-colors
+              ${activeCategory === category.name 
+                ? 'bg-syrian-green text-white' 
+                : 'bg-white hover:bg-syrian-green/10 border border-syrian-green/20'
+              }
+            `}
+          >
+            <category.icon 
+              size={16} 
+              className={`mb-1 ${activeCategory === category.name ? 'text-white' : 'text-syrian-green'}`} 
+            />
+            
+            <span className="text-xs whitespace-nowrap">
+              {language === 'ar' ? (
+                <ArabicText text={category.label} />
+              ) : (
+                category.label
+              )}
+            </span>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 };
 
