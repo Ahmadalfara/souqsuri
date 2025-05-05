@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, LogOut, Moon, Sun, Heart, MessageSquare, Bell, Plus } from 'lucide-react';
+import { User, LogOut, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ArabicText from '@/components/ArabicText';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -34,92 +34,49 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className={`md:hidden py-4 bg-white dark:bg-gray-800 rounded-b-lg shadow-md ${language === 'ar' ? 'rtl' : ''}`}>
-      <div className="flex flex-col space-y-4 p-4">
-        <div className="flex justify-between items-center mb-2">
+    <div className={`md:hidden py-4 border-t border-syrian-green/10 ${language === 'ar' ? 'rtl' : ''}`}>
+      <div className="flex flex-col space-y-4">
+        <div className={`flex justify-between ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
           <LanguageSwitcher className="self-start" />
-          <ThemeSwitcher className="self-start" />
+          <ThemeSwitcher id="dark-mode-toggle" className="self-start" />
         </div>
         
         {currentUser ? (
           <>
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-              <Button 
-                variant="outline" 
-                className="w-full justify-start"
-                onClick={() => navigate('/profile')}
-              >
-                <User className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
-                {language === 'ar' ? (
-                  <ArabicText text="الملف الشخصي" />
-                ) : (
-                  "Profile"
-                )}
-              </Button>
-            </div>
-            
             <Button 
               variant="outline" 
-              className="w-full justify-start"
-              onClick={() => navigate('/favorites')}
+              className="justify-start"
+              onClick={() => navigate('/profile')}
             >
-              <Heart className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
+              <User className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
               {language === 'ar' ? (
-                <ArabicText text="المفضلة" />
+                <ArabicText text="الملف الشخصي" />
               ) : (
-                "Favorites"
+                "Profile"
               )}
             </Button>
             
             <Button 
               variant="outline" 
-              className="w-full justify-start"
-              onClick={() => navigate('/messages')}
+              className="justify-start text-destructive"
+              onClick={handleLogout}
             >
-              <MessageSquare className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
+              <LogOut className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
               {language === 'ar' ? (
-                <ArabicText text="الرسائل" />
+                <ArabicText text="تسجيل الخروج" />
               ) : (
-                "Messages"
+                "Logout"
               )}
             </Button>
-            
-            <Button 
-              variant="outline" 
-              className="w-full justify-start"
-              onClick={() => navigate('/notifications')}
-            >
-              <Bell className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
-              {language === 'ar' ? (
-                <ArabicText text="الإشعارات" />
-              ) : (
-                "Notifications"
-              )}
-            </Button>
-            
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-2">
-              <Button 
-                variant="outline" 
-                className="w-full justify-start text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/10"
-                onClick={handleLogout}
-              >
-                <LogOut className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
-                {language === 'ar' ? (
-                  <ArabicText text="تسجيل الخروج" />
-                ) : (
-                  "Logout"
-                )}
-              </Button>
-            </div>
           </>
         ) : (
           <>
             <AuthSheet>
               <Button 
                 variant="outline" 
-                className="w-full justify-center border-syrian-gold text-syrian-dark hover:bg-syrian-gold/10"
+                className="w-full border-syrian-gold text-syrian-dark hover:bg-syrian-gold/10"
               >
-                <User className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
+                <User className={`${language === 'ar' ? 'ml-1' : 'mr-1'} h-4 w-4`} />
                 {language === 'ar' ? (
                   <ArabicText text="تسجيل الدخول" />
                 ) : (
@@ -130,18 +87,15 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
           </>
         )}
         
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-2">
-          <CreateListingSheet>
-            <Button className="w-full bg-syrian-green hover:bg-syrian-dark text-white justify-center">
-              <Plus className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
-              {language === 'ar' ? (
-                <ArabicText text="إضافة إعلان" />
-              ) : (
-                <span>{t('addListing')}</span>
-              )}
-            </Button>
-          </CreateListingSheet>
-        </div>
+        <CreateListingSheet>
+          <Button className="w-full bg-syrian-green hover:bg-syrian-dark text-white">
+            {language === 'ar' ? (
+              <ArabicText text="إضافة إعلان" />
+            ) : (
+              <span>{t('addListing')}</span>
+            )}
+          </Button>
+        </CreateListingSheet>
       </div>
     </div>
   );
