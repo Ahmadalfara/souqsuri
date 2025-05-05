@@ -21,8 +21,8 @@ const Index = () => {
             <CategoryView categoryName={categoryName} />
           ) : (
             <>
-              <WelcomeSection />
               <FeaturesSection />
+              <WelcomeSection />
             </>
           )}
         </main>

@@ -65,9 +65,9 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <section className="py-16 px-6 syrian-pattern">
+    <section className="py-10 px-6 syrian-pattern">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-center mb-12">
+        <h2 className="text-center mb-8">
           <ArabicText text="تصفح حسب الفئة" size="2xl" className="font-bold text-syrian-dark" />
         </h2>
         
@@ -82,7 +82,7 @@ const FeaturesSection = () => {
           ))}
         </div>
         
-        <div className="mt-16">
+        <div className="mt-12 mb-4">
           <Card className="bg-syrian-light border-syrian-green p-6">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="md:w-2/3 mb-6 md:mb-0 text-center md:text-right">

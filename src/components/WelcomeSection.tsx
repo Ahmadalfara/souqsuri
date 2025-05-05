@@ -87,7 +87,7 @@ const WelcomeSection = () => {
   ];
 
   return (
-    <section className="flex flex-col items-center py-10 px-6 md:px-10">
+    <section className="flex flex-col items-center py-10 px-6 md:px-10 bg-white">
       <div className="max-w-6xl w-full">
         <h1 className="mb-8 text-center">
           <ArabicText 
