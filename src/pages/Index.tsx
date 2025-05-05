@@ -1,11 +1,10 @@
-
 import React from 'react';
 import Header from '@/components/Header';
-import GeometricPattern from '@/components/GeometricPattern';
-import WelcomeSection from '@/components/WelcomeSection';
-import FeaturesSection from '@/components/FeaturesSection';
+import HeroSection from '@/components/HeroSection';
+import CategoryIcons from '@/components/CategoryIcons';
 import Footer from '@/components/Footer';
 import { useLocation } from 'react-router-dom';
+import FeaturedListings from '@/components/FeaturesSection';
 
 const Index = () => {
   const location = useLocation();
@@ -13,20 +12,19 @@ const Index = () => {
   const categoryName = isCategoryPage ? location.pathname.split('/').pop() : null;
   
   return (
-    <div className="min-h-screen flex flex-col bg-syrian-light">
-      <GeometricPattern className="flex-grow">
-        <Header />
-        <main>
-          {isCategoryPage ? (
-            <CategoryView categoryName={categoryName} />
-          ) : (
-            <>
-              <WelcomeSection />
-              <FeaturesSection />
-            </>
-          )}
-        </main>
-      </GeometricPattern>
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+      <Header />
+      <main>
+        {isCategoryPage ? (
+          <CategoryView categoryName={categoryName} />
+        ) : (
+          <>
+            <HeroSection />
+            <CategoryIcons />
+            <FeaturedSection />
+          </>
+        )}
+      </main>
       <Footer />
     </div>
   );
@@ -351,6 +349,17 @@ const getCategoryData = (categoryName: string | null) => {
         listings: []
       };
   }
+};
+
+// New component for featured listings section
+const FeaturedSection = () => {
+  return (
+    <section className="py-10 px-4 bg-white dark:bg-gray-800">
+      <div className="max-w-7xl mx-auto">
+        <FeaturedListings />
+      </div>
+    </section>
+  );
 };
 
 export default Index;
