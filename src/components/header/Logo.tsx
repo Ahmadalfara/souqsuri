@@ -7,13 +7,17 @@ const Logo = () => {
   const { language } = useLanguage();
   
   return (
-    <Link to="/" className="flex items-center">
-      {language === 'ar' ? (
-        <h1 className="text-2xl font-bold text-red-600 font-arabic">سوق سوريا</h1>
-      ) : (
-        <h1 className="text-2xl font-bold text-red-600">Syria Market</h1>
-      )}
-    </Link>
+    <div className="flex items-center">
+      <Link to="/">
+        <div className="w-16 h-16 flex items-center justify-center">
+          <img 
+            src="/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png" 
+            alt="Syria Market" 
+            className="w-16 h-16 object-contain" 
+          />
+        </div>
+      </Link>
+    </div>
   );
 };
 
