@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -182,18 +183,11 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
             </SelectTrigger>
             <SelectContent>
               <ScrollArea className="h-[200px] overflow-auto">
-                <SelectItem value="">
+                <SelectItem value="all">
                   {language === 'ar' ? (
                     <ArabicText text={t('allCategories')} />
                   ) : (
                     t('allCategories')
-                  )}
-                </SelectItem>
-                <SelectItem value="all">
-                  {language === 'ar' ? (
-                    <ArabicText text={t('all')} />
-                  ) : (
-                    t('all')
                   )}
                 </SelectItem>
                 <SelectItem value="real_estate">
@@ -463,3 +457,4 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
 };
 
 export default ListingFilters;
+

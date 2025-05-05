@@ -268,7 +268,7 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
                   )}
                 </div>
                 <Select 
-                  value={selectedLocation || ''} 
+                  value={selectedLocation || undefined} 
                   onValueChange={setSelectedLocation}
                 >
                   <SelectTrigger>
@@ -299,7 +299,7 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
                   )}
                 </div>
                 <Select 
-                  value={selectedCurrency || ''} 
+                  value={selectedCurrency || undefined} 
                   onValueChange={setSelectedCurrency}
                 >
                   <SelectTrigger>
@@ -439,3 +439,4 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
 };
 
 export default SearchBar;
+
