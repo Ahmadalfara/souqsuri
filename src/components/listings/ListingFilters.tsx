@@ -45,19 +45,22 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
   const [districtId, setDistrictId] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('newest');
   const [keywords, setKeywords] = useState<string>('');
-  const [category, setCategory] = useState<string>('all');
+  const [category, setCategory] = useState<string>('');
   const [condition, setCondition] = useState<string[]>([]);
   const [urgent, setUrgent] = useState<boolean>(false);
   const [currency, setCurrency] = useState<string>('SYP');
 
+  // Update price range when min/max inputs change
   useEffect(() => {
     setPriceRange([minPrice, maxPrice]);
   }, [minPrice, maxPrice]);
 
+  // Adjust max price range based on currency
   useEffect(() => {
     if (currency === 'USD') {
       setMaxPrice(prev => prev > 1000 ? 1000 : prev);
     } else {
+      // For SYP, allow higher values
       setMaxPrice(prev => prev < 10000 ? 1000000 : prev);
     }
   }, [currency]);
@@ -179,11 +182,18 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
             </SelectTrigger>
             <SelectContent>
               <ScrollArea className="h-[200px] overflow-auto">
-                <SelectItem value="all">
+                <SelectItem value="">
                   {language === 'ar' ? (
                     <ArabicText text={t('allCategories')} />
                   ) : (
                     t('allCategories')
+                  )}
+                </SelectItem>
+                <SelectItem value="all">
+                  {language === 'ar' ? (
+                    <ArabicText text={t('all')} />
+                  ) : (
+                    t('all')
                   )}
                 </SelectItem>
                 <SelectItem value="real_estate">
@@ -233,6 +243,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
           </Select>
         </div>
 
+        {/* Currency Selection */}
         <div className="space-y-2">
           <Label className={language === 'ar' ? 'block text-right' : ''}>
             {language === 'ar' ? (
@@ -245,6 +256,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
             value={currency} 
             onValueChange={(value) => {
               setCurrency(value);
+              // Reset price range when currency changes
               setMinPrice(0);
               setMaxPrice(value === 'USD' ? 1000 : 1000000);
             }}
@@ -266,6 +278,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
           </RadioGroup>
         </div>
 
+        {/* Price Range */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <Label className={language === 'ar' ? 'block text-right' : ''}>
@@ -295,6 +308,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
           </div>
         </div>
         
+        {/* Governorate and District Selection - Now using LocationSelector component */}
         <div className="space-y-2">
           <LocationSelector 
             onGovernorateChange={setGovernorateId}
@@ -302,6 +316,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
           />
         </div>
         
+        {/* Sort By */}
         <div className="space-y-2">
           <Label className={language === 'ar' ? 'block text-right' : ''}>
             {language === 'ar' ? (
@@ -349,6 +364,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
         
         {isExpanded && (
           <>
+            {/* Condition checkboxes */}
             <div className="space-y-2">
               <Label className={language === 'ar' ? 'block text-right' : ''}>
                 {language === 'ar' ? (
@@ -395,6 +411,7 @@ const ListingFilters = ({ onFilter, className = '' }: ListingFiltersProps) => {
               </div>
             </div>
             
+            {/* Urgent checkbox */}
             <div className={`flex items-center ${language === 'ar' ? 'space-x-reverse' : ''} space-x-2`}>
               <Checkbox 
                 id="urgent" 
