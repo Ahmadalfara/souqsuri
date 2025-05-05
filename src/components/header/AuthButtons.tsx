@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { User } from 'lucide-react';
+import { User, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ArabicText from '@/components/ArabicText';
 import AuthSheet from '@/components/auth/AuthSheet';
@@ -20,9 +20,10 @@ const AuthButtons = () => {
           <UserMenu />
           
           <CreateListingSheet>
-            <Button className="bg-syrian-green hover:bg-syrian-dark text-white">
+            <Button className="bg-syrian-green hover:bg-syrian-dark text-white flex items-center">
+              <Plus className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
               {language === 'ar' ? (
-                <ArabicText text="إضافة إعلان" />
+                <ArabicText text="أضف إعلانك" />
               ) : (
                 <span>{t('addListing')}</span>
               )}
@@ -36,7 +37,7 @@ const AuthButtons = () => {
               variant="outline" 
               className="border-syrian-gold text-syrian-dark hover:bg-syrian-gold/10"
             >
-              <User className={`${language === 'ar' ? 'ml-1' : 'mr-1'} h-4 w-4`} />
+              <User className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
               {language === 'ar' ? (
                 <ArabicText text="تسجيل الدخول" />
               ) : (
@@ -46,9 +47,10 @@ const AuthButtons = () => {
           </AuthSheet>
           
           <CreateListingSheet>
-            <Button className="bg-syrian-green hover:bg-syrian-dark text-white">
+            <Button className="bg-syrian-green hover:bg-syrian-dark text-white flex items-center">
+              <Plus className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
               {language === 'ar' ? (
-                <ArabicText text="إضافة إعلان" />
+                <ArabicText text="أضف إعلانك" />
               ) : (
                 <span>{t('addListing')}</span>
               )}
