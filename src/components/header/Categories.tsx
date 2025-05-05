@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import ArabicText from '@/components/ArabicText';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Car, Home, Laptop, Sofa, Baby, Shirt, Briefcase, Wrench, TennisBall, RefreshCcw } from 'lucide-react';
+import { Car, Home, Laptop, Sofa, Baby, Shirt, Briefcase, Wrench, Bike, RefreshCcw } from 'lucide-react';
 
 const categoryIcons = {
   all: null,
@@ -15,7 +15,7 @@ const categoryIcons = {
   clothing: Shirt,
   jobs: Briefcase,
   services: Wrench, 
-  hobbies: TennisBall,
+  hobbies: Bike, // Changed from TennisBall to Bike
   refurbished: RefreshCcw
 };
 

@@ -5,7 +5,7 @@ import ArabicText from './ArabicText';
 import { Card, CardContent } from '@/components/ui/card';
 import CreateListingSheet from './listings/CreateListingSheet';
 import { Button } from './ui/button';
-import { Car, Home, Laptop, Sofa, Baby, Shirt, Briefcase, Wrench, TennisBall, RefreshCcw } from 'lucide-react';
+import { Car, Home, Laptop, Sofa, Baby, Shirt, Briefcase, Wrench, Bike, RefreshCcw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 type CategoryProps = {
@@ -89,7 +89,7 @@ const FeaturesSection = () => {
     },
     {
       title: language === 'ar' ? "هوايات" : "Hobbies",
-      icon: <TennisBall size={28} />,
+      icon: <Bike size={28} />, // Changed from TennisBall to Bike
       count: 287,
       slug: "hobbies"
     },
