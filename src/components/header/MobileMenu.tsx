@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, LogOut, Moon, Sun } from 'lucide-react';
+import { User, LogOut, MessageSquare, Bookmark, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ArabicText from '@/components/ArabicText';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -36,13 +36,47 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
   return (
     <div className={`md:hidden py-4 border-t border-syrian-green/10 ${language === 'ar' ? 'rtl' : ''}`}>
       <div className="flex flex-col space-y-4">
-        <div className={`flex justify-between ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-          <LanguageSwitcher className="self-start" />
-          <ThemeSwitcher id="dark-mode-toggle" className="self-start" />
-        </div>
-        
-        {currentUser ? (
+        {currentUser && (
           <>
+            <Button 
+              variant="outline" 
+              className="justify-start"
+              onClick={() => navigate('/messages')}
+            >
+              <MessageSquare className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
+              {language === 'ar' ? (
+                <ArabicText text="الرسائل" />
+              ) : (
+                "Messages"
+              )}
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="justify-start"
+              onClick={() => navigate('/favorites')}
+            >
+              <Bookmark className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
+              {language === 'ar' ? (
+                <ArabicText text="المفضلة" />
+              ) : (
+                "Favorites"
+              )}
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="justify-start"
+              onClick={() => navigate('/my-listings')}
+            >
+              <Package className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
+              {language === 'ar' ? (
+                <ArabicText text="إعلاناتي" />
+              ) : (
+                "My Ads"
+              )}
+            </Button>
+            
             <Button 
               variant="outline" 
               className="justify-start"
@@ -69,22 +103,22 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
               )}
             </Button>
           </>
-        ) : (
-          <>
-            <AuthSheet>
-              <Button 
-                variant="outline" 
-                className="w-full border-syrian-gold text-syrian-dark hover:bg-syrian-gold/10"
-              >
-                <User className={`${language === 'ar' ? 'ml-1' : 'mr-1'} h-4 w-4`} />
-                {language === 'ar' ? (
-                  <ArabicText text="تسجيل الدخول" />
-                ) : (
-                  <span>{t('login')}</span>
-                )}
-              </Button>
-            </AuthSheet>
-          </>
+        )}
+        
+        {!currentUser && (
+          <AuthSheet>
+            <Button 
+              variant="outline" 
+              className="w-full border-syrian-gold text-syrian-dark hover:bg-syrian-gold/10"
+            >
+              <User className={`${language === 'ar' ? 'ml-1' : 'mr-1'} h-4 w-4`} />
+              {language === 'ar' ? (
+                <ArabicText text="تسجيل الدخول" />
+              ) : (
+                <span>{t('login')}</span>
+              )}
+            </Button>
+          </AuthSheet>
         )}
         
         <CreateListingSheet>
@@ -96,6 +130,11 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
             )}
           </Button>
         </CreateListingSheet>
+        
+        <div className={`flex justify-between mt-4 pt-4 border-t border-syrian-green/10 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+          <LanguageSwitcher className="self-start" />
+          <ThemeSwitcher id="dark-mode-toggle" className="self-start" />
+        </div>
       </div>
     </div>
   );

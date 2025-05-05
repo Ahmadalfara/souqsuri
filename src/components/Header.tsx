@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, MessageSquare, Bookmark, User } from 'lucide-react';
 import SearchBar from './SearchBar';
 import LanguageSwitcher from './LanguageSwitcher';
 import ThemeSwitcher from './ThemeSwitcher';
@@ -8,8 +8,10 @@ import Logo from './header/Logo';
 import Categories from './header/Categories';
 import AuthButtons from './header/AuthButtons';
 import MobileMenu from './header/MobileMenu';
+import TopBar from './header/TopBar';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -19,8 +21,11 @@ const Header = () => {
   return (
     <header className={`flex flex-col py-4 px-6 bg-white border-b border-syrian-green/20 shadow-sm sticky top-0 z-20
                        dark:bg-gray-900 dark:border-gray-800 dark:text-white transition-colors duration-300`}>
-      {/* Upper header with logo, language switcher and auth buttons */}
-      <div className={`flex items-center justify-between mb-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+      {/* Top bar with icons */}
+      <TopBar />
+      
+      {/* Main header with logo, search and auth buttons */}
+      <div className={`flex items-center justify-between py-3 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
         <Logo />
 
         {/* Mobile menu toggle */}
@@ -33,8 +38,6 @@ const Header = () => {
         </button>
         
         <div className={`hidden md:flex items-center space-x-4 ${language === 'ar' ? 'space-x-reverse flex-row-reverse' : ''}`}>
-          <ThemeSwitcher />
-          <LanguageSwitcher />
           <AuthButtons />
         </div>
       </div>
@@ -47,7 +50,7 @@ const Header = () => {
         <SearchBar className="max-w-4xl mx-auto" />
       </div>
       
-      {/* Categories menu - restoring as per refactoring */}
+      {/* Categories menu */}
       <Categories />
     </header>
   );

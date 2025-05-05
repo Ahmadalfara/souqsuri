@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import GeometricPattern from '@/components/GeometricPattern';
 import WelcomeSection from '@/components/WelcomeSection';
 import FeaturesSection from '@/components/FeaturesSection';
+import HeroSection from '@/components/HeroSection';
 import Footer from '@/components/Footer';
 import { useLocation } from 'react-router-dom';
 
@@ -13,7 +14,7 @@ const Index = () => {
   const categoryName = isCategoryPage ? location.pathname.split('/').pop() : null;
   
   return (
-    <div className="min-h-screen flex flex-col bg-syrian-light">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <GeometricPattern className="flex-grow">
         <Header />
         <main>
@@ -21,6 +22,7 @@ const Index = () => {
             <CategoryView categoryName={categoryName} />
           ) : (
             <>
+              <HeroSection />
               <FeaturesSection />
               <WelcomeSection />
             </>
