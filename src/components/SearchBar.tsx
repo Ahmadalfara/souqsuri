@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -268,8 +267,9 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
                   )}
                 </div>
                 <Select 
-                  value={selectedLocation || undefined} 
+                  value={selectedLocation || 'all'} 
                   onValueChange={setSelectedLocation}
+                  defaultValue="all"
                 >
                   <SelectTrigger>
                     <SelectValue placeholder={language === 'ar' ? "اختر المحافظة" : "Select governorate"} />
@@ -299,8 +299,9 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
                   )}
                 </div>
                 <Select 
-                  value={selectedCurrency || undefined} 
+                  value={selectedCurrency || 'all'} 
                   onValueChange={setSelectedCurrency}
+                  defaultValue="all"
                 >
                   <SelectTrigger>
                     <SelectValue placeholder={language === 'ar' ? "اختر العملة" : "Select currency"} />
@@ -439,4 +440,3 @@ const SearchBar = ({ className, variant = 'default' }: SearchBarProps) => {
 };
 
 export default SearchBar;
-
