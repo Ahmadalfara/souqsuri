@@ -1,11 +1,15 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import GeometricPattern from '@/components/GeometricPattern';
 import WelcomeSection from '@/components/WelcomeSection';
 import FeaturesSection from '@/components/FeaturesSection';
 import Footer from '@/components/Footer';
 import { useLocation } from 'react-router-dom';
+import ListingFilters from '@/components/listings/ListingFilters';
+import { getListingsByCategory } from '@/services/listings';
+import { ListingWithRelations } from '@/types/supabase';
+import ArabicText from '@/components/ArabicText';
 
 const Index = () => {
   const location = useLocation();
@@ -38,7 +42,33 @@ interface CategoryViewProps {
 
 // This component shows listings by category
 const CategoryView = ({ categoryName }: CategoryViewProps) => {
-  const categoryData = getCategoryData(categoryName);
+  const [listings, setListings] = useState<ListingWithRelations[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const fetchCategoryListings = async () => {
+      if (!categoryName) return;
+      
+      try {
+        setIsLoading(true);
+        setError(null);
+        console.log(`Fetching listings for category: ${categoryName}`);
+        const data = await getListingsByCategory(categoryName, 12);
+        console.log(`Received ${data.length} listings for category ${categoryName}`, data);
+        setListings(data);
+      } catch (err) {
+        console.error('Error fetching category listings:', err);
+        setError('Failed to load listings');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchCategoryListings();
+  }, [categoryName]);
+  
+  const categoryData = getCategoryData(categoryName, listings.length);
   
   return (
     <section className="py-8 px-4 max-w-7xl mx-auto">
@@ -68,30 +98,90 @@ const CategoryView = ({ categoryName }: CategoryViewProps) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {categoryData.listings.map((item, index) => (
-          <CategoryListingCard key={index} listing={item} />
-        ))}
+      {/* Filters */}
+      <div className="mb-6">
+        <ListingFilters />
       </div>
+
+      {isLoading ? (
+        <div className="flex justify-center p-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-syrian-green"></div>
+        </div>
+      ) : error ? (
+        <div className="bg-red-50 p-4 rounded-md text-center">
+          <p className="text-red-600">{error}</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {listings.length > 0 ? (
+            listings.map((listing, index) => (
+              <CategoryListingCard key={listing.id || index} listing={listing} />
+            ))
+          ) : (
+            // When no listings are found for the category
+            <div className="col-span-full text-center py-12">
+              <div className="text-6xl mb-4">🔍</div>
+              <h3 className="text-xl font-medium mb-2">
+                <ArabicText text="لا توجد إعلانات في هذه الفئة حالياً" />
+              </h3>
+              <p className="text-gray-600">
+                <ArabicText text="كن أول من يضيف إعلاناً هنا" />
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </section>
   );
 };
 
-interface ListingItem {
+interface ListingDisplayProps {
   title: string;
-  price: string;
-  location: string;
-  imageUrl: string;
+  price?: string | number;
+  currency?: string;
+  location?: string;
+  imageUrl?: string;
   isPromoted?: boolean;
-  date: string;
+  createdAt?: string | Date;
 }
 
-const CategoryListingCard = ({ listing }: { listing: ListingItem }) => {
+const CategoryListingCard = ({ listing }: { listing: ListingWithRelations }) => {
+  // Format creation date
+  const formatDate = (dateString?: string | Date): string => {
+    if (!dateString) return 'منذ قليل';
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffMinutes < 60) return `منذ ${diffMinutes} دقيقة`;
+    
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `منذ ${diffHours} ساعة`;
+    
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 7) return `منذ ${diffDays} يوم`;
+    
+    return `منذ ${Math.floor(diffDays / 7)} أسبوع`;
+  };
+  
+  // Format price with currency
+  const formatPrice = (price?: number | string, currency?: string): string => {
+    if (!price) return 'السعر غير محدد';
+    
+    const currencySymbol = currency === 'USD' ? '$' : (currency === 'SYP' ? 'ل.س' : '');
+    return `${price} ${currencySymbol}`;
+  };
+  
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-syrian-green/10 hover:shadow-md transition-all hover:border-syrian-green/30">
       <div className="relative">
-        <img src={listing.imageUrl} alt={listing.title} className="w-full h-48 object-cover" />
-        {listing.isPromoted && (
+        <img 
+          src={listing.images?.[0] || '/placeholder.svg'} 
+          alt={listing.title} 
+          className="w-full h-48 object-cover" 
+        />
+        {listing.is_featured && (
           <span className="absolute top-2 right-2 bg-syrian-gold text-white text-xs px-2 py-1 rounded">
             <span className="font-arabic">مميز</span>
           </span>
@@ -102,7 +192,7 @@ const CategoryListingCard = ({ listing }: { listing: ListingItem }) => {
           <span className="font-arabic rtl">{listing.title}</span>
         </h3>
         <p className="text-right text-syrian-green font-bold">
-          <span className="font-arabic rtl">{listing.price}</span>
+          <span className="font-arabic rtl">{formatPrice(listing.price, listing.currency)}</span>
         </p>
       </div>
       <div className="px-4 pb-4 flex justify-between items-center text-sm text-gray-500">
@@ -110,245 +200,72 @@ const CategoryListingCard = ({ listing }: { listing: ListingItem }) => {
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span className="font-arabic rtl">{listing.date}</span>
+          <span className="font-arabic rtl">{formatDate(listing.created_at)}</span>
         </span>
         <span className="flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          <span className="font-arabic rtl">{listing.location}</span>
+          <span className="font-arabic rtl">
+            {listing.governorate?.name_ar || 'غير محدد'}
+          </span>
         </span>
       </div>
     </div>
   );
 };
 
-const getCategoryData = (categoryName: string | null) => {
-  // تخصيص الفئات
+const getCategoryData = (categoryName: string | null, count: number = 0) => {
+  // Map category names to their data
   switch(categoryName) {
     case 'real_estate':
       return {
         title: 'العقارات',
-        count: 1250,
+        count: count,
         icon: '🏠',
-        listings: [
-          {
-            title: 'شقة للبيع في المزة',
-            price: '٧٥٠,٠٠٠ ل.س',
-            location: 'دمشق',
-            imageUrl: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            isPromoted: true,
-            date: 'منذ ساعتين'
-          },
-          {
-            title: 'فيلا مفروشة للإيجار',
-            price: '١,٥٠٠,٠٠٠ ل.س',
-            location: 'اللاذقية',
-            imageUrl: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            date: 'منذ يوم واحد'
-          },
-          {
-            title: 'محل تجاري للبيع',
-            price: '٥٠٠,٠٠٠ ل.س',
-            location: 'حلب',
-            imageUrl: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=958&q=80',
-            date: 'منذ 3 أيام'
-          },
-          {
-            title: 'أرض للبيع بإطلالة بحرية',
-            price: '١٠,٠٠٠,٠٠٠ ل.س',
-            location: 'طرطوس',
-            imageUrl: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1332&q=80',
-            date: 'منذ أسبوع'
-          },
-          {
-            title: 'مكتب فاخر للإيجار',
-            price: '٣٥٠,٠٠٠ ل.س',
-            location: 'دمشق',
-            imageUrl: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            date: 'منذ أسبوع'
-          },
-          {
-            title: 'شقة مفروشة للطلاب',
-            price: '٢٥٠,٠٠٠ ل.س',
-            location: 'حمص',
-            imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            isPromoted: true,
-            date: 'منذ يومين'
-          },
-        ]
       };
     case 'cars':
       return {
         title: 'سيارات',
-        count: 876,
+        count: count,
         icon: '🚗',
-        listings: [
-          {
-            title: 'مرسيدس E200 موديل 2019',
-            price: '١٥,٠٠٠,٠٠٠ ل.س',
-            location: 'دمشق',
-            imageUrl: 'https://images.unsplash.com/photo-1563720223185-11003d516935?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            isPromoted: true,
-            date: 'منذ ساعتين'
-          },
-          {
-            title: 'كيا سيراتو 2020 كاملة المواصفات',
-            price: '٨,٥٠٠,٠٠٠ ل.س',
-            location: 'حلب',
-            imageUrl: 'https://images.unsplash.com/photo-1573074617613-fc8ef27eaa2f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            date: 'منذ يوم واحد'
-          },
-          {
-            title: 'هيونداي توسان 2018',
-            price: '٧,٠٠٠,٠٠٠ ل.س',
-            location: 'حمص',
-            imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            date: 'منذ 3 أيام'
-          },
-          {
-            title: 'فولكسفاغن باسات 2016',
-            price: '٦,٥٠٠,٠٠٠ ل.س',
-            location: 'اللاذقية',
-            imageUrl: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            date: 'منذ 5 أيام'
-          },
-        ]
+      };
+    case 'clothes':
+      return {
+        title: 'ملابس',
+        count: count,
+        icon: '👕',
       };
     case 'electronics':
       return {
         title: 'إلكترونيات',
-        count: 980,
+        count: count,
         icon: '💻',
-        listings: [
-          {
-            title: 'ايفون 13 برو ماكس جديد',
-            price: '٢,٥٠٠,٠٠٠ ل.س',
-            location: 'دمشق',
-            imageUrl: 'https://images.unsplash.com/photo-1603791239531-1dda55e194a6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            isPromoted: true,
-            date: 'منذ ساعتين'
-          },
-          {
-            title: 'لابتوب ماك بوك برو 2021',
-            price: '٣,٠٠٠,٠٠٠ ل.س',
-            location: 'حلب',
-            imageUrl: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1626&q=80',
-            date: 'منذ يوم واحد'
-          },
-          {
-            title: 'سماعات ايربودز برو أصلية',
-            price: '٥٠٠,٠٠٠ ل.س',
-            location: 'اللاذقية',
-            imageUrl: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            date: 'منذ 3 أيام'
-          },
-          {
-            title: 'تلفزيون ذكي سامسونج 55 بوصة',
-            price: '١,٢٠٠,٠٠٠ ل.س',
-            location: 'حمص',
-            imageUrl: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            date: 'منذ 4 أيام'
-          },
-        ]
       };
     case 'furniture':
       return {
         title: 'أثاث',
-        count: 543,
+        count: count,
         icon: '🛋️',
-        listings: [
-          {
-            title: 'طقم كنب مودرن جديد',
-            price: '١,٨٠٠,٠٠٠ ل.س',
-            location: 'دمشق',
-            imageUrl: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            isPromoted: true,
-            date: 'منذ ساعتين'
-          },
-          {
-            title: 'طاولة طعام خشبية فاخرة',
-            price: '٧٥٠,٠٠٠ ل.س',
-            location: 'حلب',
-            imageUrl: 'https://images.unsplash.com/photo-1617104678098-de229db51175?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            date: 'منذ يوم واحد'
-          },
-          {
-            title: 'خزانة ملابس بتصميم عصري',
-            price: '٥٠٠,٠٠٠ ل.س',
-            location: 'طرطوس',
-            imageUrl: 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80',
-            date: 'منذ 3 أيام'
-          },
-        ]
       };
     case 'jobs':
       return {
         title: 'وظائف',
-        count: 325,
+        count: count,
         icon: '💼',
-        listings: [
-          {
-            title: 'مطلوب مهندس برمجيات',
-            price: 'الراتب حسب الخبرة',
-            location: 'دمشق',
-            imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=688&q=80',
-            date: 'منذ ساعتين'
-          },
-          {
-            title: 'شاغر وظيفي محاسب',
-            price: '٥٠٠,٠٠٠ ل.س',
-            location: 'حلب',
-            imageUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1026&q=80',
-            isPromoted: true,
-            date: 'منذ يوم واحد'
-          },
-          {
-            title: 'مطلوب مدير مبيعات',
-            price: '٧٠٠,٠٠٠ ل.س',
-            location: 'اللاذقية',
-            imageUrl: 'https://images.unsplash.com/photo-1542744094-24638eff58bb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            date: 'منذ 3 أيام'
-          },
-        ]
       };
     case 'services':
       return {
         title: 'خدمات',
-        count: 410,
+        count: count,
         icon: '🔧',
-        listings: [
-          {
-            title: 'خدمات تصميم وتطوير مواقع',
-            price: 'حسب المشروع',
-            location: 'دمشق',
-            imageUrl: 'https://images.unsplash.com/photo-1522542550221-31fd19575a2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            isPromoted: true,
-            date: 'منذ ساعتين'
-          },
-          {
-            title: 'نقل أثاث وفك وتركيب',
-            price: 'حسب المسافة',
-            location: 'حلب',
-            imageUrl: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            date: 'منذ يوم واحد'
-          },
-          {
-            title: 'دروس خصوصية رياضيات وفيزياء',
-            price: '١٠,٠٠٠ ل.س / ساعة',
-            location: 'حمص',
-            imageUrl: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-            date: 'منذ 3 أيام'
-          },
-        ]
       };
     default:
       return {
         title: 'جميع الفئات',
-        count: 0,
+        count: count,
         icon: '📋',
-        listings: []
       };
   }
 };

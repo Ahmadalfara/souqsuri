@@ -30,7 +30,7 @@ export const getListingsByCategory = async (category: string, count = 12): Promi
       .order('created_at', { ascending: false });
     
     // Only filter by category if it's not 'all'
-    if (category !== 'all') {
+    if (category && category !== 'all') {
       console.log(`Applying category filter: ${category}`);
       query = query.eq('category', category);
     } else {

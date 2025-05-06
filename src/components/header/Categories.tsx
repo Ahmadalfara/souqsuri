@@ -14,6 +14,7 @@ const Categories = () => {
     // Extract category from URL if on a category page
     if (location.pathname.startsWith('/category/')) {
       const categoryName = location.pathname.split('/').pop();
+      console.log("Current category from URL:", categoryName);
       setActiveCategory(categoryName || null);
     } else {
       setActiveCategory(null);
