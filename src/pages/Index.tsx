@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import GeometricPattern from '@/components/GeometricPattern';
@@ -7,7 +6,7 @@ import FeaturesSection from '@/components/FeaturesSection';
 import Footer from '@/components/Footer';
 import { useLocation } from 'react-router-dom';
 import ListingFilters from '@/components/listings/ListingFilters';
-import { getListingsByCategory } from '@/services/listings';
+import { getListingsByCategory } from '@/services/listings/search';
 import { ListingWithRelations } from '@/types/supabase';
 import ArabicText from '@/components/ArabicText';
 import { useToast } from '@/hooks/use-toast';

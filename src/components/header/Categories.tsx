@@ -21,6 +21,7 @@ const Categories = () => {
     }
   }, [location]);
 
+  // These must match the front-end routing paths
   const categories = [
     { name: 'all', label: language === 'ar' ? 'الكل' : t('all'), icon: Home },
     { name: 'real_estate', label: language === 'ar' ? 'العقارات' : t('realEstate'), icon: Home },

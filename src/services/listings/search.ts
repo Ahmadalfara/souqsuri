@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { ListingWithRelations } from '@/types/supabase';
 
@@ -14,6 +13,22 @@ interface ListingFilters {
   urgent?: boolean;
   currency?: string;
 }
+
+// Map frontend category names to database enum values
+const mapCategoryToEnum = (category: string): string => {
+  const categoryMap: Record<string, string> = {
+    'real_estate': 'real_estate',
+    'cars': 'vehicles',
+    'clothes': 'clothing',
+    'electronics': 'electronics',
+    'furniture': 'furniture',
+    'jobs': 'jobs',
+    'services': 'services'
+  };
+  
+  console.log(`Mapping category '${category}' to enum value: ${categoryMap[category] || category}`);
+  return categoryMap[category] || category;
+};
 
 export const getListingsByCategory = async (category: string, count = 12): Promise<ListingWithRelations[]> => {
   try {
@@ -32,8 +47,9 @@ export const getListingsByCategory = async (category: string, count = 12): Promi
     
     // Only filter by category if it's not 'all'
     if (category && category !== 'all') {
-      console.log(`Applying category filter: ${category}`);
-      query = query.eq('category', category);
+      const dbCategory = mapCategoryToEnum(category);
+      console.log(`Applying category filter: ${category} (mapped to: ${dbCategory})`);
+      query = query.eq('category', dbCategory);
     } else {
       console.log('Showing all categories - no category filter applied');
     }
@@ -96,8 +112,9 @@ export const searchListings = async (filters: ListingFilters): Promise<ListingWi
     
     // Apply category filter only if category is specified and not 'all'
     if (filters.category && filters.category !== 'all' && filters.category !== '') {
-      console.log("Applying category filter:", filters.category);
-      query = query.eq('category', filters.category);
+      const dbCategory = mapCategoryToEnum(filters.category);
+      console.log("Applying category filter:", filters.category, "(mapped to:", dbCategory, ")");
+      query = query.eq('category', dbCategory);
     } else {
       console.log("No category filter applied or showing all categories");
     }
