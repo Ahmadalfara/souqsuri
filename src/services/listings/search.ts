@@ -18,13 +18,14 @@ interface ListingFilters {
 export const getListingsByCategory = async (category: string, count = 12): Promise<ListingWithRelations[]> => {
   try {
     console.log(`Fetching listings by category: ${category}`);
+    
+    // Modified query to avoid the user_id foreign key issue
     let query = supabase
       .from('listings')
       .select(`
         *,
         governorate:governorate_id(*),
-        district:district_id(*),
-        user:user_id(*)
+        district:district_id(*)
       `)
       .eq('status', 'active')
       .order('created_at', { ascending: false });
@@ -62,8 +63,7 @@ export const getFeaturedListings = async (count = 8): Promise<ListingWithRelatio
       .select(`
         *,
         governorate:governorate_id(*),
-        district:district_id(*),
-        user:user_id(*)
+        district:district_id(*)
       `)
       .eq('is_featured', true)
       .eq('status', 'active')
@@ -90,8 +90,7 @@ export const searchListings = async (filters: ListingFilters): Promise<ListingWi
       .select(`
         *,
         governorate:governorate_id(*),
-        district:district_id(*),
-        user:user_id(*)
+        district:district_id(*)
       `)
       .eq('status', 'active');
     

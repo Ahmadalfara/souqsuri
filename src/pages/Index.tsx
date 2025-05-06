@@ -10,6 +10,7 @@ import ListingFilters from '@/components/listings/ListingFilters';
 import { getListingsByCategory } from '@/services/listings';
 import { ListingWithRelations } from '@/types/supabase';
 import ArabicText from '@/components/ArabicText';
+import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
   const location = useLocation();
@@ -45,6 +46,7 @@ const CategoryView = ({ categoryName }: CategoryViewProps) => {
   const [listings, setListings] = useState<ListingWithRelations[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
   
   useEffect(() => {
     const fetchCategoryListings = async () => {
@@ -60,13 +62,18 @@ const CategoryView = ({ categoryName }: CategoryViewProps) => {
       } catch (err) {
         console.error('Error fetching category listings:', err);
         setError('Failed to load listings');
+        toast({
+          title: "Error",
+          description: "Failed to load listings. Please try again later.",
+          variant: "destructive",
+        });
       } finally {
         setIsLoading(false);
       }
     };
     
     fetchCategoryListings();
-  }, [categoryName]);
+  }, [categoryName, toast]);
   
   const categoryData = getCategoryData(categoryName, listings.length);
   
@@ -177,7 +184,7 @@ const CategoryListingCard = ({ listing }: { listing: ListingWithRelations }) => 
     <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-syrian-green/10 hover:shadow-md transition-all hover:border-syrian-green/30">
       <div className="relative">
         <img 
-          src={listing.images?.[0] || '/placeholder.svg'} 
+          src={listing.images?.[0] || "/placeholder.svg"} 
           alt={listing.title} 
           className="w-full h-48 object-cover" 
         />
