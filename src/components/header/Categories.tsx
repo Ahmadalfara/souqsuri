@@ -33,37 +33,55 @@ const Categories = () => {
     { name: 'services', label: language === 'ar' ? 'خدمات' : t('services'), icon: Wrench },
   ];
   
-  // Enhanced iOS-style categories with more spacing between them
   return (
-    <div className="flex justify-center overflow-x-auto pb-3 mb-5">
-      <div className={`inline-flex ${language === 'ar' ? 'space-x-reverse rtl' : ''} px-2 gap-5 md:gap-7`}>
-        {categories.map((category) => (
-          <Link 
-            key={category.name}
-            to={category.name === 'all' ? '/' : `/category/${category.name}`}
-            className={`
-              flex flex-col items-center px-6 py-3 rounded-lg transition-all duration-200
-              ${activeCategory === category.name || (category.name === 'all' && !activeCategory)
-                ? 'bg-syrian-green text-white shadow-md transform hover:scale-105' 
-                : 'bg-white hover:bg-syrian-green/10 border border-syrian-green/20 hover:border-syrian-green/50 hover:shadow-md transform hover:scale-105'
-              }
-            `}
-          >
-            <category.icon 
-              size={28} 
-              strokeWidth={1.5}
-              className={`mb-2 ${activeCategory === category.name || (category.name === 'all' && !activeCategory) ? 'text-white' : 'text-syrian-green'}`} 
+    <div className="flex flex-col items-center justify-center mb-8">
+      {/* Professional title header with green text */}
+      <div className="w-full text-center mb-4">
+        <h2 className="text-syrian-green font-bold text-2xl md:text-3xl relative inline-block">
+          {language === 'ar' ? (
+            <ArabicText
+              text="أكبر سوق في سوريا"
+              className="font-bold tracking-wide"
+              size="2xl"
             />
-            
-            <span className="text-sm font-medium whitespace-nowrap">
-              {language === 'ar' ? (
-                <ArabicText text={category.label} />
-              ) : (
-                category.label
-              )}
-            </span>
-          </Link>
-        ))}
+          ) : (
+            <span className="tracking-wide">Biggest Market in Syria</span>
+          )}
+          <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-2/3 h-0.5 bg-syrian-green/40 rounded-full"></span>
+        </h2>
+      </div>
+      
+      {/* Enhanced iOS-style categories */}
+      <div className="flex justify-center overflow-x-auto pb-3 w-full">
+        <div className={`inline-flex ${language === 'ar' ? 'space-x-reverse rtl' : ''} px-2 gap-5 md:gap-7`}>
+          {categories.map((category) => (
+            <Link 
+              key={category.name}
+              to={category.name === 'all' ? '/' : `/category/${category.name}`}
+              className={`
+                flex flex-col items-center px-6 py-3 rounded-lg transition-all duration-200
+                ${activeCategory === category.name || (category.name === 'all' && !activeCategory)
+                  ? 'bg-syrian-green text-white shadow-md transform hover:scale-105' 
+                  : 'bg-white hover:bg-syrian-green/10 border border-syrian-green/20 hover:border-syrian-green/50 hover:shadow-md transform hover:scale-105'
+                }
+              `}
+            >
+              <category.icon 
+                size={28} 
+                strokeWidth={1.5}
+                className={`mb-2 ${activeCategory === category.name || (category.name === 'all' && !activeCategory) ? 'text-white' : 'text-syrian-green'}`} 
+              />
+              
+              <span className="text-sm font-medium whitespace-nowrap">
+                {language === 'ar' ? (
+                  <ArabicText text={category.label} />
+                ) : (
+                  category.label
+                )}
+              </span>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
