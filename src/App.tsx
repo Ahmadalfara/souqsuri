@@ -26,6 +26,34 @@ import { useState, useEffect } from "react";
 
 const queryClient = new QueryClient();
 
+const AppRoutes = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/listing/:id" element={<ListingDetails />} />
+      <Route path="/profile" element={
+        <ProtectedRoute>
+          <UserProfile />
+        </ProtectedRoute>
+      } />
+      <Route path="/category/:categoryName" element={<Index />} />
+      <Route path="/search" element={<SearchResults />} />
+      
+      {/* Info Pages */}
+      <Route path="/how-to-sell" element={<HowToSell />} />
+      <Route path="/featured-listings" element={<FeaturedListings />} />
+      <Route path="/customer-support" element={<CustomerSupport />} />
+      <Route path="/faq" element={<FAQ />} />
+      <Route path="/contact" element={<ContactUs />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-of-service" element={<TermsOfService />} />
+      
+      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+
 const AppContent = () => {
   const [loading, setLoading] = useState(true);
   
@@ -42,32 +70,10 @@ const AppContent = () => {
   }
   
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/listing/:id" element={<ListingDetails />} />
-        <Route path="/profile" element={
-          <ProtectedRoute>
-            <UserProfile />
-          </ProtectedRoute>
-        } />
-        <Route path="/category/:categoryName" element={<Index />} />
-        <Route path="/search" element={<SearchResults />} />
-        
-        {/* New Pages */}
-        <Route path="/how-to-sell" element={<HowToSell />} />
-        <Route path="/featured-listings" element={<FeaturedListings />} />
-        <Route path="/customer-support" element={<CustomerSupport />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/contact" element={<ContactUs />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/terms-of-service" element={<TermsOfService />} />
-        
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+    <>
+      <AppRoutes />
       <AIChatWidget />
-    </BrowserRouter>
+    </>
   );
 };
 
@@ -75,13 +81,15 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <LanguageProvider>
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <AppContent />
-          </TooltipProvider>
-        </AuthProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <AppContent />
+            </TooltipProvider>
+          </AuthProvider>
+        </BrowserRouter>
       </LanguageProvider>
     </ThemeProvider>
   </QueryClientProvider>

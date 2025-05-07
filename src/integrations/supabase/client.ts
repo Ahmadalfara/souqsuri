@@ -17,34 +17,5 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   }
 });
 
-// Initialize storage buckets - creating the listings bucket if it doesn't exist
-(async () => {
-  try {
-    // Try to create the listings bucket if it doesn't exist
-    try {
-      const { data: bucketData, error: bucketError } = await supabase.storage.createBucket('listings', {
-        public: true,
-        fileSizeLimit: 10485760, // 10MB limit
-        allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp']
-      });
-      
-      if (bucketError && bucketError.message !== 'Bucket already exists') {
-        console.warn('Error creating listings bucket:', bucketError);
-      } else if (bucketData) {
-        console.log('Listings bucket created successfully:', bucketData);
-      }
-    } catch (createError) {
-      console.warn('Error while trying to create listings bucket:', createError);
-    }
-    
-    // Check if we can access the storage
-    const { data, error } = await supabase.storage.getBucket('listings');
-    if (error) {
-      console.warn('Listings bucket might not exist or is inaccessible:', error);
-    } else {
-      console.log('Listings bucket accessible:', data);
-    }
-  } catch (error) {
-    console.error('Failed to initialize storage buckets:', error);
-  }
-})();
+// Note: Bucket initialization removed to prevent RLS policy errors
+// Storage buckets should be created via SQL in the Supabase dashboard instead
