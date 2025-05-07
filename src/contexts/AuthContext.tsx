@@ -9,8 +9,9 @@ interface AuthContextType {
   currentUser: User | null;
   session: Session | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<User>;
-  register: (name: string, email: string, password: string, phone: string) => Promise<User>;
+  login: (phone: string, password: string) => Promise<boolean>; // Returns true if OTP is needed
+  register: (name: string, phone: string, password: string, phoneForProfile: string) => Promise<boolean>; // Returns true if OTP is needed
+  verifyOtp: (phone: string, token: string) => Promise<User>;
   logout: () => Promise<void>;
   updateUserProfile: (data: {[key: string]: any}) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -54,6 +55,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             description: t('comeBackSoon'),
           });
         }
+
+        if (event === 'USER_UPDATED') {
+          toast({
+            title: t('profileUpdated'),
+            description: t('profileUpdateSuccess'),
+          });
+        }
       }
     );
     
@@ -67,37 +75,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, [toast, t]);
   
-  const login = async (email: string, password: string): Promise<User> => {
+  // Phone login now returns true if OTP verification is needed
+  const login = async (phone: string, password: string): Promise<boolean> => {
     try {
-      // Determine if login is using email or phone
-      const isPhone = email.includes('@phone.user');
-      
-      let authResponse;
-      if (isPhone) {
-        // Extract phone from email format (phone@phone.user)
-        const phone = email.split('@')[0];
-        // Log in with phone number
-        authResponse = await supabase.auth.signInWithPassword({
-          phone: phone,
-          password,
-        });
-      } else {
-        // Log in with email
-        authResponse = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-      }
-      
-      const { data, error } = authResponse;
+      // Always use signInWithPassword for the initial authentication
+      const { data, error } = await supabase.auth.signInWithPassword({
+        phone,
+        password,
+      });
       
       if (error) {
         let errorMessage = t('loginFailed');
         
         if (error.message.includes('Invalid login')) {
           errorMessage = t('wrongPassword');
-        } else if (error.message.includes('Email not confirmed')) {
-          errorMessage = t('emailNotConfirmed');
+        } else if (error.message.includes('not confirmed')) {
+          errorMessage = t('phoneNotConfirmed');
         } else if (error.message.includes('User not found')) {
           errorMessage = t('userNotFound');
         }
@@ -109,8 +102,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         throw error;
       }
+
+      if (!data.user?.phone_confirmed_at) {
+        // If phone is not confirmed, trigger OTP verification
+        const { error: otpError } = await supabase.auth.signInWithOtp({
+          phone,
+        });
+        
+        if (otpError) {
+          toast({
+            title: t('error'),
+            description: otpError.message || t('otpSendFailed'),
+            variant: "destructive"
+          });
+          throw otpError;
+        }
+        
+        return true; // OTP verification needed
+      }
       
-      return data.user;
+      return false; // No OTP needed, login successful
     } catch (error: any) {
       toast({
         title: t('error'),
@@ -121,48 +132,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
   
-  const register = async (name: string, email: string, password: string, phone: string): Promise<User> => {
+  // Register with phone verification
+  const register = async (name: string, phone: string, password: string, phoneForProfile: string): Promise<boolean> => {
     try {
-      // Determine if registration is using email or phone
-      const isPhoneRegistration = email.includes('@phone.user');
-      
-      let authResponse;
-      if (isPhoneRegistration) {
-        // Extract phone from email format
-        const phoneNumber = email.split('@')[0];
-        
-        // Register with phone number
-        authResponse = await supabase.auth.signUp({
-          phone: phoneNumber,
-          password,
-          options: {
-            data: {
-              name,
-              phone: phoneNumber
-            }
+      // Register with phone
+      const { data, error } = await supabase.auth.signUp({
+        phone,
+        password,
+        options: {
+          data: {
+            name,
+            phone: phoneForProfile
           }
-        });
-      } else {
-        // Register with email
-        authResponse = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              name,
-              phone
-            }
-          }
-        });
-      }
-      
-      const { data, error } = authResponse;
+        }
+      });
       
       if (error) {
         let errorMessage = t('registrationFailed');
         
         if (error.message.includes('already registered')) {
-          errorMessage = t('emailInUse');
+          errorMessage = t('phoneInUse');
         } else if (error.message.includes('weak password')) {
           errorMessage = t('weakPassword');
         }
@@ -174,17 +163,62 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         throw error;
       }
+
+      // If user was created but phone is not confirmed, trigger OTP verification
+      if (!data.user?.phone_confirmed_at) {
+        // Registration requires verification
+        toast({
+          title: t('registrationStarted'),
+          description: t('pleaseVerifyPhone'),
+        });
+        
+        return true; // OTP verification needed
+      }
       
       toast({
         title: t('registrationSuccess'),
         description: t('accountCreated'),
       });
       
-      return data.user;
+      return false; // No OTP needed, registration successful
     } catch (error: any) {
       toast({
         title: t('error'),
         description: error.message || t('registrationFailed'),
+        variant: "destructive"
+      });
+      throw error;
+    }
+  };
+
+  // Verify OTP token
+  const verifyOtp = async (phone: string, token: string): Promise<User> => {
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        phone,
+        token,
+        type: 'sms'
+      });
+      
+      if (error) {
+        toast({
+          title: t('error'),
+          description: error.message || t('otpVerificationFailed'),
+          variant: "destructive"
+        });
+        throw error;
+      }
+
+      toast({
+        title: t('success'),
+        description: t('phoneVerified'),
+      });
+      
+      return data.user;
+    } catch (error: any) {
+      toast({
+        title: t('error'),
+        description: error.message || t('otpVerificationFailed'),
         variant: "destructive"
       });
       throw error;
@@ -237,26 +271,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
   
-  // New password reset functionality
+  // For phone-only auth, resetPassword will need to be modified
   const resetPassword = async (email: string): Promise<void> => {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-      
-      if (error) {
-        toast({
-          title: t('error'),
-          description: error.message || t('resetPasswordFailed'),
-          variant: "destructive"
-        });
-        throw error;
-      }
-      
+      // For phone auth, we should ideally use phone-based password reset
+      // This is a placeholder until we implement phone-based reset
       toast({
-        title: t('resetPasswordEmailSent'),
-        description: t('checkEmailForInstructions'),
+        title: t('notSupported'),
+        description: t('featureNotAvailable'),
+        variant: "destructive"
       });
+      throw new Error('Password reset via email not supported in phone-only auth');
     } catch (error: any) {
       toast({
         title: t('error'),
@@ -303,6 +328,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     login,
     register,
+    verifyOtp,
     logout,
     updateUserProfile,
     resetPassword,
