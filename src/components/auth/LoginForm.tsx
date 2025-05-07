@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -229,8 +228,8 @@ const LoginForm = ({ onForgotPassword }: LoginFormProps) => {
                       onChange={field.onChange}
                       render={({ slots }) => (
                         <InputOTPGroup className="gap-2 justify-center">
-                          {slots.map((slot, index) => (
-                            <InputOTPSlot key={index} {...slot} className="border-syrian-green focus:border-syrian-dark" />
+                          {slots.map((slot, i) => (
+                            <InputOTPSlot key={i} {...slot} index={i} className="border-syrian-green focus:border-syrian-dark" />
                           ))}
                         </InputOTPGroup>
                       )}
