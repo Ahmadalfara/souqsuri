@@ -8,7 +8,7 @@ import { searchListings } from './search';
  * @param count Maximum number of listings to return
  * @returns Array of listings filtered by category
  */
-export const getListingsByCategory = async (
+export const getListingsByCategoryId = async (
   category: string,
   count: number = 12
 ): Promise<ListingWithRelations[]> => {
@@ -17,7 +17,7 @@ export const getListingsByCategory = async (
   // Use the existing search function with category filter
   return searchListings({
     category,
-    sortBy: 'newest',
-    limit: count
-  });
+    sortBy: 'newest'
+    // Using a valid property from ListingFilters instead of 'limit'
+  }).then(listings => listings.slice(0, count)); // Apply limit after search
 };

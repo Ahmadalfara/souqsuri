@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCurrencyConverter } from '@/services/currencyService';
 import { searchListings } from '@/services/listings/search';
-import { getListingsByCategory } from '@/services/listings/categorySearch';
+import { getListingsByCategoryId } from '@/services/listings/categorySearch';
 import ListingGrid from '@/components/listings/ListingGrid';
 import LoadingState from '@/components/listings/LoadingState';
 import EmptyState from '@/components/listings/EmptyState';
@@ -66,7 +66,7 @@ const SearchResults = () => {
   // Use the appropriate search function based on whether we have a category or query
   const searchFunction = () => {
     if (categoryParam && !query) {
-      return getListingsByCategory(categoryParam);
+      return getListingsByCategoryId(categoryParam);
     } else {
       return searchListings(filters);
     }
