@@ -131,6 +131,76 @@ const mockListings: MockListingWithRelations[] = [
       created_at: new Date().toISOString()
     }
   },
+  {
+    id: 'real-estate-3',
+    title: 'شقة مفروشة للإيجار في اللاذقية',
+    title_en: 'Furnished apartment for rent in Latakia',
+    description: 'شقة مفروشة بالكامل للإيجار في منطقة هادئة قرب البحر',
+    description_en: 'Fully furnished apartment for rent in a quiet area near the sea',
+    price: 750000,
+    currency: 'SYP',
+    category: 'real_estate',
+    category_ar: 'العقارات',
+    category_en: 'Real Estate',
+    condition: 'excellent',
+    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/real-estate-3.jpg'],
+    created_at: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+    updated_at: new Date(Date.now() - 172800000).toISOString(),
+    user_id: 'mock-user-3',
+    governorate_id: 'latakia',
+    district_id: 'corniche',
+    is_featured: true,
+    status: 'active',
+    views: 143,
+    governorate: {
+      id: 'latakia',
+      name_ar: 'اللاذقية',
+      name_en: 'Latakia',
+      created_at: new Date().toISOString()
+    },
+    district: {
+      id: 'corniche',
+      name_ar: 'الكورنيش',
+      name_en: 'Corniche',
+      governorate_id: 'latakia',
+      created_at: new Date().toISOString()
+    }
+  },
+  {
+    id: 'real-estate-4',
+    title: 'أرض زراعية للبيع في حمص',
+    title_en: 'Agricultural land for sale in Homs',
+    description: 'قطعة أرض زراعية خصبة مساحة 5000 متر مربع مع بئر ماء',
+    description_en: 'Fertile agricultural land, area 5000 square meters with water well',
+    price: 45000000,
+    currency: 'SYP',
+    category: 'real_estate',
+    category_ar: 'العقارات',
+    category_en: 'Real Estate',
+    condition: 'good',
+    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/real-estate-4.jpg'],
+    created_at: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
+    updated_at: new Date(Date.now() - 259200000).toISOString(),
+    user_id: 'mock-user-4',
+    governorate_id: 'homs',
+    district_id: 'countryside',
+    is_featured: false,
+    status: 'active',
+    views: 98,
+    governorate: {
+      id: 'homs',
+      name_ar: 'حمص',
+      name_en: 'Homs',
+      created_at: new Date().toISOString()
+    },
+    district: {
+      id: 'countryside',
+      name_ar: 'الريف',
+      name_en: 'Countryside',
+      governorate_id: 'homs',
+      created_at: new Date().toISOString()
+    }
+  },
   
   // Cars listings
   {
@@ -200,6 +270,76 @@ const mockListings: MockListingWithRelations[] = [
       name_ar: 'وسط المدينة', 
       name_en: 'City Center',
       governorate_id: 'latakia',
+      created_at: new Date().toISOString()
+    }
+  },
+  {
+    id: 'cars-3',
+    title: 'هوندا سيفيك 2019',
+    title_en: 'Honda Civic 2019',
+    description: 'هوندا سيفيك بحالة ممتازة، استعمال شخصي',
+    description_en: 'Honda Civic in excellent condition, personal use',
+    price: 75000000,
+    currency: 'SYP',
+    category: 'vehicles',
+    category_ar: 'سيارات',
+    category_en: 'Cars',
+    condition: 'good',
+    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/car-3.jpg'],
+    created_at: new Date(Date.now() - 345600000).toISOString(), // 4 days ago
+    updated_at: new Date(Date.now() - 345600000).toISOString(),
+    user_id: 'mock-user-5',
+    governorate_id: 'damascus',
+    district_id: 'center',
+    is_featured: false,
+    status: 'active',
+    views: 130,
+    governorate: {
+      id: 'damascus',
+      name_ar: 'دمشق',
+      name_en: 'Damascus',
+      created_at: new Date().toISOString()
+    },
+    district: {
+      id: 'center',
+      name_ar: 'وسط المدينة',
+      name_en: 'City Center',
+      governorate_id: 'damascus',
+      created_at: new Date().toISOString()
+    }
+  },
+  {
+    id: 'cars-4',
+    title: 'تويوتا لاند كروزر 2015',
+    title_en: 'Toyota Land Cruiser 2015',
+    description: 'سيارة دفع رباعي فاخرة بحالة جيدة جداً',
+    description_en: 'Luxury 4x4 vehicle in very good condition',
+    price: 200000000,
+    currency: 'SYP',
+    category: 'vehicles',
+    category_ar: 'سيارات',
+    category_en: 'Cars',
+    condition: 'excellent',
+    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/car-4.jpg'],
+    created_at: new Date(Date.now() - 432000000).toISOString(), // 5 days ago
+    updated_at: new Date(Date.now() - 432000000).toISOString(),
+    user_id: 'mock-user-6',
+    governorate_id: 'aleppo',
+    district_id: 'aziziyeh',
+    is_featured: true,
+    status: 'active',
+    views: 185,
+    governorate: {
+      id: 'aleppo',
+      name_ar: 'حلب',
+      name_en: 'Aleppo',
+      created_at: new Date().toISOString()
+    },
+    district: {
+      id: 'aziziyeh',
+      name_ar: 'العزيزية',
+      name_en: 'Aziziyeh',
+      governorate_id: 'aleppo',
       created_at: new Date().toISOString()
     }
   },
@@ -275,6 +415,76 @@ const mockListings: MockListingWithRelations[] = [
       created_at: new Date().toISOString()
     }
   },
+  {
+    id: 'electronics-3',
+    title: 'سماعات سوني بلوتوث',
+    title_en: 'Sony Bluetooth Headphones',
+    description: 'سماعات سوني لاسلكية ذات جودة عالية للصوت',
+    description_en: 'Sony wireless headphones with high sound quality',
+    price: 850000,
+    currency: 'SYP',
+    category: 'electronics',
+    category_ar: 'إلكترونيات',
+    category_en: 'Electronics',
+    condition: 'like_new',
+    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/headphones-1.jpg'],
+    created_at: new Date(Date.now() - 518400000).toISOString(), // 6 days ago
+    updated_at: new Date(Date.now() - 518400000).toISOString(),
+    user_id: 'mock-user-7',
+    governorate_id: 'damascus',
+    district_id: 'mezzeh',
+    is_featured: false,
+    status: 'active',
+    views: 135,
+    governorate: {
+      id: 'damascus',
+      name_ar: 'دمشق',
+      name_en: 'Damascus',
+      created_at: new Date().toISOString()
+    },
+    district: {
+      id: 'mezzeh',
+      name_ar: 'المزة',
+      name_en: 'Mezzeh',
+      governorate_id: 'damascus',
+      created_at: new Date().toISOString()
+    }
+  },
+  {
+    id: 'electronics-4',
+    title: 'تلفزيون سامسونج سمارت 55 انش',
+    title_en: 'Samsung Smart TV 55 inch',
+    description: 'تلفزيون ذكي من سامسونج بشاشة 55 انش دقة 4K',
+    description_en: 'Samsung Smart TV with 55 inch 4K display',
+    price: 3800000,
+    currency: 'SYP',
+    category: 'electronics',
+    category_ar: 'إلكترونيات',
+    category_en: 'Electronics',
+    condition: 'new',
+    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/tv-1.jpg'],
+    created_at: new Date(Date.now() - 604800000).toISOString(), // 7 days ago
+    updated_at: new Date(Date.now() - 604800000).toISOString(),
+    user_id: 'mock-user-8',
+    governorate_id: 'aleppo',
+    district_id: 'center',
+    is_featured: true,
+    status: 'active',
+    views: 220,
+    governorate: {
+      id: 'aleppo',
+      name_ar: 'حلب',
+      name_en: 'Aleppo',
+      created_at: new Date().toISOString()
+    },
+    district: {
+      id: 'center',
+      name_ar: 'وسط المدينة',
+      name_en: 'City Center',
+      governorate_id: 'aleppo',
+      created_at: new Date().toISOString()
+    }
+  },
   
   // Clothes listings
   {
@@ -344,6 +554,76 @@ const mockListings: MockListingWithRelations[] = [
       name_ar: 'العزيزية', 
       name_en: 'Aziziyeh',
       governorate_id: 'aleppo',
+      created_at: new Date().toISOString()
+    }
+  },
+  {
+    id: 'clothes-3',
+    title: 'حذاء رياضي نايك',
+    title_en: 'Nike sports shoes',
+    description: 'حذاء رياضي نايك جديد لون أسود مقاس 43',
+    description_en: 'New Nike sports shoes, black color, size 43',
+    price: 450000,
+    currency: 'SYP',
+    category: 'clothing',
+    category_ar: 'ملابس',
+    category_en: 'Clothes',
+    condition: 'new',
+    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/shoes-1.jpg'],
+    created_at: new Date(Date.now() - 691200000).toISOString(), // 8 days ago
+    updated_at: new Date(Date.now() - 691200000).toISOString(),
+    user_id: 'mock-user-9',
+    governorate_id: 'latakia',
+    district_id: 'center',
+    is_featured: false,
+    status: 'active',
+    views: 78,
+    governorate: {
+      id: 'latakia',
+      name_ar: 'اللاذقية',
+      name_en: 'Latakia',
+      created_at: new Date().toISOString()
+    },
+    district: {
+      id: 'center',
+      name_ar: 'وسط المدينة',
+      name_en: 'City Center',
+      governorate_id: 'latakia',
+      created_at: new Date().toISOString()
+    }
+  },
+  {
+    id: 'clothes-4',
+    title: 'جاكيت جلد أصلي',
+    title_en: 'Genuine leather jacket',
+    description: 'جاكيت من الجلد الطبيعي بحالة ممتازة',
+    description_en: 'Genuine leather jacket in excellent condition',
+    price: 650000,
+    currency: 'SYP',
+    category: 'clothing',
+    category_ar: 'ملابس',
+    category_en: 'Clothes',
+    condition: 'used',
+    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/jacket-1.jpg'],
+    created_at: new Date(Date.now() - 777600000).toISOString(), // 9 days ago
+    updated_at: new Date(Date.now() - 777600000).toISOString(),
+    user_id: 'mock-user-10',
+    governorate_id: 'damascus',
+    district_id: 'shaalan',
+    is_featured: true,
+    status: 'active',
+    views: 115,
+    governorate: {
+      id: 'damascus',
+      name_ar: 'دمشق',
+      name_en: 'Damascus',
+      created_at: new Date().toISOString()
+    },
+    district: {
+      id: 'shaalan',
+      name_ar: 'الشعلان',
+      name_en: 'Shaalan',
+      governorate_id: 'damascus',
       created_at: new Date().toISOString()
     }
   },
@@ -419,6 +699,76 @@ const mockListings: MockListingWithRelations[] = [
       created_at: new Date().toISOString()
     }
   },
+  {
+    id: 'furniture-3',
+    title: 'طاولة طعام خشبية للعائلة',
+    title_en: 'Wooden family dining table',
+    description: 'طاولة طعام خشبية كبيرة تتسع لـ8 أشخاص',
+    description_en: 'Large wooden dining table for 8 people',
+    price: 2100000,
+    currency: 'SYP',
+    category: 'furniture',
+    category_ar: 'أثاث',
+    category_en: 'Furniture',
+    condition: 'excellent',
+    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/table-1.jpg'],
+    created_at: new Date(Date.now() - 864000000).toISOString(), // 10 days ago
+    updated_at: new Date(Date.now() - 864000000).toISOString(),
+    user_id: 'mock-user-11',
+    governorate_id: 'aleppo',
+    district_id: 'north',
+    is_featured: false,
+    status: 'active',
+    views: 95,
+    governorate: {
+      id: 'aleppo',
+      name_ar: 'حلب',
+      name_en: 'Aleppo',
+      created_at: new Date().toISOString()
+    },
+    district: {
+      id: 'north',
+      name_ar: 'الشمال',
+      name_en: 'North',
+      governorate_id: 'aleppo',
+      created_at: new Date().toISOString()
+    }
+  },
+  {
+    id: 'furniture-4',
+    title: 'خزانة ملابس بمرآة',
+    title_en: 'Wardrobe with mirror',
+    description: 'خزانة ملابس عصرية مع مرآة كاملة الارتفاع',
+    description_en: 'Modern wardrobe with full-length mirror',
+    price: 1800000,
+    currency: 'SYP',
+    category: 'furniture',
+    category_ar: 'أثاث',
+    category_en: 'Furniture',
+    condition: 'new',
+    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/wardrobe-1.jpg'],
+    created_at: new Date(Date.now() - 950400000).toISOString(), // 11 days ago
+    updated_at: new Date(Date.now() - 950400000).toISOString(),
+    user_id: 'mock-user-12',
+    governorate_id: 'latakia',
+    district_id: 'corniche',
+    is_featured: true,
+    status: 'active',
+    views: 140,
+    governorate: {
+      id: 'latakia',
+      name_ar: 'اللاذقية',
+      name_en: 'Latakia',
+      created_at: new Date().toISOString()
+    },
+    district: {
+      id: 'corniche',
+      name_ar: 'الكورنيش',
+      name_en: 'Corniche',
+      governorate_id: 'latakia',
+      created_at: new Date().toISOString()
+    }
+  },
   
   // Jobs listings
   {
@@ -491,6 +841,76 @@ const mockListings: MockListingWithRelations[] = [
       created_at: new Date().toISOString()
     }
   },
+  {
+    id: 'jobs-3',
+    title: 'مطلوب مصمم جرافيك',
+    title_en: 'Graphic designer needed',
+    description: 'شركة دعاية تبحث عن مصمم جرافيك محترف',
+    description_en: 'Advertising company looking for professional graphic designer',
+    price: 750000,
+    currency: 'SYP',
+    category: 'jobs',
+    category_ar: 'وظائف',
+    category_en: 'Jobs',
+    condition: 'new',
+    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/job-3.jpg'],
+    created_at: new Date(Date.now() - 1036800000).toISOString(), // 12 days ago
+    updated_at: new Date(Date.now() - 1036800000).toISOString(),
+    user_id: 'mock-user-13',
+    governorate_id: 'damascus',
+    district_id: 'malki',
+    is_featured: false,
+    status: 'active',
+    views: 170,
+    governorate: {
+      id: 'damascus',
+      name_ar: 'دمشق',
+      name_en: 'Damascus',
+      created_at: new Date().toISOString()
+    },
+    district: {
+      id: 'malki',
+      name_ar: 'المالكي',
+      name_en: 'Malki',
+      governorate_id: 'damascus',
+      created_at: new Date().toISOString()
+    }
+  },
+  {
+    id: 'jobs-4',
+    title: 'فرص عمل لمترجمين',
+    title_en: 'Job opportunities for translators',
+    description: 'مكتب ترجمة يطلب مترجمين من وإلى اللغة الإنكليزية',
+    description_en: 'Translation office requesting English translators',
+    price: 700000,
+    currency: 'SYP',
+    category: 'jobs',
+    category_ar: 'وظائف',
+    category_en: 'Jobs',
+    condition: 'new',
+    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/job-4.jpg'],
+    created_at: new Date(Date.now() - 1123200000).toISOString(), // 13 days ago
+    updated_at: new Date(Date.now() - 1123200000).toISOString(),
+    user_id: 'mock-user-14',
+    governorate_id: 'aleppo',
+    district_id: 'center',
+    is_featured: true,
+    status: 'active',
+    views: 190,
+    governorate: {
+      id: 'aleppo',
+      name_ar: 'حلب',
+      name_en: 'Aleppo',
+      created_at: new Date().toISOString()
+    },
+    district: {
+      id: 'center',
+      name_ar: 'وسط المدينة',
+      name_en: 'City Center',
+      governorate_id: 'aleppo',
+      created_at: new Date().toISOString()
+    }
+  },
   
   // Services listings
   {
@@ -560,6 +980,76 @@ const mockListings: MockListingWithRelations[] = [
       name_ar: 'وسط المدينة', 
       name_en: 'City Center',
       governorate_id: 'hama',
+      created_at: new Date().toISOString()
+    }
+  },
+  {
+    id: 'services-3',
+    title: 'خدمات نقل وتوصيل',
+    title_en: 'Transport and delivery services',
+    description: 'خدمات نقل وتوصيل البضائع داخل وخارج المدينة',
+    description_en: 'Transport and delivery services within and outside the city',
+    price: 250000,
+    currency: 'SYP',
+    category: 'services',
+    category_ar: 'خدمات',
+    category_en: 'Services',
+    condition: 'new',
+    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/service-3.jpg'],
+    created_at: new Date(Date.now() - 1209600000).toISOString(), // 14 days ago
+    updated_at: new Date(Date.now() - 1209600000).toISOString(),
+    user_id: 'mock-user-1',
+    governorate_id: 'damascus',
+    district_id: 'mezzeh',
+    is_featured: false,
+    status: 'active',
+    views: 110,
+    governorate: {
+      id: 'damascus',
+      name_ar: 'دمشق',
+      name_en: 'Damascus',
+      created_at: new Date().toISOString()
+    },
+    district: {
+      id: 'mezzeh',
+      name_ar: 'المزة',
+      name_en: 'Mezzeh',
+      governorate_id: 'damascus',
+      created_at: new Date().toISOString()
+    }
+  },
+  {
+    id: 'services-4',
+    title: 'خدمات تنظيف المنازل',
+    title_en: 'Home cleaning services',
+    description: 'خدمات تنظيف شاملة للمنازل والمكاتب',
+    description_en: 'Comprehensive cleaning services for homes and offices',
+    price: 200000,
+    currency: 'SYP',
+    category: 'services',
+    category_ar: 'خدمات',
+    category_en: 'Services',
+    condition: 'new',
+    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/service-4.jpg'],
+    created_at: new Date(Date.now() - 1296000000).toISOString(), // 15 days ago
+    updated_at: new Date(Date.now() - 1296000000).toISOString(),
+    user_id: 'mock-user-2',
+    governorate_id: 'latakia',
+    district_id: 'center',
+    is_featured: true,
+    status: 'active',
+    views: 125,
+    governorate: {
+      id: 'latakia',
+      name_ar: 'اللاذقية',
+      name_en: 'Latakia',
+      created_at: new Date().toISOString()
+    },
+    district: {
+      id: 'center',
+      name_ar: 'وسط المدينة',
+      name_en: 'City Center',
+      governorate_id: 'latakia',
       created_at: new Date().toISOString()
     }
   }
