@@ -22,11 +22,11 @@ const FeaturedListings = () => {
     queryKey: ['featuredListings'],
     queryFn: () => getFeaturedListings(12),
     retry: 1,
-    onSuccess: (data) => {
-      console.info('Successfully retrieved featured listings');
-    },
-    onSettled: (data, error) => {
-      if (error) {
+    meta: {
+      onSuccess: () => {
+        console.info('Successfully retrieved featured listings');
+      },
+      onError: (error) => {
         console.error('Failed to fetch featured listings:', error);
         toast({
           variant: "destructive",
