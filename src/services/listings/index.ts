@@ -1,7 +1,7 @@
 
 // Re-export all listing services from their respective modules
 export * from './core';
-// Import the search functions but exclude getListingsByCategory to avoid conflict
+// Export all search functions including getFeaturedListings
 export { searchListings, getFeaturedListings } from './search';
 export * from './user';
 export * from './location';

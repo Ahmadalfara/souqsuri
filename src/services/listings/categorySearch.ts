@@ -15,9 +15,11 @@ export const getListingsByCategoryId = async (
   console.log(`Getting listings for category: ${category}`);
   
   // Use the existing search function with category filter
-  return searchListings({
+  const filteredListings = searchListings({
     category,
     sortBy: 'newest'
-    // Using a valid property from ListingFilters instead of 'limit'
-  }).then(listings => listings.slice(0, count)); // Apply limit after search
+  });
+  
+  // Apply limit and return as Promise
+  return Promise.resolve(filteredListings.slice(0, count));
 };

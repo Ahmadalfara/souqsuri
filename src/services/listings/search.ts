@@ -539,3 +539,21 @@ export const searchListings = (filters: ListingFilters): ListingWithRelations[] 
   
   return results;
 };
+
+/**
+ * Get featured listings
+ * @param count Maximum number of listings to return
+ * @returns Array of featured listings
+ */
+export const getFeaturedListings = (count: number = 12): Promise<ListingWithRelations[]> => {
+  console.log(`Getting featured listings, limit: ${count}`);
+  
+  // Use the existing search function with is_featured filter
+  const featuredListings = mockListingsData
+    .filter(listing => listing.is_featured === true)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, count);
+  
+  // Return as Promise to match expected return type in components
+  return Promise.resolve(featuredListings);
+};
