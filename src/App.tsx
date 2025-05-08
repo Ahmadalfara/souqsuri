@@ -13,6 +13,7 @@ const queryClient = new QueryClient();
 const Index = lazy(() => import('./pages/Index'));
 const FeaturedListings = lazy(() => import('./pages/FeaturedListings'));
 const UserProfile = lazy(() => import('./pages/UserProfile'));
+const ListingDetails = lazy(() => import('./pages/ListingDetails'));
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
                 <Route path="/category/:categoryName" element={<Index />} />
                 <Route path="/featured-listings" element={<FeaturedListings />} />
                 <Route path="/profile" element={<UserProfile />} />
+                <Route path="/listing/:listingId" element={<ListingDetails />} />
               </Routes>
             </Suspense>
             <Toaster />

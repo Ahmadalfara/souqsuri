@@ -18,7 +18,7 @@ const FeaturedListings = () => {
   const { language, t } = useLanguage();
   const { toast } = useToast();
   
-  const { data: listings, isLoading, error } = useQuery({
+  const { data: listings, isLoading, error, refetch } = useQuery({
     queryKey: ['featuredListings'],
     queryFn: () => getFeaturedListings(12),
     retry: 1,
