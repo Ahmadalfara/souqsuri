@@ -28,6 +28,11 @@ export const useCurrentRoute = () => {
         }
       }
       
+      // Special case for featured-listings page
+      if (path === '/featured-listings' && location.pathname === '/featured-listings') {
+        return true;
+      }
+      
       return location.pathname.includes(path);
     },
     query: new URLSearchParams(location.search),

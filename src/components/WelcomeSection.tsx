@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ArabicText from './ArabicText';
 import ArabicBorder from './ArabicBorder';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -87,6 +87,7 @@ const FeaturedListing = ({ item }: { item: ListingItem }) => {
 
 const WelcomeSection = () => {
   const { language, t } = useLanguage();
+  const navigate = useNavigate();
   const featuredListings: ListingItem[] = [
     {
       id: 1,
@@ -134,6 +135,10 @@ const WelcomeSection = () => {
     }
   ];
 
+  const handleViewMoreClick = () => {
+    navigate('/featured-listings');
+  };
+
   return (
     <section className="flex flex-col items-center py-10 px-6 md:px-10 bg-white">
       <div className="max-w-6xl w-full">
@@ -156,7 +161,10 @@ const WelcomeSection = () => {
         </div>
         
         <div className="mt-10 text-center">
-          <Button className="bg-syrian-green hover:bg-syrian-dark text-white px-8 py-6">
+          <Button 
+            className="bg-syrian-green hover:bg-syrian-dark text-white px-8 py-6"
+            onClick={handleViewMoreClick}
+          >
             {language === 'ar' ? (
               <ArabicText text={t('viewMoreListings')} size="normal" />
             ) : (
