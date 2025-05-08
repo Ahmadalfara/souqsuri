@@ -7,9 +7,12 @@ import ArabicText from '@/components/ArabicText';
 import { Card } from '@/components/ui/card';
 import { Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const HowToSell = () => {
   const { language, t } = useLanguage();
+  const navigate = useNavigate();
   
   const steps = [
     {
@@ -102,6 +105,15 @@ const HowToSell = () => {
                 </div>
               ))}
             </div>
+          </div>
+          
+          <div className="text-center">
+            <Button 
+              onClick={() => navigate('/search?category=all')} 
+              className="bg-syrian-green hover:bg-syrian-dark text-white px-8 py-3"
+            >
+              <ArabicText text={t('browseListings')} />
+            </Button>
           </div>
         </main>
         <Footer />
