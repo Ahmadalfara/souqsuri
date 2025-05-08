@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ArabicText from '@/components/ArabicText';
-import { useCurrentRoute } from '@/hooks/useCurrentRoute'; // Let's assume we have this hook
+import { useCurrentRoute } from '@/hooks/useCurrentRoute'; 
 
 // Categories for the navigation
 const categoryItems = [
@@ -22,15 +22,20 @@ const categoryItems = [
 
 const Categories = () => {
   const { language } = useLanguage();
+  const { isActive } = useCurrentRoute();
   
   return (
     <div className="w-full">
-      <nav className={`flex space-x-1 ${language === 'ar' ? 'flex-row-reverse space-x-reverse' : ''} overflow-x-auto custom-scrollbar pb-2`}>
+      <nav 
+        className={`flex ${language === 'ar' ? 'flex-row-reverse' : ''} overflow-x-auto custom-scrollbar pb-2`}
+        style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}
+      >
         {categoryItems.map((item) => (
           <Link
             key={item.id}
             to={item.path}
-            className="flex flex-col items-center justify-center min-w-[80px] px-3 py-2 rounded-lg transition-colors hover:bg-syrian-green/10"
+            className={`flex flex-col items-center justify-center min-w-[80px] px-3 py-2 rounded-lg transition-colors 
+                      hover:bg-syrian-green/20 ${isActive(item.path) ? 'bg-syrian-green/10' : ''}`}
           >
             <span className="text-xl mb-1">{language === 'ar' ? item.iconAr : item.iconEn}</span>
             <span className="text-xs text-center">

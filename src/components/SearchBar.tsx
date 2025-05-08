@@ -18,7 +18,7 @@ const SearchBar = ({ className = '', onSearch, initialQuery = '' }: SearchBarPro
   const [query, setQuery] = useState(initialQuery);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [filters, setFilters] = useState<any>({});
+  const [filters, setFilters] = useState<Record<string, any>>({});
   const [showInlineFilters, setShowInlineFilters] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -76,7 +76,12 @@ const SearchBar = ({ className = '', onSearch, initialQuery = '' }: SearchBarPro
     const initialFilters: Record<string, any> = {};
     for (const [key, value] of searchParams.entries()) {
       if (key !== 'q') {
-        if (initialFilters[key] && Array.isArray(initialFilters[key])) {
+        if (key === 'condition') {
+          if (!initialFilters.condition) {
+            initialFilters.condition = [];
+          }
+          initialFilters.condition.push(value);
+        } else if (initialFilters[key] && Array.isArray(initialFilters[key])) {
           initialFilters[key].push(value);
         } else if (initialFilters[key]) {
           initialFilters[key] = [initialFilters[key], value];
@@ -135,7 +140,7 @@ const SearchBar = ({ className = '', onSearch, initialQuery = '' }: SearchBarPro
     }
   };
 
-  const handleFilterChange = (newFilters: any) => {
+  const handleFilterChange = (newFilters: Record<string, any>) => {
     setFilters({...filters, ...newFilters});
     
     // Apply filters immediately if we're on the search page
@@ -156,7 +161,7 @@ const SearchBar = ({ className = '', onSearch, initialQuery = '' }: SearchBarPro
         <div className="relative flex-grow">
           <Input
             type="text"
-            placeholder={t('searchFor')}
+            placeholder={language === 'ar' ? 'ابحث هنا...' : 'Search...'}
             className={`pl-10 pr-4 py-6 w-full border-2 border-syrian-green/20 focus:border-syrian-green rounded-lg bg-white 
                       ${language === 'ar' ? 'text-right pr-10 pl-4' : ''}`}
             value={query}
@@ -178,7 +183,7 @@ const SearchBar = ({ className = '', onSearch, initialQuery = '' }: SearchBarPro
         <Button
           type="button"
           variant="outline"
-          className={`px-3 py-6 border-2 hover:bg-syrian-green/5 rounded-lg
+          className={`px-3 py-6 border-2 hover:bg-syrian-green/5 rounded-lg transition-colors
                      ${showInlineFilters ? 'border-syrian-green bg-syrian-green/5' : 'border-syrian-green/20'}`}
           aria-label="Filter"
           onClick={toggleFilters}

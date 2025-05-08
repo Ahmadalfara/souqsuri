@@ -15,6 +15,20 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCurrencyConverter } from '@/services/currencyService';
 import { searchListings } from '@/services/listings/search';
 
+// Define the filters type to match our component's state
+interface FilterState {
+  query: string;
+  category: string;
+  governorate_id: string;
+  district_id: string;
+  priceMin: number | undefined;
+  priceMax: number | undefined;
+  condition: string[];
+  sortBy: string;
+  urgent: boolean;
+  currency: string;
+}
+
 const SearchResults = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
@@ -28,7 +42,7 @@ const SearchResults = () => {
   );
   
   // Filter states
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<FilterState>({
     query: query,
     category: categoryParam,
     governorate_id: searchParams.get('governorate_id') || '',
@@ -69,24 +83,20 @@ const SearchResults = () => {
     setSearchParams(params);
     
     // Update filters based on new params
-    const updatedFilters: Record<string, any> = { 
-      query: params.get('q') || ''
+    const newFilters: FilterState = {
+      query: params.get('q') || '',
+      category: params.get('category') || '',
+      governorate_id: params.get('governorate_id') || '',
+      district_id: params.get('district_id') || '',
+      priceMin: params.get('priceMin') ? Number(params.get('priceMin')) : undefined,
+      priceMax: params.get('priceMax') ? Number(params.get('priceMax')) : undefined,
+      condition: params.getAll('condition') || [],
+      sortBy: params.get('sortBy') || 'newest',
+      urgent: params.get('urgent') === 'true',
+      currency: params.get('currency') || ''
     };
     
-    for (const [key, value] of params.entries()) {
-      if (key !== 'q') {
-        if (key === 'condition') {
-          if (!updatedFilters.condition) {
-            updatedFilters.condition = [];
-          }
-          updatedFilters.condition.push(value);
-        } else {
-          updatedFilters[key] = value;
-        }
-      }
-    }
-    
-    setFilters(updatedFilters);
+    setFilters(newFilters);
     refetch();
   };
 
@@ -151,45 +161,45 @@ const SearchResults = () => {
     <div className="min-h-screen flex flex-col bg-syrian-light dark:bg-gray-900">
       <GeometricPattern className="flex-grow">
         <Header />
-        <main className="container mx-auto py-4 px-4">
-          <div className="mb-6">
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-syrian-green/20 dark:bg-gray-800 dark:border-gray-700">
-              <div className="flex justify-between items-center">
-                <h1 className={`text-2xl font-bold text-syrian-dark dark:text-white ${language === 'ar' ? 'text-right' : 'text-left'}`}>
-                  {language === 'ar' ? (
-                    <ArabicText text={query ? `نتائج البحث عن: "${query}"` : categoryParam ? `فئة: "${t(categoryParam)}"` : 'نتائج البحث'} />
-                  ) : (
-                    query ? `Search results for: "${query}"` : categoryParam ? `Category: "${t(categoryParam)}"` : 'Search Results'
-                  )}
-                </h1>
-                <button 
-                  onClick={toggleCurrency}
-                  className="text-sm px-3 py-1 rounded-full bg-syrian-green/10 text-syrian-green hover:bg-syrian-green/20 transition-colors"
-                >
-                  {language === 'ar' ? (
-                    <ArabicText text={`عرض بـ: ${displayCurrency === 'USD' ? 'دولار' : 'ليرة سورية'}`} />
-                  ) : (
-                    `Show in: ${displayCurrency}`
-                  )}
-                </button>
-              </div>
-              <div className="flex items-center text-sm text-syrian-dark/70 dark:text-gray-400 mt-2 justify-end">
+        <main className="container mx-auto px-4 pb-8">
+          <div className="mb-6 mt-4 bg-white rounded-lg p-5 shadow-sm border border-syrian-green/20 dark:bg-gray-800 dark:border-gray-700">
+            <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+              <h1 className={`text-2xl font-bold text-syrian-dark dark:text-white ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                 {language === 'ar' ? (
-                  <ArabicText text={isLoading ? 'جاري البحث...' : results && results.length ? `تم العثور على ${results.length} نتيجة` : 'لم يتم العثور على نتائج'} />
+                  <ArabicText text={query ? `نتائج البحث عن: "${query}"` : categoryParam ? `فئة: "${t(categoryParam)}"` : 'نتائج البحث'} />
                 ) : (
-                  isLoading ? 'Searching...' : results && results.length ? `Found ${results.length} results` : 'No results found'
+                  query ? `Search results for: "${query}"` : categoryParam ? `Category: "${t(categoryParam)}"` : 'Search Results'
                 )}
-              </div>
-              {!isLoading && exchangeRate && (
-                <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                  {language === 'ar' ? (
-                    <ArabicText text={`سعر الصرف: 1 دولار = ${exchangeRate.toLocaleString()} ليرة سورية`} />
-                  ) : (
-                    `Exchange rate: 1 USD = ${exchangeRate.toLocaleString()} SYP`
-                  )}
-                </div>
+              </h1>
+              <button 
+                onClick={toggleCurrency}
+                className="text-sm px-3 py-1 rounded-full bg-syrian-green/10 text-syrian-green hover:bg-syrian-green/20 transition-colors"
+              >
+                {language === 'ar' ? (
+                  <ArabicText text={`عرض بـ: ${displayCurrency === 'USD' ? 'دولار' : 'ليرة سورية'}`} />
+                ) : (
+                  `Show in: ${displayCurrency}`
+                )}
+              </button>
+            </div>
+
+            <div className={`flex items-center text-sm text-syrian-dark/70 dark:text-gray-400 mt-2 ${language === 'ar' ? 'justify-start' : 'justify-end'}`}>
+              {language === 'ar' ? (
+                <ArabicText text={isLoading ? 'جاري البحث...' : results && results.length ? `تم العثور على ${results.length} نتيجة` : 'لم يتم العثور على نتائج'} />
+              ) : (
+                isLoading ? 'Searching...' : results && results.length ? `Found ${results.length} results` : 'No results found'
               )}
             </div>
+
+            {!isLoading && exchangeRate && (
+              <div className={`text-xs text-gray-500 dark:text-gray-500 mt-1 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                {language === 'ar' ? (
+                  <ArabicText text={`سعر الصرف: 1 دولار = ${exchangeRate.toLocaleString()} ليرة سورية`} />
+                ) : (
+                  `Exchange rate: 1 USD = ${exchangeRate.toLocaleString()} SYP`
+                )}
+              </div>
+            )}
           </div>
 
           {/* Improved Search Bar for inline filtering */}
@@ -203,7 +213,7 @@ const SearchResults = () => {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Card key={i} className="overflow-hidden hover:shadow-lg transition-shadow dark:bg-gray-800 dark:border-gray-700">
+                <Card key={i} className="overflow-hidden rounded-lg hover:shadow-lg transition-shadow dark:bg-gray-800 dark:border-gray-700">
                   <CardHeader className="p-0">
                     <Skeleton className="w-full h-48" />
                   </CardHeader>
@@ -223,7 +233,7 @@ const SearchResults = () => {
               {results && results.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {results.map((item: any) => (
-                    <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-all border border-syrian-green/10 hover:border-syrian-green/30 dark:bg-gray-800 dark:border-gray-700">
+                    <Card key={item.id} className="overflow-hidden rounded-lg hover:shadow-md transition-all border border-syrian-green/10 hover:border-syrian-green/30 dark:bg-gray-800 dark:border-gray-700">
                       <CardHeader className="p-0">
                         <div className="h-48 overflow-hidden">
                           <img 
@@ -233,10 +243,14 @@ const SearchResults = () => {
                           />
                         </div>
                       </CardHeader>
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-2">
+                      <CardContent className={`p-4 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex ${language === 'ar' ? 'flex-row-reverse justify-end' : 'justify-start'} items-start mb-2 gap-2`}>
                           <span className="bg-syrian-green/10 text-syrian-green px-2 py-1 rounded-full text-xs">
-                            {getCategoryName(item)}
+                            {language === 'ar' ? (
+                              <ArabicText text={getCategoryName(item)} />
+                            ) : (
+                              getCategoryName(item)
+                            )}
                           </span>
                           {item.is_featured && (
                             <span className="bg-amber-500/10 text-amber-600 px-2 py-1 rounded-full text-xs">
@@ -244,7 +258,7 @@ const SearchResults = () => {
                             </span>
                           )}
                         </div>
-                        <h3 className={`font-bold ${language === 'ar' ? 'text-right' : 'text-left'} flex-grow ml-2 dark:text-white`}>
+                        <h3 className={`font-bold ${language === 'ar' ? 'text-right' : 'text-left'} flex-grow dark:text-white`}>
                           {language === 'ar' ? (
                             <ArabicText text={item.title} textAr={item.title} textEn={item.title_en} />
                           ) : (
@@ -259,8 +273,8 @@ const SearchResults = () => {
                           )}
                         </p>
                       </CardContent>
-                      <CardFooter className="p-4 pt-0 flex justify-between items-center">
-                        <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                      <CardFooter className={`p-4 pt-0 flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                        <span className={`text-sm text-gray-500 dark:text-gray-400 flex items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                           <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ${language === 'ar' ? 'ml-1' : 'mr-1'} text-syrian-green`} viewBox="0 0 20 20" fill="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                           </svg>
