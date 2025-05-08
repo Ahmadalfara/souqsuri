@@ -1,69 +1,48 @@
 
-import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import ArabicText from '@/components/ArabicText';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Home, Car, Tv, Sofa, Briefcase, Wrench, ShoppingBag, Shirt } from 'lucide-react';
+import ArabicText from '@/components/ArabicText';
+import { useCurrentRoute } from '@/hooks/useCurrentRoute'; // Let's assume we have this hook
+
+// Categories for the navigation
+const categoryItems = [
+  { id: 'all', iconEn: '🏠', iconAr: '🏠', nameEn: 'Home', nameAr: 'الرئيسية', path: '/' },
+  { id: 'real_estate', iconEn: '🏢', iconAr: '🏢', nameEn: 'Real Estate', nameAr: 'عقارات', path: '/search?category=real_estate' },
+  { id: 'cars', iconEn: '🚗', iconAr: '🚗', nameEn: 'Cars', nameAr: 'سيارات', path: '/search?category=cars' },
+  { id: 'electronics', iconEn: '📱', iconAr: '📱', nameEn: 'Electronics', nameAr: 'الكترونيات', path: '/search?category=electronics' },
+  { id: 'furniture', iconEn: '🛋️', iconAr: '🛋️', nameEn: 'Furniture', nameAr: 'أثاث', path: '/search?category=furniture' },
+  { id: 'jobs', iconEn: '💼', iconAr: '💼', nameEn: 'Jobs', nameAr: 'وظائف', path: '/search?category=jobs' },
+  { id: 'services', iconEn: '🔧', iconAr: '🔧', nameEn: 'Services', nameAr: 'خدمات', path: '/search?category=services' },
+  { id: 'fashion', iconEn: '👗', iconAr: '👗', nameEn: 'Fashion', nameAr: 'أزياء', path: '/search?category=fashion' },
+  { id: 'books', iconEn: '📚', iconAr: '📚', nameEn: 'Books', nameAr: 'كتب', path: '/search?category=books' },
+  { id: 'pets', iconEn: '🐱', iconAr: '🐱', nameEn: 'Pets', nameAr: 'حيوانات أليفة', path: '/search?category=pets' },
+  { id: 'sports', iconEn: '⚽', iconAr: '⚽', nameEn: 'Sports', nameAr: 'رياضة', path: '/search?category=sports' },
+];
 
 const Categories = () => {
-  const { language, t } = useLanguage();
-  const location = useLocation();
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  
-  useEffect(() => {
-    // Extract category from URL if on a category page
-    if (location.pathname.startsWith('/category/')) {
-      const categoryName = location.pathname.split('/').pop();
-      console.log("Current category from URL:", categoryName);
-      setActiveCategory(categoryName || null);
-    } else {
-      setActiveCategory(null);
-    }
-  }, [location]);
-
-  // These must match the front-end routing paths
-  const categories = [
-    { name: 'all', label: t('all'), icon: Home },
-    { name: 'real_estate', label: t('realEstate'), icon: Home },
-    { name: 'cars', label: t('cars'), icon: Car },
-    { name: 'clothes', label: t('clothes'), icon: Shirt },
-    { name: 'electronics', label: t('electronics'), icon: Tv },
-    { name: 'furniture', label: t('furniture'), icon: Sofa },
-    { name: 'jobs', label: t('jobs'), icon: Briefcase },
-    { name: 'services', label: t('services'), icon: Wrench },
-  ];
+  const { language } = useLanguage();
   
   return (
-    <div className="flex justify-center overflow-x-auto pb-3 mb-5">
-      <div className={`inline-flex ${language === 'ar' ? 'space-x-reverse rtl' : ''} px-2 gap-5 md:gap-7`}>
-        {categories.map((category) => (
-          <Link 
-            key={category.name}
-            to={category.name === 'all' ? '/' : `/category/${category.name}`}
-            className={`
-              flex flex-col items-center px-6 py-3 rounded-lg transition-all duration-200
-              ${activeCategory === category.name || (category.name === 'all' && !activeCategory)
-                ? 'bg-syrian-green text-white shadow-md transform hover:scale-105' 
-                : 'bg-white hover:bg-syrian-green/10 border border-syrian-green/20 hover:border-syrian-green/50 hover:shadow-md transform hover:scale-105'
-              }
-            `}
+    <div className="w-full">
+      <nav className={`flex space-x-1 ${language === 'ar' ? 'flex-row-reverse space-x-reverse' : ''} overflow-x-auto custom-scrollbar pb-2`}>
+        {categoryItems.map((item) => (
+          <Link
+            key={item.id}
+            to={item.path}
+            className="flex flex-col items-center justify-center min-w-[80px] px-3 py-2 rounded-lg transition-colors hover:bg-syrian-green/10"
           >
-            <category.icon 
-              size={28} 
-              strokeWidth={1.5}
-              className={`mb-2 ${activeCategory === category.name || (category.name === 'all' && !activeCategory) ? 'text-white' : 'text-syrian-green'}`} 
-            />
-            
-            <span className="text-sm font-medium whitespace-nowrap">
+            <span className="text-xl mb-1">{language === 'ar' ? item.iconAr : item.iconEn}</span>
+            <span className="text-xs text-center">
               {language === 'ar' ? (
-                <ArabicText text={category.label} />
+                <ArabicText text={item.nameAr} />
               ) : (
-                category.label
+                item.nameEn
               )}
             </span>
           </Link>
         ))}
-      </div>
+      </nav>
     </div>
   );
 };

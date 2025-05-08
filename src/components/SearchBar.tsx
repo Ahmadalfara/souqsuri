@@ -1,33 +1,28 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search, Filter } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Search, Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SearchSuggestions from '@/components/SearchSuggestions';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
 import ListingFilters from '@/components/listings/ListingFilters';
 
 interface SearchBarProps {
   className?: string;
+  onSearch?: (searchParams: URLSearchParams) => void;
+  initialQuery?: string;
 }
 
-const SearchBar = ({ className = '' }: SearchBarProps) => {
-  const [query, setQuery] = useState('');
+const SearchBar = ({ className = '', onSearch, initialQuery = '' }: SearchBarProps) => {
+  const [query, setQuery] = useState(initialQuery);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [filters, setFilters] = useState({});
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [filters, setFilters] = useState<any>({});
+  const [showInlineFilters, setShowInlineFilters] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { language, t } = useLanguage();
 
   // Common search terms for demo purposes
@@ -76,31 +71,53 @@ const SearchBar = ({ className = '' }: SearchBarProps) => {
     }
   }, [query, language]);
 
+  // Initialize filters from URL on component mount
+  useEffect(() => {
+    const initialFilters: Record<string, any> = {};
+    for (const [key, value] of searchParams.entries()) {
+      if (key !== 'q') {
+        if (initialFilters[key] && Array.isArray(initialFilters[key])) {
+          initialFilters[key].push(value);
+        } else if (initialFilters[key]) {
+          initialFilters[key] = [initialFilters[key], value];
+        } else {
+          initialFilters[key] = value;
+        }
+      }
+    }
+    setFilters(initialFilters);
+  }, [searchParams]);
+
+  // Set initial query from props
+  useEffect(() => {
+    if (initialQuery) {
+      setQuery(initialQuery);
+    }
+  }, [initialQuery]);
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (query.trim()) {
-      navigate(`/search?q=${encodeURIComponent(query)}`);
-      setShowSuggestions(false);
-    }
+    performSearch();
   };
 
   const handleSuggestionClick = (suggestion: string) => {
     setQuery(suggestion);
-    navigate(`/search?q=${encodeURIComponent(suggestion)}`);
     setShowSuggestions(false);
+    
+    // Small delay to allow the query to update before search
+    setTimeout(() => {
+      performSearch();
+    }, 10);
   };
 
-  const handleFilterChange = (newFilters: any) => {
-    setFilters(newFilters);
-    setIsFiltersOpen(false);
-
-    // Build query parameters from filters
+  const performSearch = () => {
+    // Build query parameters from filters and search query
     const params = new URLSearchParams();
     
-    if (query) params.set('q', query);
+    if (query.trim()) params.set('q', query.trim());
     
     // Add all filter parameters
-    Object.entries(newFilters).forEach(([key, value]) => {
+    Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '' && value !== 'all') {
         if (Array.isArray(value)) {
           value.forEach((v) => params.append(key, v.toString()));
@@ -109,8 +126,28 @@ const SearchBar = ({ className = '' }: SearchBarProps) => {
         }
       }
     });
+
+    // Either call the onSearch callback or navigate to the search page
+    if (onSearch) {
+      onSearch(params);
+    } else {
+      navigate(`/search?${params.toString()}`);
+    }
+  };
+
+  const handleFilterChange = (newFilters: any) => {
+    setFilters({...filters, ...newFilters});
     
-    navigate(`/search?${params.toString()}`);
+    // Apply filters immediately if we're on the search page
+    if (window.location.pathname.includes('/search')) {
+      setTimeout(() => {
+        performSearch();
+      }, 10);
+    }
+  };
+
+  const toggleFilters = () => {
+    setShowInlineFilters(!showInlineFilters);
   };
 
   return (
@@ -137,38 +174,21 @@ const SearchBar = ({ className = '' }: SearchBarProps) => {
           />
         </div>
         
-        {/* Filter Button Sheet */}
-        <Sheet open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
-          <SheetTrigger asChild>
-            <Button
-              type="button"
-              variant="outline"
-              className="px-3 py-6 border-2 border-syrian-green/20 hover:border-syrian-green hover:bg-syrian-green/5 rounded-lg"
-              aria-label="Filter"
-            >
-              <Filter size={20} className="text-syrian-green" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent 
-            side={language === 'ar' ? 'right' : 'left'}
-            className="w-full sm:max-w-md"
-          >
-            <SheetHeader>
-              <SheetTitle>{language === 'ar' ? 'فلترة البحث' : 'Search Filters'}</SheetTitle>
-              <SheetDescription>
-                {language === 'ar' 
-                  ? 'حدد معايير البحث لتحسين نتائجك'
-                  : 'Set search criteria to refine your results'}
-              </SheetDescription>
-            </SheetHeader>
-            <div className="mt-6">
-              <ListingFilters
-                initialFilters={filters}
-                onFilterChange={handleFilterChange}
-              />
-            </div>
-          </SheetContent>
-        </Sheet>
+        {/* Filter Toggle Button */}
+        <Button
+          type="button"
+          variant="outline"
+          className={`px-3 py-6 border-2 hover:bg-syrian-green/5 rounded-lg
+                     ${showInlineFilters ? 'border-syrian-green bg-syrian-green/5' : 'border-syrian-green/20'}`}
+          aria-label="Filter"
+          onClick={toggleFilters}
+        >
+          {showInlineFilters ? (
+            <X size={20} className="text-syrian-green" />
+          ) : (
+            <Filter size={20} className="text-syrian-green" />
+          )}
+        </Button>
         
         <Button
           type="submit"
@@ -187,6 +207,17 @@ const SearchBar = ({ className = '' }: SearchBarProps) => {
           onSuggestionClick={handleSuggestionClick}
           language={language}
         />
+      )}
+
+      {/* Inline filters panel */}
+      {showInlineFilters && (
+        <div className="absolute z-40 mt-2 w-full bg-white rounded-lg border border-syrian-green/20 shadow-lg p-4 dark:bg-gray-800">
+          <ListingFilters
+            initialFilters={filters}
+            onFilterChange={handleFilterChange}
+            className="p-0"
+          />
+        </div>
       )}
     </div>
   );

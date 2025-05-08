@@ -5,7 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GeometricPattern from '@/components/GeometricPattern';
 import ArabicText from '@/components/ArabicText';
-import ListingFilters from '@/components/listings/ListingFilters';
+import SearchBar from '@/components/SearchBar';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,9 +13,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCurrencyConverter } from '@/services/currencyService';
-import { Button } from '@/components/ui/button';
 import { searchListings } from '@/services/listings/search';
-import { Filter } from 'lucide-react';
 
 const SearchResults = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -49,7 +47,7 @@ const SearchResults = () => {
     }
   }, [query, categoryParam, navigate]);
 
-  const { data: results, isLoading, error } = useQuery({
+  const { data: results, isLoading, error, refetch } = useQuery({
     queryKey: ['search', filters],
     queryFn: () => searchListings(filters),
     enabled: !!(query || categoryParam),
@@ -66,48 +64,31 @@ const SearchResults = () => {
     }
   });
 
-  // Apply filters
-  const handleFilterChange = (newFilters: any) => {
-    const updatedFilters = {
-      ...filters,
-      ...newFilters,
-      query: query || ''  // Always maintain the search query
+  // Handle search with updated params
+  const handleSearch = (params: URLSearchParams) => {
+    setSearchParams(params);
+    
+    // Update filters based on new params
+    const updatedFilters: Record<string, any> = { 
+      query: params.get('q') || ''
     };
     
-    setFilters(updatedFilters);
-    
-    // Update URL search params
-    const params = new URLSearchParams();
-    
-    if (query) params.set('q', query);
-    if (updatedFilters.category && updatedFilters.category !== 'all') params.set('category', updatedFilters.category);
-    if (updatedFilters.governorate_id) params.set('governorate_id', updatedFilters.governorate_id);
-    if (updatedFilters.district_id) params.set('district_id', updatedFilters.district_id);
-    if (updatedFilters.priceMin) params.set('priceMin', updatedFilters.priceMin.toString());
-    if (updatedFilters.priceMax) params.set('priceMax', updatedFilters.priceMax.toString());
-    if (updatedFilters.sortBy && updatedFilters.sortBy !== 'newest') params.set('sortBy', updatedFilters.sortBy);
-    if (updatedFilters.urgent) params.set('urgent', 'true');
-    if (updatedFilters.currency) params.set('currency', updatedFilters.currency);
-    
-    updatedFilters.condition?.forEach((cond: string) => {
-      params.append('condition', cond);
-    });
-    
-    setSearchParams(params);
-  };
-
-  // Display error toast when an error occurs
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: language === 'ar' ? "خطأ في البحث" : "Search Error",
-        description: language === 'ar' ? 
-          "لم نتمكن من إتمام البحث، يرجى المحاولة مرة أخرى." : 
-          "We couldn't complete your search, please try again.",
-        variant: "destructive",
-      });
+    for (const [key, value] of params.entries()) {
+      if (key !== 'q') {
+        if (key === 'condition') {
+          if (!updatedFilters.condition) {
+            updatedFilters.condition = [];
+          }
+          updatedFilters.condition.push(value);
+        } else {
+          updatedFilters[key] = value;
+        }
+      }
     }
-  }, [error, toast, language]);
+    
+    setFilters(updatedFilters);
+    refetch();
+  };
 
   // Toggle currency display
   const toggleCurrency = () => {
@@ -170,7 +151,7 @@ const SearchResults = () => {
     <div className="min-h-screen flex flex-col bg-syrian-light dark:bg-gray-900">
       <GeometricPattern className="flex-grow">
         <Header />
-        <main className="container mx-auto py-8 px-4">
+        <main className="container mx-auto py-4 px-4">
           <div className="mb-6">
             <div className="bg-white rounded-lg p-6 shadow-sm border border-syrian-green/20 dark:bg-gray-800 dark:border-gray-700">
               <div className="flex justify-between items-center">
@@ -211,11 +192,11 @@ const SearchResults = () => {
             </div>
           </div>
 
-          {/* Listing Filters */}
+          {/* Improved Search Bar for inline filtering */}
           <div className="mb-6">
-            <ListingFilters 
-              initialFilters={filters} 
-              onFilterChange={handleFilterChange} 
+            <SearchBar 
+              initialQuery={query} 
+              onSearch={handleSearch} 
             />
           </div>
 

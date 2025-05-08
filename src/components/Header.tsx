@@ -17,10 +17,10 @@ const Header = () => {
   const { language } = useLanguage();
   
   return (
-    <header className={`flex flex-col py-4 px-6 bg-white border-b border-syrian-green/20 shadow-sm sticky top-0 z-20
-                       dark:bg-gray-900 dark:border-gray-800 dark:text-white transition-colors duration-300`}>
-      {/* Upper header with logo, language switcher and auth buttons */}
-      <div className={`flex items-center justify-between mb-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+    <header className="flex flex-col bg-white dark:bg-gray-900 dark:text-white transition-colors duration-300">
+      {/* Fixed top header with logo, language switcher and auth buttons */}
+      <div className={`flex items-center justify-between p-4 bg-white border-b border-syrian-green/20 shadow-sm sticky top-0 z-50
+                      dark:bg-gray-900 dark:border-gray-800 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
         <Logo />
 
         {/* Mobile menu toggle */}
@@ -42,13 +42,18 @@ const Header = () => {
       {/* Mobile menu (shown on small screens) */}
       <MobileMenu isOpen={mobileMenuOpen} />
       
-      {/* Search bar */}
-      <div className="mb-2">
-        <SearchBar className="max-w-4xl mx-auto" />
-      </div>
+      {/* Scrollable content area */}
+      <div className="w-full overflow-x-auto scrollbar-hide py-4 px-6">
+        {/* Search bar */}
+        <div className="mb-4 max-w-4xl mx-auto">
+          <SearchBar />
+        </div>
 
-      {/* Categories */}
-      <Categories />
+        {/* Categories with horizontal scroll */}
+        <div className="overflow-x-auto pb-2">
+          <Categories />
+        </div>
+      </div>
     </header>
   );
 };
