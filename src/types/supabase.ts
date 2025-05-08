@@ -1,4 +1,3 @@
-
 export type Json =
   | string
   | number
@@ -257,4 +256,19 @@ export interface ListingWithRelations extends Listing {
   category_ar?: string;
   category_en?: string;
   condition?: string;
+}
+
+// Add the missing ListingFilters interface
+export interface ListingFilters {
+  query?: string;
+  category?: string;
+  governorate_id?: string;
+  district_id?: string;
+  priceMin?: number;
+  priceMax?: number;
+  condition?: string[];
+  sortBy?: string;
+  urgent?: boolean;
+  currency?: string;
+  limit?: number;
 }

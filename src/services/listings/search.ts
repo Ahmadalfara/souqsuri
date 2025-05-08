@@ -1,4 +1,3 @@
-
 import { ListingWithRelations, ListingFilters } from '@/types/supabase';
 
 // Mock data with more listings across all categories
@@ -15,8 +14,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'real_estate',
     is_featured: true,
     created_at: '2025-05-01T10:30:00Z',
-    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: 1, name_ar: 'المزة', name_en: 'Al Mazzeh' },
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: '1', name_ar: 'المزة', name_en: 'Al Mazzeh' },
     images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
@@ -30,8 +29,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'real_estate',
     is_featured: false,
     created_at: '2025-04-28T14:20:00Z',
-    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: 5, name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
+    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: '5', name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
     images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
@@ -45,8 +44,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'real_estate',
     is_featured: true,
     created_at: '2025-05-07T09:15:00Z',
-    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: 3, name_ar: 'قدسيا', name_en: 'Qudsaya' },
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: '3', name_ar: 'قدسيا', name_en: 'Qudsaya' },
     images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   },
   {
@@ -60,8 +59,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'real_estate',
     is_featured: false,
     created_at: '2025-05-05T16:45:00Z',
-    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: 10, name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
+    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: '10', name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
     images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
   },
   
@@ -77,8 +76,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'cars',
     is_featured: true,
     created_at: '2025-05-03T11:20:00Z',
-    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: 2, name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: '2', name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
     images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
@@ -92,8 +91,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'cars',
     is_featured: false,
     created_at: '2025-05-02T15:30:00Z',
-    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: 6, name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
+    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: '6', name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
     images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
@@ -107,8 +106,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'cars',
     is_featured: false,
     created_at: '2025-04-29T14:10:00Z',
-    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: 11, name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
+    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: '11', name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
     images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
   },
   {
@@ -122,8 +121,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'cars',
     is_featured: true,
     created_at: '2025-05-06T12:15:00Z',
-    governorate: { id: 4, name_ar: 'حمص', name_en: 'Homs' },
-    district: { id: 15, name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
+    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs' },
+    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
     images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   },
   
@@ -139,8 +138,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'electronics',
     is_featured: true,
     created_at: '2025-05-07T10:25:00Z',
-    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: 1, name_ar: 'المزة', name_en: 'Al Mazzeh' },
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: '1', name_ar: 'المزة', name_en: 'Al Mazzeh' },
     images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
@@ -154,8 +153,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'electronics',
     is_featured: false,
     created_at: '2025-05-01T13:40:00Z',
-    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: 5, name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
+    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: '5', name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
     images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
@@ -169,8 +168,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'electronics',
     is_featured: true,
     created_at: '2025-05-04T15:50:00Z',
-    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: 10, name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
+    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: '10', name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
     images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
   },
   {
@@ -184,8 +183,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'electronics',
     is_featured: false,
     created_at: '2025-04-30T09:15:00Z',
-    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: 4, name_ar: 'المالكي', name_en: 'Al Malki' },
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: '4', name_ar: 'المالكي', name_en: 'Al Malki' },
     images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   },
   
@@ -201,8 +200,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'furniture',
     is_featured: true,
     created_at: '2025-05-05T14:20:00Z',
-    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: 6, name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
+    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: '6', name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
     images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
@@ -216,8 +215,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'furniture',
     is_featured: false,
     created_at: '2025-05-02T16:30:00Z',
-    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: 2, name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: '2', name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
     images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
@@ -231,8 +230,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'furniture',
     is_featured: false,
     created_at: '2025-04-29T11:20:00Z',
-    governorate: { id: 4, name_ar: 'حمص', name_en: 'Homs' },
-    district: { id: 15, name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
+    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs' },
+    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
     images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
   },
   {
@@ -246,8 +245,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'furniture',
     is_featured: true,
     created_at: '2025-05-07T13:45:00Z',
-    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: 11, name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
+    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: '11', name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
     images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   },
   
@@ -263,8 +262,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'jobs',
     is_featured: true,
     created_at: '2025-05-06T09:30:00Z',
-    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: 1, name_ar: 'المزة', name_en: 'Al Mazzeh' },
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: '1', name_ar: 'المزة', name_en: 'Al Mazzeh' },
     images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
@@ -278,8 +277,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'jobs',
     is_featured: false,
     created_at: '2025-05-03T14:15:00Z',
-    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: 5, name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
+    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: '5', name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
     images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
@@ -293,8 +292,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'jobs',
     is_featured: false,
     created_at: '2025-04-30T10:45:00Z',
-    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: 10, name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
+    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: '10', name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
     images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
   },
   {
@@ -308,8 +307,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'jobs',
     is_featured: true,
     created_at: '2025-05-07T16:20:00Z',
-    governorate: { id: 4, name_ar: 'حمص', name_en: 'Homs' },
-    district: { id: 15, name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
+    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs' },
+    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
     images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   },
   
@@ -325,8 +324,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'services',
     is_featured: true,
     created_at: '2025-05-04T12:30:00Z',
-    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: 2, name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: '2', name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
     images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
@@ -340,8 +339,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'services',
     is_featured: false,
     created_at: '2025-05-01T09:45:00Z',
-    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: 6, name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
+    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: '6', name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
     images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
@@ -355,8 +354,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'services',
     is_featured: true,
     created_at: '2025-05-06T15:10:00Z',
-    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: 11, name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
+    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: '11', name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
     images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
   },
   {
@@ -370,8 +369,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'services',
     is_featured: false,
     created_at: '2025-04-29T16:50:00Z',
-    governorate: { id: 4, name_ar: 'حمص', name_en: 'Homs' },
-    district: { id: 15, name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
+    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs' },
+    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
     images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   },
   
@@ -387,8 +386,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'fashion',
     is_featured: true,
     created_at: '2025-05-05T17:30:00Z',
-    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: 1, name_ar: 'المزة', name_en: 'Al Mazzeh' },
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: '1', name_ar: 'المزة', name_en: 'Al Mazzeh' },
     images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
@@ -402,8 +401,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'fashion',
     is_featured: false,
     created_at: '2025-05-02T13:15:00Z',
-    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: 5, name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
+    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: '5', name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
     images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
@@ -417,8 +416,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'fashion',
     is_featured: true,
     created_at: '2025-05-07T11:40:00Z',
-    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: 10, name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
+    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: '10', name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
     images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
   },
   {
@@ -432,8 +431,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'fashion',
     is_featured: false,
     created_at: '2025-04-30T14:25:00Z',
-    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: 4, name_ar: 'المالكي', name_en: 'Al Malki' },
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: '4', name_ar: 'المالكي', name_en: 'Al Malki' },
     images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   },
   
@@ -449,8 +448,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'books',
     is_featured: true,
     created_at: '2025-05-06T10:15:00Z',
-    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: 2, name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: '2', name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
     images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
@@ -464,8 +463,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'books',
     is_featured: false,
     created_at: '2025-05-03T09:50:00Z',
-    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: 6, name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
+    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: '6', name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
     images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
@@ -479,8 +478,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'books',
     is_featured: true,
     created_at: '2025-04-29T15:35:00Z',
-    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: 11, name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
+    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: '11', name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
     images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
   },
   {
@@ -494,8 +493,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'books',
     is_featured: false,
     created_at: '2025-05-01T16:10:00Z',
-    governorate: { id: 4, name_ar: 'حمص', name_en: 'Homs' },
-    district: { id: 15, name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
+    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs' },
+    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
     images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   },
   
@@ -511,8 +510,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'pets',
     is_featured: true,
     created_at: '2025-05-07T14:30:00Z',
-    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: 1, name_ar: 'المزة', name_en: 'Al Mazzeh' },
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: '1', name_ar: 'المزة', name_en: 'Al Mazzeh' },
     images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
@@ -526,8 +525,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'pets',
     is_featured: false,
     created_at: '2025-05-04T11:15:00Z',
-    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: 5, name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
+    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: '5', name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
     images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
@@ -541,8 +540,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'pets',
     is_featured: true,
     created_at: '2025-04-30T13:20:00Z',
-    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: 10, name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
+    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: '10', name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
     images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
   },
   {
@@ -556,8 +555,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'pets',
     is_featured: false,
     created_at: '2025-05-02T10:50:00Z',
-    governorate: { id: 4, name_ar: 'حمص', name_en: 'Homs' },
-    district: { id: 15, name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
+    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs' },
+    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
     images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   },
   
@@ -573,8 +572,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'sports',
     is_featured: true,
     created_at: '2025-05-06T11:40:00Z',
-    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: 2, name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: '2', name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
     images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
@@ -588,8 +587,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'sports',
     is_featured: false,
     created_at: '2025-05-01T15:20:00Z',
-    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: 6, name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
+    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: '6', name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
     images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
@@ -603,8 +602,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'sports',
     is_featured: true,
     created_at: '2025-04-29T12:10:00Z',
-    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: 11, name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
+    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: '11', name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
     images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
   },
   {
@@ -618,8 +617,8 @@ const mockListingsData: ListingWithRelations[] = [
     category: 'sports',
     is_featured: false,
     created_at: '2025-05-05T09:45:00Z',
-    governorate: { id: 4, name_ar: 'حمص', name_en: 'Homs' },
-    district: { id: 15, name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
+    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs' },
+    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
     images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   }
 ];
@@ -656,11 +655,11 @@ export const searchListings = (filters: ListingFilters): Promise<ListingWithRela
   
   // Apply location filter if specified
   if (filters.governorate_id) {
-    results = results.filter(listing => listing.governorate?.id === Number(filters.governorate_id));
+    results = results.filter(listing => listing.governorate?.id === filters.governorate_id);
   }
   
   if (filters.district_id) {
-    results = results.filter(listing => listing.district?.id === Number(filters.district_id));
+    results = results.filter(listing => listing.district?.id === filters.district_id);
   }
   
   // Apply price filters if specified
@@ -694,6 +693,11 @@ export const searchListings = (filters: ListingFilters): Promise<ListingWithRela
   // Apply urgent/featured filter
   if (filters.urgent) {
     results = results.filter(listing => listing.is_featured);
+  }
+  
+  // Apply limit if specified
+  if (filters.limit && filters.limit > 0) {
+    results = results.slice(0, filters.limit);
   }
   
   console.log('Search results:', results.length);
