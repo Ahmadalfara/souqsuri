@@ -13,10 +13,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'real_estate',
     is_featured: true,
+    user_id: '1',
+    status: 'active',
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png'],
     created_at: '2025-05-01T10:30:00Z',
-    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: '1', name_ar: 'المزة', name_en: 'Al Mazzeh' },
-    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
+    updated_at: '2025-05-01T10:30:00Z',
+    views: 120,
+    governorate_id: '1',
+    district_id: '1',
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '1', name_ar: 'المزة', name_en: 'Al Mazzeh', governorate_id: '1', created_at: '2025-01-01T00:00:00Z' }
   },
   {
     id: '2',
@@ -28,10 +34,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'real_estate',
     is_featured: false,
+    user_id: '2',
+    status: 'active',
+    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png'],
     created_at: '2025-04-28T14:20:00Z',
-    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: '5', name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
-    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
+    updated_at: '2025-04-28T14:20:00Z',
+    views: 85,
+    governorate_id: '2',
+    district_id: '5',
+    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '5', name_ar: 'الجميلية', name_en: 'Al Jamiliyah', governorate_id: '2', created_at: '2025-01-01T00:00:00Z' }
   },
   {
     id: '3',
@@ -43,10 +55,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'real_estate',
     is_featured: true,
+    user_id: '3',
+    status: 'active',
+    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png'],
     created_at: '2025-05-07T09:15:00Z',
-    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: '3', name_ar: 'قدسيا', name_en: 'Qudsaya' },
-    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
+    updated_at: '2025-05-07T09:15:00Z',
+    views: 42,
+    governorate_id: '1',
+    district_id: '3',
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '3', name_ar: 'قدسيا', name_en: 'Qudsaya', governorate_id: '1', created_at: '2025-01-01T00:00:00Z' }
   },
   {
     id: '4',
@@ -58,10 +76,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'real_estate',
     is_featured: false,
+    user_id: '4',
+    status: 'active',
+    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png'],
     created_at: '2025-05-05T16:45:00Z',
-    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: '10', name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
-    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
+    updated_at: '2025-05-05T16:45:00Z',
+    views: 63,
+    governorate_id: '3',
+    district_id: '10',
+    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '10', name_ar: 'الرمل الشمالي', name_en: 'Northern Sand', governorate_id: '3', created_at: '2025-01-01T00:00:00Z' }
   },
   
   // Cars Listings (4)
@@ -75,10 +99,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'cars',
     is_featured: true,
+    user_id: '5',
+    status: 'active',
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png'],
     created_at: '2025-05-03T11:20:00Z',
-    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: '2', name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
-    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
+    updated_at: '2025-05-03T11:20:00Z',
+    views: 156,
+    governorate_id: '1',
+    district_id: '2',
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '2', name_ar: 'المهاجرين', name_en: 'Al Muhajirin', governorate_id: '1', created_at: '2025-01-01T00:00:00Z' }
   },
   {
     id: '6',
@@ -90,10 +120,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'cars',
     is_featured: false,
+    user_id: '6',
+    status: 'active',
+    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png'],
     created_at: '2025-05-02T15:30:00Z',
-    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: '6', name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
-    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
+    updated_at: '2025-05-02T15:30:00Z',
+    views: 92,
+    governorate_id: '2',
+    district_id: '6',
+    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '6', name_ar: 'الشهباء', name_en: 'Al Shahbaa', governorate_id: '2', created_at: '2025-01-01T00:00:00Z' }
   },
   {
     id: '7',
@@ -105,10 +141,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'cars',
     is_featured: false,
+    user_id: '7',
+    status: 'active',
+    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png'],
     created_at: '2025-04-29T14:10:00Z',
-    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: '11', name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
-    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
+    updated_at: '2025-04-29T14:10:00Z',
+    views: 78,
+    governorate_id: '3',
+    district_id: '11',
+    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '11', name_ar: 'الأوقاف', name_en: 'Al Awqaf', governorate_id: '3', created_at: '2025-01-01T00:00:00Z' }
   },
   {
     id: '8',
@@ -120,10 +162,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'cars',
     is_featured: true,
+    user_id: '8',
+    status: 'active',
+    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png'],
     created_at: '2025-05-06T12:15:00Z',
-    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs' },
-    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
-    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
+    updated_at: '2025-05-06T12:15:00Z',
+    views: 110,
+    governorate_id: '4',
+    district_id: '15',
+    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah', governorate_id: '4', created_at: '2025-01-01T00:00:00Z' }
   },
   
   // Electronics Listings (4)
@@ -137,10 +185,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'electronics',
     is_featured: true,
+    user_id: '9',
+    status: 'active',
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png'],
     created_at: '2025-05-07T10:25:00Z',
-    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: '1', name_ar: 'المزة', name_en: 'Al Mazzeh' },
-    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
+    updated_at: '2025-05-07T10:25:00Z',
+    views: 135,
+    governorate_id: '1',
+    district_id: '1',
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '1', name_ar: 'المزة', name_en: 'Al Mazzeh', governorate_id: '1', created_at: '2025-01-01T00:00:00Z' }
   },
   {
     id: '10',
@@ -152,10 +206,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'electronics',
     is_featured: false,
+    user_id: '10',
+    status: 'active',
+    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png'],
     created_at: '2025-05-01T13:40:00Z',
-    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: '5', name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
-    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
+    updated_at: '2025-05-01T13:40:00Z',
+    views: 68,
+    governorate_id: '2',
+    district_id: '5',
+    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '5', name_ar: 'الجميلية', name_en: 'Al Jamiliyah', governorate_id: '2', created_at: '2025-01-01T00:00:00Z' }
   },
   {
     id: '11',
@@ -167,10 +227,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'electronics',
     is_featured: true,
+    user_id: '11',
+    status: 'active',
+    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png'],
     created_at: '2025-05-04T15:50:00Z',
-    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: '10', name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
-    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
+    updated_at: '2025-05-04T15:50:00Z',
+    views: 102,
+    governorate_id: '3',
+    district_id: '10',
+    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '10', name_ar: 'الرمل الشمالي', name_en: 'Northern Sand', governorate_id: '3', created_at: '2025-01-01T00:00:00Z' }
   },
   {
     id: '12',
@@ -182,10 +248,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'electronics',
     is_featured: false,
+    user_id: '12',
+    status: 'active',
+    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png'],
     created_at: '2025-04-30T09:15:00Z',
-    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: '4', name_ar: 'المالكي', name_en: 'Al Malki' },
-    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
+    updated_at: '2025-04-30T09:15:00Z',
+    views: 55,
+    governorate_id: '1',
+    district_id: '4',
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '4', name_ar: 'المالكي', name_en: 'Al Malki', governorate_id: '1', created_at: '2025-01-01T00:00:00Z' }
   },
   
   // Furniture Listings (4)
@@ -199,10 +271,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'furniture',
     is_featured: true,
+    user_id: '13',
+    status: 'active',
+    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png'],
     created_at: '2025-05-05T14:20:00Z',
-    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: '6', name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
-    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
+    updated_at: '2025-05-05T14:20:00Z',
+    views: 142,
+    governorate_id: '2',
+    district_id: '6',
+    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '6', name_ar: 'الشهباء', name_en: 'Al Shahbaa', governorate_id: '2', created_at: '2025-01-01T00:00:00Z' }
   },
   {
     id: '14',
@@ -214,10 +292,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'furniture',
     is_featured: false,
+    user_id: '14',
+    status: 'active',
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png'],
     created_at: '2025-05-02T16:30:00Z',
-    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: '2', name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
-    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
+    updated_at: '2025-05-02T16:30:00Z',
+    views: 89,
+    governorate_id: '1',
+    district_id: '2',
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '2', name_ar: 'المهاجرين', name_en: 'Al Muhajirin', governorate_id: '1', created_at: '2025-01-01T00:00:00Z' }
   },
   {
     id: '15',
@@ -229,10 +313,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'furniture',
     is_featured: false,
+    user_id: '15',
+    status: 'active',
+    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png'],
     created_at: '2025-04-29T11:20:00Z',
-    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs' },
-    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
-    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
+    updated_at: '2025-04-29T11:20:00Z',
+    views: 71,
+    governorate_id: '4',
+    district_id: '15',
+    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah', governorate_id: '4', created_at: '2025-01-01T00:00:00Z' }
   },
   {
     id: '16',
@@ -244,10 +334,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'furniture',
     is_featured: true,
+    user_id: '16',
+    status: 'active',
+    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png'],
     created_at: '2025-05-07T13:45:00Z',
-    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: '11', name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
-    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
+    updated_at: '2025-05-07T13:45:00Z',
+    views: 124,
+    governorate_id: '3',
+    district_id: '11',
+    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '11', name_ar: 'الأوقاف', name_en: 'Al Awqaf', governorate_id: '3', created_at: '2025-01-01T00:00:00Z' }
   },
   
   // Jobs Listings (4)
@@ -261,10 +357,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'jobs',
     is_featured: true,
+    user_id: '17',
+    status: 'active',
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png'],
     created_at: '2025-05-06T09:30:00Z',
-    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: '1', name_ar: 'المزة', name_en: 'Al Mazzeh' },
-    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
+    updated_at: '2025-05-06T09:30:00Z',
+    views: 115,
+    governorate_id: '1',
+    district_id: '1',
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '1', name_ar: 'المزة', name_en: 'Al Mazzeh', governorate_id: '1', created_at: '2025-01-01T00:00:00Z' }
   },
   {
     id: '18',
@@ -276,10 +378,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'jobs',
     is_featured: false,
+    user_id: '18',
+    status: 'active',
+    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png'],
     created_at: '2025-05-03T14:15:00Z',
-    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: '5', name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
-    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
+    updated_at: '2025-05-03T14:15:00Z',
+    views: 60,
+    governorate_id: '2',
+    district_id: '5',
+    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '5', name_ar: 'الجميلية', name_en: 'Al Jamiliyah', governorate_id: '2', created_at: '2025-01-01T00:00:00Z' }
   },
   {
     id: '19',
@@ -291,10 +399,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'jobs',
     is_featured: false,
+    user_id: '19',
+    status: 'active',
+    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png'],
     created_at: '2025-04-30T10:45:00Z',
-    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: '10', name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
-    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
+    updated_at: '2025-04-30T10:45:00Z',
+    views: 48,
+    governorate_id: '3',
+    district_id: '10',
+    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '10', name_ar: 'الرمل الشمالي', name_en: 'Northern Sand', governorate_id: '3', created_at: '2025-01-01T00:00:00Z' }
   },
   {
     id: '20',
@@ -306,10 +420,16 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'jobs',
     is_featured: true,
+    user_id: '20',
+    status: 'active',
+    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png'],
     created_at: '2025-05-07T16:20:00Z',
-    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs' },
-    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
-    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
+    updated_at: '2025-05-07T16:20:00Z',
+    views: 95,
+    governorate_id: '4',
+    district_id: '15',
+    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah', governorate_id: '4', created_at: '2025-01-01T00:00:00Z' }
   },
   
   // Services Listings (4)
@@ -323,416 +443,12 @@ const mockListingsData: ListingWithRelations[] = [
     currency: 'USD',
     category: 'services',
     is_featured: true,
+    user_id: '21',
+    status: 'active',
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png'],
     created_at: '2025-05-04T12:30:00Z',
-    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: '2', name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
-    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
-  },
-  {
-    id: '22',
-    title: 'خدمات نقل وتوصيل',
-    title_en: 'Transport and Delivery Services',
-    description: 'خدمات نقل البضائع والأثاث داخل المدينة وبين المحافظات.',
-    description_en: 'Goods and furniture transport services within the city and between governorates.',
-    price: 200,
-    currency: 'USD',
-    category: 'services',
-    is_featured: false,
-    created_at: '2025-05-01T09:45:00Z',
-    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: '6', name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
-    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
-  },
-  {
-    id: '23',
-    title: 'صيانة أجهزة كهربائية',
-    title_en: 'Electrical Appliance Maintenance',
-    description: 'صيانة جميع أنواع الأجهزة المنزلية والكهربائية بضمان.',
-    description_en: 'Maintenance of all types of household and electrical appliances with warranty.',
-    price: 100,
-    currency: 'USD',
-    category: 'services',
-    is_featured: true,
-    created_at: '2025-05-06T15:10:00Z',
-    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: '11', name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
-    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
-  },
-  {
-    id: '24',
-    title: 'دروس خصوصية',
-    title_en: 'Private Lessons',
-    description: 'دروس خصوصية في الرياضيات والفيزياء للمرحلة الثانوية.',
-    description_en: 'Private lessons in mathematics and physics for high school students.',
-    price: 30,
-    currency: 'USD',
-    category: 'services',
-    is_featured: false,
-    created_at: '2025-04-29T16:50:00Z',
-    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs' },
-    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
-    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
-  },
-  
-  // Fashion Listings (4)
-  {
-    id: '25',
-    title: 'فستان سهرة فاخر',
-    title_en: 'Luxury Evening Dress',
-    description: 'فستان سهرة فاخر، لون أحمر، مقاس M، استخدام مرة واحدة فقط.',
-    description_en: 'Luxury evening dress, red color, size M, used only once.',
-    price: 200,
-    currency: 'USD',
-    category: 'fashion',
-    is_featured: true,
-    created_at: '2025-05-05T17:30:00Z',
-    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: '1', name_ar: 'المزة', name_en: 'Al Mazzeh' },
-    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
-  },
-  {
-    id: '26',
-    title: 'حذاء رياضي نايك',
-    title_en: 'Nike Sneakers',
-    description: 'حذاء رياضي نايك أصلي، مقاس 43، لون أسود، جديد.',
-    description_en: 'Original Nike sneakers, size 43, black color, new.',
-    price: 150,
-    currency: 'USD',
-    category: 'fashion',
-    is_featured: false,
-    created_at: '2025-05-02T13:15:00Z',
-    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: '5', name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
-    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
-  },
-  {
-    id: '27',
-    title: 'حقيبة يد ماركة',
-    title_en: 'Designer Handbag',
-    description: 'حقيبة يد ماركة، جلد طبيعي، لون بني، حالة ممتازة.',
-    description_en: 'Designer handbag, genuine leather, brown color, excellent condition.',
-    price: 300,
-    currency: 'USD',
-    category: 'fashion',
-    is_featured: true,
-    created_at: '2025-05-07T11:40:00Z',
-    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: '10', name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
-    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
-  },
-  {
-    id: '28',
-    title: 'بدلة رجالية أنيقة',
-    title_en: 'Elegant Men\'s Suit',
-    description: 'بدلة رجالية أنيقة، لون كحلي، مقاس 52، قماش إيطالي.',
-    description_en: 'Elegant men\'s suit, navy blue color, size 52, Italian fabric.',
-    price: 400,
-    currency: 'USD',
-    category: 'fashion',
-    is_featured: false,
-    created_at: '2025-04-30T14:25:00Z',
-    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: '4', name_ar: 'المالكي', name_en: 'Al Malki' },
-    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
-  },
-  
-  // Books Listings (4)
-  {
-    id: '29',
-    title: 'رواية مئة عام من العزلة',
-    title_en: 'One Hundred Years of Solitude Novel',
-    description: 'رواية مئة عام من العزلة للكاتب غابرييل غارسيا ماركيز، طبعة جديدة.',
-    description_en: 'One Hundred Years of Solitude novel by Gabriel Garcia Marquez, new edition.',
-    price: 20,
-    currency: 'USD',
-    category: 'books',
-    is_featured: true,
-    created_at: '2025-05-06T10:15:00Z',
-    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: '2', name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
-    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
-  },
-  {
-    id: '30',
-    title: 'كتب دراسية جامعية',
-    title_en: 'University Textbooks',
-    description: 'مجموعة كتب دراسية لكلية الهندسة، حالة جيدة.',
-    description_en: 'Set of textbooks for the Faculty of Engineering, good condition.',
-    price: 50,
-    currency: 'USD',
-    category: 'books',
-    is_featured: false,
-    created_at: '2025-05-03T09:50:00Z',
-    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: '6', name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
-    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
-  },
-  {
-    id: '31',
-    title: 'قاموس إنجليزي - عربي',
-    title_en: 'English-Arabic Dictionary',
-    description: 'قاموس إنجليزي - عربي شامل، أكثر من 50,000 كلمة ومصطلح.',
-    description_en: 'Comprehensive English-Arabic dictionary, more than 50,000 words and terms.',
-    price: 30,
-    currency: 'USD',
-    category: 'books',
-    is_featured: true,
-    created_at: '2025-04-29T15:35:00Z',
-    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: '11', name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
-    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
-  },
-  {
-    id: '32',
-    title: 'كتاب طبخ شامل',
-    title_en: 'Comprehensive Cookbook',
-    description: 'كتاب طبخ شامل يحتوي على أكثر من 500 وصفة متنوعة.',
-    description_en: 'Comprehensive cookbook containing more than 500 various recipes.',
-    price: 25,
-    currency: 'USD',
-    category: 'books',
-    is_featured: false,
-    created_at: '2025-05-01T16:10:00Z',
-    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs' },
-    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
-    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
-  },
-  
-  // Pets Listings (4)
-  {
-    id: '33',
-    title: 'قطة شيرازي للبيع',
-    title_en: 'Persian Cat for Sale',
-    description: 'قطة شيرازي بيضاء، عمر 3 أشهر، مطعمة بالكامل.',
-    description_en: 'White Persian cat, 3 months old, fully vaccinated.',
-    price: 150,
-    currency: 'USD',
-    category: 'pets',
-    is_featured: true,
-    created_at: '2025-05-07T14:30:00Z',
-    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: '1', name_ar: 'المزة', name_en: 'Al Mazzeh' },
-    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
-  },
-  {
-    id: '34',
-    title: 'كلب جيرمن شيبرد',
-    title_en: 'German Shepherd Dog',
-    description: 'كلب جيرمن شيبرد، عمر سنة، مدرب على الطاعة والحراسة.',
-    description_en: 'German Shepherd dog, 1 year old, trained for obedience and guarding.',
-    price: 400,
-    currency: 'USD',
-    category: 'pets',
-    is_featured: false,
-    created_at: '2025-05-04T11:15:00Z',
-    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: '5', name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
-    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
-  },
-  {
-    id: '35',
-    title: 'أحواض سمك مع إكسسوارات',
-    title_en: 'Fish Tanks with Accessories',
-    description: 'أحواض سمك مختلفة الأحجام مع إكسسوارات كاملة.',
-    description_en: 'Fish tanks of various sizes with complete accessories.',
-    price: 80,
-    currency: 'USD',
-    category: 'pets',
-    is_featured: true,
-    created_at: '2025-04-30T13:20:00Z',
-    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: '10', name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
-    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
-  },
-  {
-    id: '36',
-    title: 'طيور كناري للبيع',
-    title_en: 'Canary Birds for Sale',
-    description: 'طيور كناري مغردة، ألوان متنوعة، صحية وحيوية.',
-    description_en: 'Singing canary birds, various colors, healthy and lively.',
-    price: 40,
-    currency: 'USD',
-    category: 'pets',
-    is_featured: false,
-    created_at: '2025-05-02T10:50:00Z',
-    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs' },
-    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
-    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
-  },
-  
-  // Sports Listings (4)
-  {
-    id: '37',
-    title: 'دراجة هوائية جبلية',
-    title_en: 'Mountain Bike',
-    description: 'دراجة هوائية جبلية، ماركة عالمية، 21 سرعة، إطارات مقاومة للثقب.',
-    description_en: 'Mountain bike, global brand, 21 speeds, puncture-resistant tires.',
-    price: 300,
-    currency: 'USD',
-    category: 'sports',
-    is_featured: true,
-    created_at: '2025-05-06T11:40:00Z',
-    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus' },
-    district: { id: '2', name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
-    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
-  },
-  {
-    id: '38',
-    title: 'طاولة تنس كاملة',
-    title_en: 'Complete Table Tennis Set',
-    description: 'طاولة تنس كاملة مع مضارب وكرات وشبكة، قابلة للطي.',
-    description_en: 'Complete table tennis set with paddles, balls, and net, foldable.',
-    price: 250,
-    currency: 'USD',
-    category: 'sports',
-    is_featured: false,
-    created_at: '2025-05-01T15:20:00Z',
-    governorate: { id: '2', name_ar: 'حلب', name_en: 'Aleppo' },
-    district: { id: '6', name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
-    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
-  },
-  {
-    id: '39',
-    title: 'معدات رياضية منزلية',
-    title_en: 'Home Gym Equipment',
-    description: 'معدات رياضية منزلية كاملة، حالة ممتازة، قليلة الاستخدام.',
-    description_en: 'Complete home gym equipment, excellent condition, lightly used.',
-    price: 500,
-    currency: 'USD',
-    category: 'sports',
-    is_featured: true,
-    created_at: '2025-04-29T12:10:00Z',
-    governorate: { id: '3', name_ar: 'اللاذقية', name_en: 'Latakia' },
-    district: { id: '11', name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
-    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
-  },
-  {
-    id: '40',
-    title: 'ملابس رياضية أصلية',
-    title_en: 'Original Sports Clothing',
-    description: 'ملابس رياضية أصلية، ماركات عالمية، مقاسات متنوعة.',
-    description_en: 'Original sports clothing, global brands, various sizes.',
-    price: 100,
-    currency: 'USD',
-    category: 'sports',
-    is_featured: false,
-    created_at: '2025-05-05T09:45:00Z',
-    governorate: { id: '4', name_ar: 'حمص', name_en: 'Homs' },
-    district: { id: '15', name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
-    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
-  }
-];
-
-/**
- * Search listings based on the provided filters
- * @param filters The filters to apply to the search
- * @returns List of listings that match the filters
- */
-export const searchListings = (filters: ListingFilters): Promise<ListingWithRelations[]> => {
-  console.log('Searching with filters:', filters);
-  
-  // In a real app, this would be an API call to a database
-  // For this example, we'll use mock data
-  console.log('Using mock data instead of DB call for search');
-  
-  let results = [...mockListingsData];
-  
-  // Apply category filter if specified
-  if (filters.category) {
-    console.log('Mapping category \'' + filters.category + '\' to enum value:', filters.category);
-    console.log('Applying category filter:', filters.category, '(mapped to:', filters.category, ')');
-    results = results.filter(listing => listing.category === filters.category);
-  }
-  
-  // Apply query filter if specified
-  if (filters.query) {
-    const query = filters.query.toLowerCase();
-    results = results.filter(listing => 
-      listing.title?.toLowerCase().includes(query) || 
-      listing.description?.toLowerCase().includes(query)
-    );
-  }
-  
-  // Apply location filter if specified
-  if (filters.governorate_id) {
-    results = results.filter(listing => listing.governorate?.id === filters.governorate_id);
-  }
-  
-  if (filters.district_id) {
-    results = results.filter(listing => listing.district?.id === filters.district_id);
-  }
-  
-  // Apply price filters if specified
-  if (filters.priceMin !== undefined) {
-    results = results.filter(listing => (listing.price || 0) >= (filters.priceMin || 0));
-  }
-  
-  if (filters.priceMax !== undefined) {
-    results = results.filter(listing => (listing.price || 0) <= (filters.priceMax || 0));
-  }
-  
-  // Apply sorting
-  if (filters.sortBy) {
-    console.log('Applying sort filter:', filters.sortBy);
-    switch (filters.sortBy) {
-      case 'newest':
-        results.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-        break;
-      case 'oldest':
-        results.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-        break;
-      case 'price_high_low':
-        results.sort((a, b) => (b.price || 0) - (a.price || 0));
-        break;
-      case 'price_low_high':
-        results.sort((a, b) => (a.price || 0) - (b.price || 0));
-        break;
-    }
-  }
-  
-  // Apply urgent/featured filter
-  if (filters.urgent) {
-    results = results.filter(listing => listing.is_featured);
-  }
-  
-  // Apply limit if specified
-  if (filters.limit && filters.limit > 0) {
-    results = results.slice(0, filters.limit);
-  }
-  
-  console.log('Search results:', results.length);
-  return Promise.resolve(results);
-};
-
-/**
- * Get featured listings
- * @param count Maximum number of listings to return
- * @returns Featured listings
- */
-export const getFeaturedListings = (count: number = 6): Promise<ListingWithRelations[]> => {
-  // In a real app, this would be an API call to a database
-  // For this example, we'll filter and return the mock data
-  const featuredListings = mockListingsData
-    .filter(listing => listing.is_featured)
-    .sort(() => Math.random() - 0.5) // Randomize the order
-    .slice(0, count);
-  
-  return Promise.resolve(featuredListings);
-};
-
-/**
- * Get listings by category
- * @param category The category name to filter by
- * @param count Maximum number of listings to return
- * @returns List of listings in the specified category
- */
-export const getListingsByCategory = (category: string, count = 12): Promise<ListingWithRelations[]> => {
-  // In a real app, this would be an API call to the database
-  // For this example, we'll filter the mock data
-  const categoryListings = mockListingsData
-    .filter(listing => listing.category === category)
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, count);
-  
-  return Promise.resolve(categoryListings);
-};
+    updated_at: '2025-05-04T12:30:00Z',
+    views: 108,
+    governorate_id: '1',
+    district_id: '2',
+    governorate: { id: '1', name_ar: 'دمشق
