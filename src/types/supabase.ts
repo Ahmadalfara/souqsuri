@@ -251,4 +251,10 @@ export interface ListingWithRelations extends Listing {
   governorate?: Governorate;
   district?: District;
   user?: Profile;
+  // Extended fields for mock data
+  title_en?: string;
+  description_en?: string;
+  category_ar?: string;
+  category_en?: string;
+  condition?: string;
 }
