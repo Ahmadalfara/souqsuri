@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -11,13 +10,27 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/hooks/use-toast';
 
 const FeaturedListings = () => {
   const navigate = useNavigate();
   const { language, t } = useLanguage();
-  const { data: listings, isLoading } = useQuery({
+  const { toast } = useToast();
+  
+  const { data: listings, isLoading, error } = useQuery({
     queryKey: ['featuredListings'],
-    queryFn: () => getFeaturedListings(12)
+    queryFn: () => getFeaturedListings(12),
+    retry: 1,
+    onError: (err) => {
+      console.error('Failed to fetch featured listings:', err);
+      toast({
+        variant: "destructive",
+        title: language === 'ar' ? "خطأ في جلب الإعلانات" : "Error fetching listings",
+        description: language === 'ar' 
+          ? "حدث خطأ أثناء جلب الإعلانات المميزة. يرجى المحاولة مرة أخرى لاحقاً."
+          : "An error occurred while fetching featured listings. Please try again later."
+      });
+    }
   });
 
   // Helper function to get location display string
@@ -79,6 +92,35 @@ const FeaturedListings = () => {
                   </CardFooter>
                 </Card>
               ))}
+            </div>
+          ) : error ? (
+            <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+              <div className="mx-auto w-24 h-24 mb-6 text-syrian-green/30">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-bold mb-2">
+                <ArabicText 
+                  text="حدث خطأ أثناء جلب الإعلانات"
+                  textEn="Error loading listings"
+                />
+              </h2>
+              <p className="text-gray-500">
+                <ArabicText 
+                  text="يرجى تحديث الصفحة أو المحاولة مرة أخرى لاحقاً"
+                  textEn="Please refresh the page or try again later"
+                />
+              </p>
+              <Button 
+                className="mt-6" 
+                onClick={() => window.location.reload()}
+              >
+                <ArabicText 
+                  text="تحديث الصفحة"
+                  textEn="Refresh Page"
+                />
+              </Button>
             </div>
           ) : (
             <>
