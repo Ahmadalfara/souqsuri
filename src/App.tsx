@@ -8,6 +8,7 @@ import { Toaster } from '@/components/ui/toaster';
 
 const Index = lazy(() => import('./pages/Index'));
 const FeaturedListings = lazy(() => import('./pages/FeaturedListings'));
+const UserProfile = lazy(() => import('./pages/UserProfile'));
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
               <Route path="/" element={<Index />} />
               <Route path="/category/:categoryName" element={<Index />} />
               <Route path="/featured-listings" element={<FeaturedListings />} />
+              <Route path="/profile" element={<UserProfile />} />
             </Routes>
           </Suspense>
           <Toaster />

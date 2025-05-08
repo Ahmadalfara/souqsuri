@@ -7,9 +7,17 @@ import { Loader2 } from 'lucide-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import UserInfo from '@/components/profile/UserInfo';
 import ProfileTabs from '@/components/profile/ProfileTabs';
+import { useAuth } from '@/contexts/AuthContext';
+import { Navigate } from 'react-router-dom';
 
 const UserProfile = () => {
   const { userData, userListings, setUserListings, loading } = useUserProfile();
+  const { currentUser } = useAuth();
+
+  // Redirect if not logged in
+  if (!currentUser) {
+    return <Navigate to="/" />;
+  }
 
   if (loading) {
     return (

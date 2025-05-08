@@ -10,11 +10,16 @@ import MobileMenu from './header/MobileMenu';
 import Categories from './header/Categories';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme } = useTheme();
   const { language } = useLanguage();
+  const auth = useAuth();
+  
+  // Check if auth is available (meaning we're inside AuthProvider)
+  const isAuthReady = auth !== undefined;
   
   return (
     <header className="flex flex-col bg-white dark:bg-gray-900 dark:text-white transition-colors duration-300">
@@ -35,7 +40,7 @@ const Header = () => {
         <div className={`hidden md:flex items-center space-x-4 ${language === 'ar' ? 'space-x-reverse flex-row-reverse' : ''}`}>
           <ThemeSwitcher />
           <LanguageSwitcher />
-          <AuthButtons />
+          {isAuthReady && <AuthButtons />}
         </div>
       </div>
       
