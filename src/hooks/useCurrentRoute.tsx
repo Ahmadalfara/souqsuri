@@ -18,7 +18,7 @@ export const useCurrentRoute = () => {
         const currentParams = new URLSearchParams(location.search);
         
         // Check if the current URL contains the path
-        if (!location.pathname.includes(pathPart) && pathPart !== '/search') {
+        if (!location.pathname.includes(pathPart)) {
           return false;
         }
         
