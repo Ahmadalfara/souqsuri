@@ -1,9 +1,9 @@
 
 import { ListingWithRelations } from '@/types/supabase';
-import { searchListings } from './search';
+import { getListingsByCategory } from './categories';
 
 /**
- * Get listings by category using the search service
+ * Get listings by category using Supabase
  * @param category The category ID to filter by
  * @param count Maximum number of listings to return
  * @returns Array of listings filtered by category
@@ -14,12 +14,5 @@ export const getListingsByCategoryId = async (
 ): Promise<ListingWithRelations[]> => {
   console.log(`Getting listings for category: ${category}`);
   
-  // Use the existing search function with category filter
-  const filteredListings = searchListings({
-    category,
-    sortBy: 'newest'
-  });
-  
-  // Apply limit and return as Promise
-  return Promise.resolve(filteredListings.slice(0, count));
+  return getListingsByCategory(category, count);
 };

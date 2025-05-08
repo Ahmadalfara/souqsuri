@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ArabicText from '@/components/ArabicText';
 import { useCurrentRoute } from '@/hooks/useCurrentRoute'; 
 import { Home, Building, Car, Smartphone, Sofa, Briefcase, Wrench, Shirt, Book, Cat, Volleyball } from 'lucide-react';
+import { getCategoryCount } from '@/services/listings/categories';
 
 // Updated categories with correct paths for category pages
 const categoryItems = [
@@ -24,9 +25,32 @@ const categoryItems = [
 const Categories = () => {
   const { language } = useLanguage();
   const { isActive } = useCurrentRoute();
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
   
   // Determine if we should use RTL layout
   const isRTL = language === 'ar';
+  
+  // Fetch category counts from Supabase
+  useEffect(() => {
+    const fetchCategoryCounts = async () => {
+      const counts: Record<string, number> = {};
+      
+      // Skip the 'all' category
+      for (const item of categoryItems.filter(cat => cat.id !== 'all')) {
+        try {
+          const count = await getCategoryCount(item.id);
+          counts[item.id] = count;
+        } catch (error) {
+          console.error(`Failed to fetch count for category ${item.id}:`, error);
+          counts[item.id] = 0;
+        }
+      }
+      
+      setCategoryCounts(counts);
+    };
+    
+    fetchCategoryCounts();
+  }, []);
   
   return (
     <div className="w-full">
@@ -54,6 +78,11 @@ const Categories = () => {
                   item.nameEn
                 )}
               </span>
+              {item.id !== 'all' && (
+                <span className="text-[10px] text-gray-500">
+                  {categoryCounts[item.id] || 0}
+                </span>
+              )}
             </Link>
           );
         })}

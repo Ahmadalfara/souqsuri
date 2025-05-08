@@ -5,5 +5,7 @@ export * from './core';
 export { searchListings, getFeaturedListings } from './search';
 export * from './user';
 export * from './location';
+// Export category services
+export * from './categories';
 // Export from categorySearch (which has the renamed function)
 export * from './categorySearch';
