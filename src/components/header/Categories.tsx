@@ -6,19 +6,19 @@ import ArabicText from '@/components/ArabicText';
 import { useCurrentRoute } from '@/hooks/useCurrentRoute'; 
 import { Home, Building, Car, Smartphone, Sofa, Briefcase, Wrench, Shirt, Book, Cat, Volleyball } from 'lucide-react';
 
-// Updated categories with Lucide icons
+// Updated categories with correct paths for category pages
 const categoryItems = [
   { id: 'all', icon: Home, nameEn: 'Home', nameAr: 'الرئيسية', path: '/' },
-  { id: 'real_estate', icon: Building, nameEn: 'Real Estate', nameAr: 'عقارات', path: '/search?category=real_estate' },
-  { id: 'cars', icon: Car, nameEn: 'Cars', nameAr: 'سيارات', path: '/search?category=cars' },
-  { id: 'electronics', icon: Smartphone, nameEn: 'Electronics', nameAr: 'الكترونيات', path: '/search?category=electronics' },
-  { id: 'furniture', icon: Sofa, nameEn: 'Furniture', nameAr: 'أثاث', path: '/search?category=furniture' },
-  { id: 'jobs', icon: Briefcase, nameEn: 'Jobs', nameAr: 'وظائف', path: '/search?category=jobs' },
-  { id: 'services', icon: Wrench, nameEn: 'Services', nameAr: 'خدمات', path: '/search?category=services' },
-  { id: 'fashion', icon: Shirt, nameEn: 'Fashion', nameAr: 'أزياء', path: '/search?category=fashion' },
-  { id: 'books', icon: Book, nameEn: 'Books', nameAr: 'كتب', path: '/search?category=books' },
-  { id: 'pets', icon: Cat, nameEn: 'Pets', nameAr: 'حيوانات أليفة', path: '/search?category=pets' },
-  { id: 'sports', icon: Volleyball, nameEn: 'Sports', nameAr: 'رياضة', path: '/search?category=sports' },
+  { id: 'real_estate', icon: Building, nameEn: 'Real Estate', nameAr: 'عقارات', path: '/category/real_estate' },
+  { id: 'cars', icon: Car, nameEn: 'Cars', nameAr: 'سيارات', path: '/category/cars' },
+  { id: 'electronics', icon: Smartphone, nameEn: 'Electronics', nameAr: 'الكترونيات', path: '/category/electronics' },
+  { id: 'furniture', icon: Sofa, nameEn: 'Furniture', nameAr: 'أثاث', path: '/category/furniture' },
+  { id: 'jobs', icon: Briefcase, nameEn: 'Jobs', nameAr: 'وظائف', path: '/category/jobs' },
+  { id: 'services', icon: Wrench, nameEn: 'Services', nameAr: 'خدمات', path: '/category/services' },
+  { id: 'fashion', icon: Shirt, nameEn: 'Fashion', nameAr: 'أزياء', path: '/category/fashion' },
+  { id: 'books', icon: Book, nameEn: 'Books', nameAr: 'كتب', path: '/category/books' },
+  { id: 'pets', icon: Cat, nameEn: 'Pets', nameAr: 'حيوانات أليفة', path: '/category/pets' },
+  { id: 'sports', icon: Volleyball, nameEn: 'Sports', nameAr: 'رياضة', path: '/category/sports' },
 ];
 
 const Categories = () => {

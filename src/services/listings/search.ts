@@ -1,1408 +1,734 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { ListingWithRelations } from '@/types/supabase';
+import { ListingWithRelations, ListingFilters } from '@/types/supabase';
 
-interface ListingFilters {
-  query?: string;
-  category?: string;
-  governorate_id?: string;
-  district_id?: string;
-  location?: string; // Added for named locations that aren't IDs
-  priceMin?: number;
-  priceMax?: number;
-  condition?: string[];
-  sortBy?: string;
-  urgent?: boolean;
-  showWithImagesOnly?: boolean;
-  currency?: string;
-}
-
-// Map frontend category names to database enum values
-const mapCategoryToEnum = (category: string): string => {
-  const categoryMap: Record<string, string> = {
-    'real_estate': 'real_estate',
-    'cars': 'vehicles',
-    'clothes': 'clothing',
-    'electronics': 'electronics',
-    'furniture': 'furniture',
-    'jobs': 'jobs',
-    'services': 'services'
-  };
-  
-  console.log(`Mapping category '${category}' to enum value: ${categoryMap[category] || category}`);
-  return categoryMap[category] || category;
-};
-
-// Define interfaces for mock data to match required database types
-interface MockGovernorate {
-  id: string;
-  name_ar: string;
-  name_en: string;
-  created_at: string;
-}
-
-interface MockDistrict {
-  id: string;
-  governorate_id: string;
-  name_ar: string;
-  name_en: string;
-  created_at: string;
-}
-
-// Extended interface for mock listings to include English fields
-interface MockListingWithRelations extends ListingWithRelations {
-  title_en?: string;
-  description_en?: string;
-  category_ar?: string;
-  category_en?: string;
-  condition?: string;
-}
-
-// Mock data for testing
-const mockListings: MockListingWithRelations[] = [
-  // Real Estate listings
+// Mock data with more listings across all categories
+const mockListingsData: ListingWithRelations[] = [
+  // Real Estate Listings (4)
   {
-    id: 'real-estate-1',
-    title: 'شقة فاخرة في قلب دمشق',
-    title_en: 'Luxury apartment in Damascus center',
-    description: 'شقة واسعة مع إطلالات رائعة على المدينة',
-    description_en: 'Spacious apartment with amazing city views',
-    price: 75000000,
-    currency: 'SYP',
+    id: '1',
+    title: 'شقة فاخرة للإيجار',
+    title_en: 'Luxury Apartment for Rent',
+    description: 'شقة فاخرة في وسط المدينة، 3 غرف نوم، 2 حمام، مطبخ مجهز، إطلالة على البحر.',
+    description_en: 'Luxury apartment in downtown, 3 bedrooms, 2 bathrooms, fully equipped kitchen, sea view.',
+    price: 1500,
+    currency: 'USD',
     category: 'real_estate',
-    category_ar: 'العقارات',
-    category_en: 'Real Estate',
-    condition: 'new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/real-estate-1.jpg'],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    user_id: 'mock-user-1',
-    governorate_id: 'damascus',
-    district_id: 'center',
     is_featured: true,
-    status: 'active',
-    views: 120,
-    governorate: { 
-      id: 'damascus', 
-      name_ar: 'دمشق', 
-      name_en: 'Damascus',
-      created_at: new Date().toISOString()
-    },
-    district: { 
-      id: 'center', 
-      name_ar: 'وسط المدينة', 
-      name_en: 'City Center',
-      governorate_id: 'damascus',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-01T10:30:00Z',
+    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: 1, name_ar: 'المزة', name_en: 'Al Mazzeh' },
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
-    id: 'real-estate-2',
-    title: 'فيلا مع حديقة في حلب',
-    title_en: 'Villa with garden in Aleppo',
-    description: 'فيلا فاخرة مع حديقة واسعة ومسبح',
-    description_en: 'Luxury villa with large garden and pool',
-    price: 120000000,
-    currency: 'SYP',
+    id: '2',
+    title: 'منزل مع حديقة للبيع',
+    title_en: 'House with Garden for Sale',
+    description: 'منزل مستقل مع حديقة خاصة وموقف سيارات.',
+    description_en: 'Detached house with private garden and parking.',
+    price: 120000,
+    currency: 'USD',
     category: 'real_estate',
-    category_ar: 'العقارات',
-    category_en: 'Real Estate',
-    condition: 'good',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/real-estate-2.jpg'],
-    created_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-    updated_at: new Date(Date.now() - 86400000).toISOString(),
-    user_id: 'mock-user-2',
-    governorate_id: 'aleppo',
-    district_id: 'north',
     is_featured: false,
-    status: 'active',
-    views: 85,
-    governorate: { 
-      id: 'aleppo', 
-      name_ar: 'حلب', 
-      name_en: 'Aleppo',
-      created_at: new Date().toISOString()
-    },
-    district: { 
-      id: 'north', 
-      name_ar: 'الشمال', 
-      name_en: 'North',
-      governorate_id: 'aleppo',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-04-28T14:20:00Z',
+    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: 5, name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
+    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
-    id: 'real-estate-3',
-    title: 'شقة مفروشة للإيجار في اللاذقية',
-    title_en: 'Furnished apartment for rent in Latakia',
-    description: 'شقة مفروشة بالكامل للإيجار في منطقة هادئة قرب البحر',
-    description_en: 'Fully furnished apartment for rent in a quiet area near the sea',
-    price: 750000,
-    currency: 'SYP',
+    id: '3',
+    title: 'أرض للبيع في ريف دمشق',
+    title_en: 'Land for Sale in Damascus Countryside',
+    description: 'قطعة أرض مساحتها 1000 متر مربع، صالحة للبناء والاستثمار.',
+    description_en: 'Land plot of 1000 square meters, suitable for building and investment.',
+    price: 80000,
+    currency: 'USD',
     category: 'real_estate',
-    category_ar: 'العقارات',
-    category_en: 'Real Estate',
-    condition: 'excellent',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/real-estate-3.jpg'],
-    created_at: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-    updated_at: new Date(Date.now() - 172800000).toISOString(),
-    user_id: 'mock-user-3',
-    governorate_id: 'latakia',
-    district_id: 'corniche',
     is_featured: true,
-    status: 'active',
-    views: 143,
-    governorate: {
-      id: 'latakia',
-      name_ar: 'اللاذقية',
-      name_en: 'Latakia',
-      created_at: new Date().toISOString()
-    },
-    district: {
-      id: 'corniche',
-      name_ar: 'الكورنيش',
-      name_en: 'Corniche',
-      governorate_id: 'latakia',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-07T09:15:00Z',
+    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: 3, name_ar: 'قدسيا', name_en: 'Qudsaya' },
+    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   },
   {
-    id: 'real-estate-4',
-    title: 'أرض زراعية للبيع في حمص',
-    title_en: 'Agricultural land for sale in Homs',
-    description: 'قطعة أرض زراعية خصبة مساحة 5000 متر مربع مع بئر ماء',
-    description_en: 'Fertile agricultural land, area 5000 square meters with water well',
-    price: 45000000,
-    currency: 'SYP',
+    id: '4',
+    title: 'استديو مفروش للإيجار',
+    title_en: 'Furnished Studio for Rent',
+    description: 'استديو صغير مفروش بالكامل، مناسب للطلاب أو العزاب.',
+    description_en: 'Small fully furnished studio, suitable for students or singles.',
+    price: 400,
+    currency: 'USD',
     category: 'real_estate',
-    category_ar: 'العقارات',
-    category_en: 'Real Estate',
-    condition: 'good',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/real-estate-4.jpg'],
-    created_at: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
-    updated_at: new Date(Date.now() - 259200000).toISOString(),
-    user_id: 'mock-user-4',
-    governorate_id: 'homs',
-    district_id: 'countryside',
     is_featured: false,
-    status: 'active',
-    views: 98,
-    governorate: {
-      id: 'homs',
-      name_ar: 'حمص',
-      name_en: 'Homs',
-      created_at: new Date().toISOString()
-    },
-    district: {
-      id: 'countryside',
-      name_ar: 'الريف',
-      name_en: 'Countryside',
-      governorate_id: 'homs',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-05T16:45:00Z',
+    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: 10, name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
+    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
   },
   
-  // Cars listings
+  // Cars Listings (4)
   {
-    id: 'cars-1',
-    title: 'مرسيدس S500 موديل 2018',
-    title_en: 'Mercedes S500 2018 model',
-    description: 'سيارة بحالة ممتازة، كاملة المواصفات',
-    description_en: 'Car in excellent condition, full options',
-    price: 150000000,
-    currency: 'SYP',
-    category: 'vehicles',
-    category_ar: 'سيارات',
-    category_en: 'Cars',
-    condition: 'like_new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/car-1.jpg'],
-    created_at: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-    updated_at: new Date(Date.now() - 172800000).toISOString(),
-    user_id: 'mock-user-3',
-    governorate_id: 'damascus',
-    district_id: 'mezzeh',
+    id: '5',
+    title: 'سيارة مرسيدس للبيع',
+    title_en: 'Mercedes Car for Sale',
+    description: 'مرسيدس E200 موديل 2020، لون أسود، حالة ممتازة.',
+    description_en: 'Mercedes E200, 2020 model, black color, excellent condition.',
+    price: 35000,
+    currency: 'USD',
+    category: 'cars',
     is_featured: true,
-    status: 'active',
-    views: 210,
-    governorate: { 
-      id: 'damascus', 
-      name_ar: 'دمشق', 
-      name_en: 'Damascus',
-      created_at: new Date().toISOString()
-    },
-    district: { 
-      id: 'mezzeh', 
-      name_ar: 'المزة', 
-      name_en: 'Mezzeh',
-      governorate_id: 'damascus',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-03T11:20:00Z',
+    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: 2, name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
-    id: 'cars-2',
-    title: 'كيا سبورتاج 2020',
-    title_en: 'Kia Sportage 2020',
-    description: 'سيارة اقتصادية مناسبة للعائلة',
-    description_en: 'Economic family car',
-    price: 90000000,
-    currency: 'SYP',
-    category: 'vehicles',
-    category_ar: 'سيارات',
-    category_en: 'Cars',
-    condition: 'good',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/car-2.jpg'],
-    created_at: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
-    updated_at: new Date(Date.now() - 259200000).toISOString(),
-    user_id: 'mock-user-4',
-    governorate_id: 'latakia',
-    district_id: 'center',
+    id: '6',
+    title: 'تويوتا كورولا بحالة ممتازة',
+    title_en: 'Toyota Corolla in Excellent Condition',
+    description: 'تويوتا كورولا 2018، لون أبيض، 60,000 كم فقط.',
+    description_en: 'Toyota Corolla 2018, white color, only 60,000 km.',
+    price: 15000,
+    currency: 'USD',
+    category: 'cars',
     is_featured: false,
-    status: 'active',
-    views: 150,
-    governorate: { 
-      id: 'latakia', 
-      name_ar: 'اللاذقية', 
-      name_en: 'Latakia',
-      created_at: new Date().toISOString()
-    },
-    district: { 
-      id: 'center', 
-      name_ar: 'وسط المدينة', 
-      name_en: 'City Center',
-      governorate_id: 'latakia',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-02T15:30:00Z',
+    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: 6, name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
+    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
-    id: 'cars-3',
-    title: 'هوندا سيفيك 2019',
-    title_en: 'Honda Civic 2019',
-    description: 'هوندا سيفيك بحالة ممتازة، استعمال شخصي',
-    description_en: 'Honda Civic in excellent condition, personal use',
-    price: 75000000,
-    currency: 'SYP',
-    category: 'vehicles',
-    category_ar: 'سيارات',
-    category_en: 'Cars',
-    condition: 'good',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/car-3.jpg'],
-    created_at: new Date(Date.now() - 345600000).toISOString(), // 4 days ago
-    updated_at: new Date(Date.now() - 345600000).toISOString(),
-    user_id: 'mock-user-5',
-    governorate_id: 'damascus',
-    district_id: 'center',
+    id: '7',
+    title: 'هوندا سيفيك للبيع',
+    title_en: 'Honda Civic for Sale',
+    description: 'هوندا سيفيك 2019، لون رمادي، فل أوبشن.',
+    description_en: 'Honda Civic 2019, gray color, full options.',
+    price: 18000,
+    currency: 'USD',
+    category: 'cars',
     is_featured: false,
-    status: 'active',
-    views: 130,
-    governorate: {
-      id: 'damascus',
-      name_ar: 'دمشق',
-      name_en: 'Damascus',
-      created_at: new Date().toISOString()
-    },
-    district: {
-      id: 'center',
-      name_ar: 'وسط المدينة',
-      name_en: 'City Center',
-      governorate_id: 'damascus',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-04-29T14:10:00Z',
+    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: 11, name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
+    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
   },
   {
-    id: 'cars-4',
-    title: 'تويوتا لاند كروزر 2015',
-    title_en: 'Toyota Land Cruiser 2015',
-    description: 'سيارة دفع رباعي فاخرة بحالة جيدة جداً',
-    description_en: 'Luxury 4x4 vehicle in very good condition',
-    price: 200000000,
-    currency: 'SYP',
-    category: 'vehicles',
-    category_ar: 'سيارات',
-    category_en: 'Cars',
-    condition: 'excellent',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/car-4.jpg'],
-    created_at: new Date(Date.now() - 432000000).toISOString(), // 5 days ago
-    updated_at: new Date(Date.now() - 432000000).toISOString(),
-    user_id: 'mock-user-6',
-    governorate_id: 'aleppo',
-    district_id: 'aziziyeh',
+    id: '8',
+    title: 'كيا سبورتاج',
+    title_en: 'Kia Sportage',
+    description: 'كيا سبورتاج 2021، لون أزرق، عداد 25,000 كم.',
+    description_en: 'Kia Sportage 2021, blue color, 25,000 km on odometer.',
+    price: 24000,
+    currency: 'USD',
+    category: 'cars',
     is_featured: true,
-    status: 'active',
-    views: 185,
-    governorate: {
-      id: 'aleppo',
-      name_ar: 'حلب',
-      name_en: 'Aleppo',
-      created_at: new Date().toISOString()
-    },
-    district: {
-      id: 'aziziyeh',
-      name_ar: 'العزيزية',
-      name_en: 'Aziziyeh',
-      governorate_id: 'aleppo',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-06T12:15:00Z',
+    governorate: { id: 4, name_ar: 'حمص', name_en: 'Homs' },
+    district: { id: 15, name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
+    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   },
   
-  // Electronics listings
+  // Electronics Listings (4)
   {
-    id: 'electronics-1',
-    title: 'آيفون 13 برو جديد',
-    title_en: 'New iPhone 13 Pro',
-    description: 'هاتف آيفون 13 برو جديد غير مستخدم',
-    description_en: 'Brand new unused iPhone 13 Pro',
-    price: 5500000,
-    currency: 'SYP',
+    id: '9',
+    title: 'آيفون 15 برو ماكس',
+    title_en: 'iPhone 15 Pro Max',
+    description: 'آيفون 15 برو ماكس، 256 جيجا، لون أسود، جديد مع الضمان.',
+    description_en: 'iPhone 15 Pro Max, 256GB, black color, new with warranty.',
+    price: 1200,
+    currency: 'USD',
     category: 'electronics',
-    category_ar: 'إلكترونيات',
-    category_en: 'Electronics',
-    condition: 'new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/phone-1.jpg'],
-    created_at: new Date(Date.now() - 345600000).toISOString(), // 4 days ago
-    updated_at: new Date(Date.now() - 345600000).toISOString(),
-    user_id: 'mock-user-5',
-    governorate_id: 'damascus',
-    district_id: 'shaalan',
     is_featured: true,
-    status: 'active',
-    views: 320,
-    governorate: { 
-      id: 'damascus', 
-      name_ar: 'دمشق', 
-      name_en: 'Damascus',
-      created_at: new Date().toISOString()
-    },
-    district: { 
-      id: 'shaalan', 
-      name_ar: 'الشعلان', 
-      name_en: 'Shaalan',
-      governorate_id: 'damascus',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-07T10:25:00Z',
+    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: 1, name_ar: 'المزة', name_en: 'Al Mazzeh' },
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
-    id: 'electronics-2',
-    title: 'لابتوب HP Core i7',
-    title_en: 'HP Laptop Core i7',
-    description: 'لابتوب بمواصفات عالية مناسب للألعاب والتصميم',
-    description_en: 'High-spec laptop for gaming and design',
-    price: 4200000,
-    currency: 'SYP',
+    id: '10',
+    title: 'لابتوب ماك بوك برو',
+    title_en: 'MacBook Pro Laptop',
+    description: 'ماك بوك برو 16 إنش، M2 برو، 32 جيجا رام، 1 تيرا.',
+    description_en: 'MacBook Pro 16 inch, M2 Pro, 32GB RAM, 1TB SSD.',
+    price: 2500,
+    currency: 'USD',
     category: 'electronics',
-    category_ar: 'إلكترونيات',
-    category_en: 'Electronics',
-    condition: 'used',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/laptop-1.jpg'],
-    created_at: new Date(Date.now() - 432000000).toISOString(), // 5 days ago
-    updated_at: new Date(Date.now() - 432000000).toISOString(),
-    user_id: 'mock-user-6',
-    governorate_id: 'homs',
-    district_id: 'center',
     is_featured: false,
-    status: 'active',
-    views: 175,
-    governorate: { 
-      id: 'homs', 
-      name_ar: 'حمص', 
-      name_en: 'Homs',
-      created_at: new Date().toISOString()
-    },
-    district: { 
-      id: 'center', 
-      name_ar: 'وسط المدينة', 
-      name_en: 'City Center',
-      governorate_id: 'homs',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-01T13:40:00Z',
+    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: 5, name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
+    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
-    id: 'electronics-3',
-    title: 'سماعات سوني بلوتوث',
-    title_en: 'Sony Bluetooth Headphones',
-    description: 'سماعات سوني لاسلكية ذات جودة عالية للصوت',
-    description_en: 'Sony wireless headphones with high sound quality',
-    price: 850000,
-    currency: 'SYP',
+    id: '11',
+    title: 'تلفزيون سامسونج سمارت 65 إنش',
+    title_en: 'Samsung Smart TV 65 inch',
+    description: 'تلفزيون سامسونج سمارت 65 إنش، دقة 4K، موديل 2024.',
+    description_en: 'Samsung Smart TV 65 inch, 4K resolution, 2024 model.',
+    price: 1000,
+    currency: 'USD',
     category: 'electronics',
-    category_ar: 'إلكترونيات',
-    category_en: 'Electronics',
-    condition: 'like_new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/headphones-1.jpg'],
-    created_at: new Date(Date.now() - 518400000).toISOString(), // 6 days ago
-    updated_at: new Date(Date.now() - 518400000).toISOString(),
-    user_id: 'mock-user-7',
-    governorate_id: 'damascus',
-    district_id: 'mezzeh',
-    is_featured: false,
-    status: 'active',
-    views: 135,
-    governorate: {
-      id: 'damascus',
-      name_ar: 'دمشق',
-      name_en: 'Damascus',
-      created_at: new Date().toISOString()
-    },
-    district: {
-      id: 'mezzeh',
-      name_ar: 'المزة',
-      name_en: 'Mezzeh',
-      governorate_id: 'damascus',
-      created_at: new Date().toISOString()
-    }
-  },
-  {
-    id: 'electronics-4',
-    title: 'تلفزيون سامسونج سمارت 55 انش',
-    title_en: 'Samsung Smart TV 55 inch',
-    description: 'تلفزيون ذكي من سامسونج بشاشة 55 انش دقة 4K',
-    description_en: 'Samsung Smart TV with 55 inch 4K display',
-    price: 3800000,
-    currency: 'SYP',
-    category: 'electronics',
-    category_ar: 'إلكترونيات',
-    category_en: 'Electronics',
-    condition: 'new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/tv-1.jpg'],
-    created_at: new Date(Date.now() - 604800000).toISOString(), // 7 days ago
-    updated_at: new Date(Date.now() - 604800000).toISOString(),
-    user_id: 'mock-user-8',
-    governorate_id: 'aleppo',
-    district_id: 'center',
     is_featured: true,
-    status: 'active',
-    views: 220,
-    governorate: {
-      id: 'aleppo',
-      name_ar: 'حلب',
-      name_en: 'Aleppo',
-      created_at: new Date().toISOString()
-    },
-    district: {
-      id: 'center',
-      name_ar: 'وسط المدينة',
-      name_en: 'City Center',
-      governorate_id: 'aleppo',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-04T15:50:00Z',
+    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: 10, name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
+    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
+  },
+  {
+    id: '12',
+    title: 'كاميرا كانون احترافية',
+    title_en: 'Canon Professional Camera',
+    description: 'كاميرا كانون EOS R5، مع عدسة 24-70 ملم.',
+    description_en: 'Canon EOS R5 camera with 24-70mm lens.',
+    price: 3500,
+    currency: 'USD',
+    category: 'electronics',
+    is_featured: false,
+    created_at: '2025-04-30T09:15:00Z',
+    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: 4, name_ar: 'المالكي', name_en: 'Al Malki' },
+    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   },
   
-  // Clothes listings
+  // Furniture Listings (4)
   {
-    id: 'clothes-1',
-    title: 'فستان سهرة فاخر',
-    title_en: 'Luxury evening dress',
-    description: 'فستان سهرة راقي مناسب للمناسبات الخاصة',
-    description_en: 'Elegant evening dress for special occasions',
-    price: 750000,
-    currency: 'SYP',
-    category: 'clothing',
-    category_ar: 'ملابس',
-    category_en: 'Clothes',
-    condition: 'new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/dress-1.jpg'],
-    created_at: new Date(Date.now() - 518400000).toISOString(), // 6 days ago
-    updated_at: new Date(Date.now() - 518400000).toISOString(),
-    user_id: 'mock-user-7',
-    governorate_id: 'damascus',
-    district_id: 'malki',
+    id: '13',
+    title: 'غرفة نوم كاملة',
+    title_en: 'Complete Bedroom Set',
+    description: 'غرفة نوم كاملة، خشب زان، صناعة محلية ممتازة.',
+    description_en: 'Complete bedroom set, beech wood, excellent local craftsmanship.',
+    price: 2000,
+    currency: 'USD',
+    category: 'furniture',
     is_featured: true,
-    status: 'active',
-    views: 95,
-    governorate: { 
-      id: 'damascus', 
-      name_ar: 'دمشق', 
-      name_en: 'Damascus',
-      created_at: new Date().toISOString()
-    },
-    district: { 
-      id: 'malki', 
-      name_ar: 'المالكي', 
-      name_en: 'Malki',
-      governorate_id: 'damascus',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-05T14:20:00Z',
+    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: 6, name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
+    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
-    id: 'clothes-2',
-    title: 'بدلة رجالية ماركة',
-    title_en: 'Brand name men suit',
-    description: 'بدلة رجالية راقية من ماركة إيطالية',
-    description_en: 'Elegant men suit from Italian brand',
-    price: 900000,
-    currency: 'SYP',
-    category: 'clothing',
-    category_ar: 'ملابس',
-    category_en: 'Clothes',
-    condition: 'like_new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/suit-1.jpg'],
-    created_at: new Date(Date.now() - 604800000).toISOString(), // 7 days ago
-    updated_at: new Date(Date.now() - 604800000).toISOString(),
-    user_id: 'mock-user-8',
-    governorate_id: 'aleppo',
-    district_id: 'aziziyeh',
-    is_featured: false,
-    status: 'active',
-    views: 80,
-    governorate: { 
-      id: 'aleppo', 
-      name_ar: 'حلب', 
-      name_en: 'Aleppo',
-      created_at: new Date().toISOString()
-    },
-    district: { 
-      id: 'aziziyeh', 
-      name_ar: 'العزيزية', 
-      name_en: 'Aziziyeh',
-      governorate_id: 'aleppo',
-      created_at: new Date().toISOString()
-    }
-  },
-  {
-    id: 'clothes-3',
-    title: 'حذاء رياضي نايك',
-    title_en: 'Nike sports shoes',
-    description: 'حذاء رياضي نايك جديد لون أسود مقاس 43',
-    description_en: 'New Nike sports shoes, black color, size 43',
-    price: 450000,
-    currency: 'SYP',
-    category: 'clothing',
-    category_ar: 'ملابس',
-    category_en: 'Clothes',
-    condition: 'new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/shoes-1.jpg'],
-    created_at: new Date(Date.now() - 691200000).toISOString(), // 8 days ago
-    updated_at: new Date(Date.now() - 691200000).toISOString(),
-    user_id: 'mock-user-9',
-    governorate_id: 'latakia',
-    district_id: 'center',
-    is_featured: false,
-    status: 'active',
-    views: 78,
-    governorate: {
-      id: 'latakia',
-      name_ar: 'اللاذقية',
-      name_en: 'Latakia',
-      created_at: new Date().toISOString()
-    },
-    district: {
-      id: 'center',
-      name_ar: 'وسط المدينة',
-      name_en: 'City Center',
-      governorate_id: 'latakia',
-      created_at: new Date().toISOString()
-    }
-  },
-  {
-    id: 'clothes-4',
-    title: 'جاكيت جلد أصلي',
-    title_en: 'Genuine leather jacket',
-    description: 'جاكيت من الجلد الطبيعي بحالة ممتازة',
-    description_en: 'Genuine leather jacket in excellent condition',
-    price: 650000,
-    currency: 'SYP',
-    category: 'clothing',
-    category_ar: 'ملابس',
-    category_en: 'Clothes',
-    condition: 'used',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/jacket-1.jpg'],
-    created_at: new Date(Date.now() - 777600000).toISOString(), // 9 days ago
-    updated_at: new Date(Date.now() - 777600000).toISOString(),
-    user_id: 'mock-user-10',
-    governorate_id: 'damascus',
-    district_id: 'shaalan',
-    is_featured: true,
-    status: 'active',
-    views: 115,
-    governorate: {
-      id: 'damascus',
-      name_ar: 'دمشق',
-      name_en: 'Damascus',
-      created_at: new Date().toISOString()
-    },
-    district: {
-      id: 'shaalan',
-      name_ar: 'الشعلان',
-      name_en: 'Shaalan',
-      governorate_id: 'damascus',
-      created_at: new Date().toISOString()
-    }
-  },
-  
-  // Furniture listings
-  {
-    id: 'furniture-1',
+    id: '14',
     title: 'طقم كنب مودرن',
-    title_en: 'Modern sofa set',
-    description: 'طقم كنب عصري مكون من 3 قطع مع طاولة وسط',
-    description_en: 'Modern 3-piece sofa set with center table',
-    price: 3500000,
-    currency: 'SYP',
+    title_en: 'Modern Sofa Set',
+    description: 'طقم كنب مودرن، 3 قطع، لون رمادي، قماش مستورد مقاوم للبقع.',
+    description_en: 'Modern sofa set, 3 pieces, gray color, imported stain-resistant fabric.',
+    price: 1500,
+    currency: 'USD',
     category: 'furniture',
-    category_ar: 'أثاث',
-    category_en: 'Furniture',
-    condition: 'new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/sofa-1.jpg'],
-    created_at: new Date(Date.now() - 691200000).toISOString(), // 8 days ago
-    updated_at: new Date(Date.now() - 691200000).toISOString(),
-    user_id: 'mock-user-9',
-    governorate_id: 'damascus',
-    district_id: 'mezzeh',
-    is_featured: true,
-    status: 'active',
-    views: 130,
-    governorate: { 
-      id: 'damascus', 
-      name_ar: 'دمشق', 
-      name_en: 'Damascus',
-      created_at: new Date().toISOString()
-    },
-    district: { 
-      id: 'mezzeh', 
-      name_ar: 'المزة', 
-      name_en: 'Mezzeh',
-      governorate_id: 'damascus',
-      created_at: new Date().toISOString()
-    }
-  },
-  {
-    id: 'furniture-2',
-    title: 'غرفة نوم خشب زان',
-    title_en: 'Oak wood bedroom set',
-    description: 'غرفة نوم كاملة من خشب الزان الأصلي',
-    description_en: 'Complete bedroom set made of genuine oak wood',
-    price: 5200000,
-    currency: 'SYP',
-    category: 'furniture',
-    category_ar: 'أثاث',
-    category_en: 'Furniture',
-    condition: 'good',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/bedroom-1.jpg'],
-    created_at: new Date(Date.now() - 777600000).toISOString(), // 9 days ago
-    updated_at: new Date(Date.now() - 777600000).toISOString(),
-    user_id: 'mock-user-10',
-    governorate_id: 'homs',
-    district_id: 'hamra',
     is_featured: false,
-    status: 'active',
-    views: 110,
-    governorate: { 
-      id: 'homs', 
-      name_ar: 'حمص', 
-      name_en: 'Homs',
-      created_at: new Date().toISOString()
-    },
-    district: { 
-      id: 'hamra', 
-      name_ar: 'الحمراء', 
-      name_en: 'Hamra',
-      governorate_id: 'homs',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-02T16:30:00Z',
+    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: 2, name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
-    id: 'furniture-3',
-    title: 'طاولة طعام خشبية للعائلة',
-    title_en: 'Wooden family dining table',
-    description: 'طاولة طعام خشبية كبيرة تتسع لـ8 أشخاص',
-    description_en: 'Large wooden dining table for 8 people',
-    price: 2100000,
-    currency: 'SYP',
+    id: '15',
+    title: 'طاولة طعام مع 6 كراسي',
+    title_en: 'Dining Table with 6 Chairs',
+    description: 'طاولة طعام خشبية مع 6 كراسي، تصميم كلاسيكي أنيق.',
+    description_en: 'Wooden dining table with 6 chairs, elegant classic design.',
+    price: 1200,
+    currency: 'USD',
     category: 'furniture',
-    category_ar: 'أثاث',
-    category_en: 'Furniture',
-    condition: 'excellent',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/table-1.jpg'],
-    created_at: new Date(Date.now() - 864000000).toISOString(), // 10 days ago
-    updated_at: new Date(Date.now() - 864000000).toISOString(),
-    user_id: 'mock-user-11',
-    governorate_id: 'aleppo',
-    district_id: 'north',
     is_featured: false,
-    status: 'active',
-    views: 95,
-    governorate: {
-      id: 'aleppo',
-      name_ar: 'حلب',
-      name_en: 'Aleppo',
-      created_at: new Date().toISOString()
-    },
-    district: {
-      id: 'north',
-      name_ar: 'الشمال',
-      name_en: 'North',
-      governorate_id: 'aleppo',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-04-29T11:20:00Z',
+    governorate: { id: 4, name_ar: 'حمص', name_en: 'Homs' },
+    district: { id: 15, name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
+    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
   },
   {
-    id: 'furniture-4',
-    title: 'خزانة ملابس بمرآة',
-    title_en: 'Wardrobe with mirror',
-    description: 'خزانة ملابس عصرية مع مرآة كاملة الارتفاع',
-    description_en: 'Modern wardrobe with full-length mirror',
-    price: 1800000,
-    currency: 'SYP',
+    id: '16',
+    title: 'مكتب دراسة للأطفال',
+    title_en: 'Children\'s Study Desk',
+    description: 'مكتب دراسة للأطفال مع رفوف للكتب وإضاءة LED.',
+    description_en: 'Study desk for children with bookshelves and LED lighting.',
+    price: 300,
+    currency: 'USD',
     category: 'furniture',
-    category_ar: 'أثاث',
-    category_en: 'Furniture',
-    condition: 'new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/wardrobe-1.jpg'],
-    created_at: new Date(Date.now() - 950400000).toISOString(), // 11 days ago
-    updated_at: new Date(Date.now() - 950400000).toISOString(),
-    user_id: 'mock-user-12',
-    governorate_id: 'latakia',
-    district_id: 'corniche',
     is_featured: true,
-    status: 'active',
-    views: 140,
-    governorate: {
-      id: 'latakia',
-      name_ar: 'اللاذقية',
-      name_en: 'Latakia',
-      created_at: new Date().toISOString()
-    },
-    district: {
-      id: 'corniche',
-      name_ar: 'الكورنيش',
-      name_en: 'Corniche',
-      governorate_id: 'latakia',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-07T13:45:00Z',
+    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: 11, name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
+    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   },
   
-  // Jobs listings
+  // Jobs Listings (4)
   {
-    id: 'jobs-1',
+    id: '17',
     title: 'مطلوب مهندس برمجيات',
-    title_en: 'Software engineer needed',
-    description: 'شركة تقنية تبحث عن مهندس برمجيات ذو خبرة',
-    description_en: 'Tech company looking for experienced software engineer',
-    price: 1000000,
-    currency: 'SYP',
+    title_en: 'Software Engineer Wanted',
+    description: 'شركة تقنية رائدة تبحث عن مهندس برمجيات ذو خبرة في الويب والموبايل.',
+    description_en: 'Leading tech company looking for software engineer with experience in web and mobile development.',
+    price: 1500,
+    currency: 'USD',
     category: 'jobs',
-    category_ar: 'وظائف',
-    category_en: 'Jobs',
-    condition: 'new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/job-1.jpg'],
-    created_at: new Date(Date.now() - 864000000).toISOString(), // 10 days ago
-    updated_at: new Date(Date.now() - 864000000).toISOString(),
-    user_id: 'mock-user-11',
-    governorate_id: 'damascus',
-    district_id: 'baramkeh',
     is_featured: true,
-    status: 'active',
-    views: 240,
-    governorate: { 
-      id: 'damascus', 
-      name_ar: 'دمشق', 
-      name_en: 'Damascus',
-      created_at: new Date().toISOString()
-    },
-    district: { 
-      id: 'baramkeh', 
-      name_ar: 'البرامكة', 
-      name_en: 'Baramkeh',
-      governorate_id: 'damascus',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-06T09:30:00Z',
+    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: 1, name_ar: 'المزة', name_en: 'Al Mazzeh' },
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
-    id: 'jobs-2',
-    title: 'وظيفة محاسب',
-    title_en: 'Accountant position',
-    description: 'مطلوب محاسب للعمل في شركة تجارية',
-    description_en: 'Accountant needed for commercial company',
-    price: 800000,
-    currency: 'SYP',
+    id: '18',
+    title: 'فرصة عمل في المبيعات',
+    title_en: 'Job Opportunity in Sales',
+    description: 'مطلوب موظف مبيعات للعمل بدوام كامل في متجر إلكترونيات.',
+    description_en: 'Sales representative needed for full-time work in electronics store.',
+    price: 600,
+    currency: 'USD',
     category: 'jobs',
-    category_ar: 'وظائف',
-    category_en: 'Jobs',
-    condition: 'new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/job-2.jpg'],
-    created_at: new Date(Date.now() - 950400000).toISOString(), // 11 days ago
-    updated_at: new Date(Date.now() - 950400000).toISOString(),
-    user_id: 'mock-user-12',
-    governorate_id: 'latakia',
-    district_id: 'center',
     is_featured: false,
-    status: 'active',
-    views: 180,
-    governorate: { 
-      id: 'latakia', 
-      name_ar: 'اللاذقية', 
-      name_en: 'Latakia',
-      created_at: new Date().toISOString()
-    },
-    district: { 
-      id: 'center', 
-      name_ar: 'وسط المدينة', 
-      name_en: 'City Center',
-      governorate_id: 'latakia',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-03T14:15:00Z',
+    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: 5, name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
+    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
-    id: 'jobs-3',
-    title: 'مطلوب مصمم جرافيك',
-    title_en: 'Graphic designer needed',
-    description: 'شركة دعاية تبحث عن مصمم جرافيك محترف',
-    description_en: 'Advertising company looking for professional graphic designer',
-    price: 750000,
-    currency: 'SYP',
+    id: '19',
+    title: 'مطلوب محاسب',
+    title_en: 'Accountant Needed',
+    description: 'شركة تجارية تبحث عن محاسب بخبرة لا تقل عن 3 سنوات.',
+    description_en: 'Commercial company looking for accountant with minimum 3 years experience.',
+    price: 800,
+    currency: 'USD',
     category: 'jobs',
-    category_ar: 'وظائف',
-    category_en: 'Jobs',
-    condition: 'new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/job-3.jpg'],
-    created_at: new Date(Date.now() - 1036800000).toISOString(), // 12 days ago
-    updated_at: new Date(Date.now() - 1036800000).toISOString(),
-    user_id: 'mock-user-13',
-    governorate_id: 'damascus',
-    district_id: 'malki',
     is_featured: false,
-    status: 'active',
-    views: 170,
-    governorate: {
-      id: 'damascus',
-      name_ar: 'دمشق',
-      name_en: 'Damascus',
-      created_at: new Date().toISOString()
-    },
-    district: {
-      id: 'malki',
-      name_ar: 'المالكي',
-      name_en: 'Malki',
-      governorate_id: 'damascus',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-04-30T10:45:00Z',
+    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: 10, name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
+    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
   },
   {
-    id: 'jobs-4',
-    title: 'فرص عمل لمترجمين',
-    title_en: 'Job opportunities for translators',
-    description: 'مكتب ترجمة يطلب مترجمين من وإلى اللغة الإنكليزية',
-    description_en: 'Translation office requesting English translators',
-    price: 700000,
-    currency: 'SYP',
+    id: '20',
+    title: 'مطلوب سائق',
+    title_en: 'Driver Needed',
+    description: 'مطلوب سائق مع سيارة للعمل في توصيل الطلبات.',
+    description_en: 'Driver with car needed for delivery orders.',
+    price: 500,
+    currency: 'USD',
     category: 'jobs',
-    category_ar: 'وظائف',
-    category_en: 'Jobs',
-    condition: 'new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/job-4.jpg'],
-    created_at: new Date(Date.now() - 1123200000).toISOString(), // 13 days ago
-    updated_at: new Date(Date.now() - 1123200000).toISOString(),
-    user_id: 'mock-user-14',
-    governorate_id: 'aleppo',
-    district_id: 'center',
     is_featured: true,
-    status: 'active',
-    views: 190,
-    governorate: {
-      id: 'aleppo',
-      name_ar: 'حلب',
-      name_en: 'Aleppo',
-      created_at: new Date().toISOString()
-    },
-    district: {
-      id: 'center',
-      name_ar: 'وسط المدينة',
-      name_en: 'City Center',
-      governorate_id: 'aleppo',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-07T16:20:00Z',
+    governorate: { id: 4, name_ar: 'حمص', name_en: 'Homs' },
+    district: { id: 15, name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
+    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   },
   
-  // Services listings
+  // Services Listings (4)
   {
-    id: 'services-1',
-    title: 'خدمات تصميم مواقع',
-    title_en: 'Website design services',
-    description: 'تصميم مواقع احترافية بأسعار منافسة',
-    description_en: 'Professional website design at competitive prices',
-    price: 1500000,
-    currency: 'SYP',
+    id: '21',
+    title: 'خدمات تصميم مواقع إلكترونية',
+    title_en: 'Website Design Services',
+    description: 'تصميم مواقع احترافية متوافقة مع جميع الأجهزة بأسعار منافسة.',
+    description_en: 'Professional website design compatible with all devices at competitive prices.',
+    price: 500,
+    currency: 'USD',
     category: 'services',
-    category_ar: 'خدمات',
-    category_en: 'Services',
-    condition: 'new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/service-1.jpg'],
-    created_at: new Date(Date.now() - 1036800000).toISOString(), // 12 days ago
-    updated_at: new Date(Date.now() - 1036800000).toISOString(),
-    user_id: 'mock-user-13',
-    governorate_id: 'damascus',
-    district_id: 'tijara',
     is_featured: true,
-    status: 'active',
-    views: 200,
-    governorate: { 
-      id: 'damascus', 
-      name_ar: 'دمشق', 
-      name_en: 'Damascus',
-      created_at: new Date().toISOString()
-    },
-    district: { 
-      id: 'tijara', 
-      name_ar: 'التجارة', 
-      name_en: 'Tijara',
-      governorate_id: 'damascus',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-04T12:30:00Z',
+    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: 2, name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
   },
   {
-    id: 'services-2',
-    title: 'دروس خصوصية رياضيات',
-    title_en: 'Private math lessons',
-    description: 'مدرس خبير يقدم دروس رياضيات لجميع المراحل',
-    description_en: 'Expert teacher offers math lessons for all levels',
-    price: 50000,
-    currency: 'SYP',
-    category: 'services',
-    category_ar: 'خدمات',
-    category_en: 'Services',
-    condition: 'new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/service-2.jpg'],
-    created_at: new Date(Date.now() - 1123200000).toISOString(), // 13 days ago
-    updated_at: new Date(Date.now() - 1123200000).toISOString(),
-    user_id: 'mock-user-14',
-    governorate_id: 'hama',
-    district_id: 'center',
-    is_featured: false,
-    status: 'active',
-    views: 95,
-    governorate: { 
-      id: 'hama', 
-      name_ar: 'حماة', 
-      name_en: 'Hama',
-      created_at: new Date().toISOString()
-    },
-    district: { 
-      id: 'center', 
-      name_ar: 'وسط المدينة', 
-      name_en: 'City Center',
-      governorate_id: 'hama',
-      created_at: new Date().toISOString()
-    }
-  },
-  {
-    id: 'services-3',
+    id: '22',
     title: 'خدمات نقل وتوصيل',
-    title_en: 'Transport and delivery services',
-    description: 'خدمات نقل وتوصيل البضائع داخل وخارج المدينة',
-    description_en: 'Transport and delivery services within and outside the city',
-    price: 250000,
-    currency: 'SYP',
+    title_en: 'Transport and Delivery Services',
+    description: 'خدمات نقل البضائع والأثاث داخل المدينة وبين المحافظات.',
+    description_en: 'Goods and furniture transport services within the city and between governorates.',
+    price: 200,
+    currency: 'USD',
     category: 'services',
-    category_ar: 'خدمات',
-    category_en: 'Services',
-    condition: 'new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/service-3.jpg'],
-    created_at: new Date(Date.now() - 1209600000).toISOString(), // 14 days ago
-    updated_at: new Date(Date.now() - 1209600000).toISOString(),
-    user_id: 'mock-user-1',
-    governorate_id: 'damascus',
-    district_id: 'mezzeh',
     is_featured: false,
-    status: 'active',
-    views: 110,
-    governorate: {
-      id: 'damascus',
-      name_ar: 'دمشق',
-      name_en: 'Damascus',
-      created_at: new Date().toISOString()
-    },
-    district: {
-      id: 'mezzeh',
-      name_ar: 'المزة',
-      name_en: 'Mezzeh',
-      governorate_id: 'damascus',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-01T09:45:00Z',
+    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: 6, name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
+    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
   },
   {
-    id: 'services-4',
-    title: 'خدمات تنظيف المنازل',
-    title_en: 'Home cleaning services',
-    description: 'خدمات تنظيف شاملة للمنازل والمكاتب',
-    description_en: 'Comprehensive cleaning services for homes and offices',
-    price: 200000,
-    currency: 'SYP',
+    id: '23',
+    title: 'صيانة أجهزة كهربائية',
+    title_en: 'Electrical Appliance Maintenance',
+    description: 'صيانة جميع أنواع الأجهزة المنزلية والكهربائية بضمان.',
+    description_en: 'Maintenance of all types of household and electrical appliances with warranty.',
+    price: 100,
+    currency: 'USD',
     category: 'services',
-    category_ar: 'خدمات',
-    category_en: 'Services',
-    condition: 'new',
-    images: ['https://usxnzaqxdrphdfccrgew.supabase.co/storage/v1/object/public/listings/service-4.jpg'],
-    created_at: new Date(Date.now() - 1296000000).toISOString(), // 15 days ago
-    updated_at: new Date(Date.now() - 1296000000).toISOString(),
-    user_id: 'mock-user-2',
-    governorate_id: 'latakia',
-    district_id: 'center',
     is_featured: true,
-    status: 'active',
-    views: 125,
-    governorate: {
-      id: 'latakia',
-      name_ar: 'اللاذقية',
-      name_en: 'Latakia',
-      created_at: new Date().toISOString()
-    },
-    district: {
-      id: 'center',
-      name_ar: 'وسط المدينة',
-      name_en: 'City Center',
-      governorate_id: 'latakia',
-      created_at: new Date().toISOString()
-    }
+    created_at: '2025-05-06T15:10:00Z',
+    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: 11, name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
+    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
+  },
+  {
+    id: '24',
+    title: 'دروس خصوصية',
+    title_en: 'Private Lessons',
+    description: 'دروس خصوصية في الرياضيات والفيزياء للمرحلة الثانوية.',
+    description_en: 'Private lessons in mathematics and physics for high school students.',
+    price: 30,
+    currency: 'USD',
+    category: 'services',
+    is_featured: false,
+    created_at: '2025-04-29T16:50:00Z',
+    governorate: { id: 4, name_ar: 'حمص', name_en: 'Homs' },
+    district: { id: 15, name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
+    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
+  },
+  
+  // Fashion Listings (4)
+  {
+    id: '25',
+    title: 'فستان سهرة فاخر',
+    title_en: 'Luxury Evening Dress',
+    description: 'فستان سهرة فاخر، لون أحمر، مقاس M، استخدام مرة واحدة فقط.',
+    description_en: 'Luxury evening dress, red color, size M, used only once.',
+    price: 200,
+    currency: 'USD',
+    category: 'fashion',
+    is_featured: true,
+    created_at: '2025-05-05T17:30:00Z',
+    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: 1, name_ar: 'المزة', name_en: 'Al Mazzeh' },
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
+  },
+  {
+    id: '26',
+    title: 'حذاء رياضي نايك',
+    title_en: 'Nike Sneakers',
+    description: 'حذاء رياضي نايك أصلي، مقاس 43، لون أسود، جديد.',
+    description_en: 'Original Nike sneakers, size 43, black color, new.',
+    price: 150,
+    currency: 'USD',
+    category: 'fashion',
+    is_featured: false,
+    created_at: '2025-05-02T13:15:00Z',
+    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: 5, name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
+    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
+  },
+  {
+    id: '27',
+    title: 'حقيبة يد ماركة',
+    title_en: 'Designer Handbag',
+    description: 'حقيبة يد ماركة، جلد طبيعي، لون بني، حالة ممتازة.',
+    description_en: 'Designer handbag, genuine leather, brown color, excellent condition.',
+    price: 300,
+    currency: 'USD',
+    category: 'fashion',
+    is_featured: true,
+    created_at: '2025-05-07T11:40:00Z',
+    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: 10, name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
+    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
+  },
+  {
+    id: '28',
+    title: 'بدلة رجالية أنيقة',
+    title_en: 'Elegant Men\'s Suit',
+    description: 'بدلة رجالية أنيقة، لون كحلي، مقاس 52، قماش إيطالي.',
+    description_en: 'Elegant men\'s suit, navy blue color, size 52, Italian fabric.',
+    price: 400,
+    currency: 'USD',
+    category: 'fashion',
+    is_featured: false,
+    created_at: '2025-04-30T14:25:00Z',
+    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: 4, name_ar: 'المالكي', name_en: 'Al Malki' },
+    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
+  },
+  
+  // Books Listings (4)
+  {
+    id: '29',
+    title: 'رواية مئة عام من العزلة',
+    title_en: 'One Hundred Years of Solitude Novel',
+    description: 'رواية مئة عام من العزلة للكاتب غابرييل غارسيا ماركيز، طبعة جديدة.',
+    description_en: 'One Hundred Years of Solitude novel by Gabriel Garcia Marquez, new edition.',
+    price: 20,
+    currency: 'USD',
+    category: 'books',
+    is_featured: true,
+    created_at: '2025-05-06T10:15:00Z',
+    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: 2, name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
+  },
+  {
+    id: '30',
+    title: 'كتب دراسية جامعية',
+    title_en: 'University Textbooks',
+    description: 'مجموعة كتب دراسية لكلية الهندسة، حالة جيدة.',
+    description_en: 'Set of textbooks for the Faculty of Engineering, good condition.',
+    price: 50,
+    currency: 'USD',
+    category: 'books',
+    is_featured: false,
+    created_at: '2025-05-03T09:50:00Z',
+    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: 6, name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
+    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
+  },
+  {
+    id: '31',
+    title: 'قاموس إنجليزي - عربي',
+    title_en: 'English-Arabic Dictionary',
+    description: 'قاموس إنجليزي - عربي شامل، أكثر من 50,000 كلمة ومصطلح.',
+    description_en: 'Comprehensive English-Arabic dictionary, more than 50,000 words and terms.',
+    price: 30,
+    currency: 'USD',
+    category: 'books',
+    is_featured: true,
+    created_at: '2025-04-29T15:35:00Z',
+    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: 11, name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
+    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
+  },
+  {
+    id: '32',
+    title: 'كتاب طبخ شامل',
+    title_en: 'Comprehensive Cookbook',
+    description: 'كتاب طبخ شامل يحتوي على أكثر من 500 وصفة متنوعة.',
+    description_en: 'Comprehensive cookbook containing more than 500 various recipes.',
+    price: 25,
+    currency: 'USD',
+    category: 'books',
+    is_featured: false,
+    created_at: '2025-05-01T16:10:00Z',
+    governorate: { id: 4, name_ar: 'حمص', name_en: 'Homs' },
+    district: { id: 15, name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
+    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
+  },
+  
+  // Pets Listings (4)
+  {
+    id: '33',
+    title: 'قطة شيرازي للبيع',
+    title_en: 'Persian Cat for Sale',
+    description: 'قطة شيرازي بيضاء، عمر 3 أشهر، مطعمة بالكامل.',
+    description_en: 'White Persian cat, 3 months old, fully vaccinated.',
+    price: 150,
+    currency: 'USD',
+    category: 'pets',
+    is_featured: true,
+    created_at: '2025-05-07T14:30:00Z',
+    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: 1, name_ar: 'المزة', name_en: 'Al Mazzeh' },
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
+  },
+  {
+    id: '34',
+    title: 'كلب جيرمن شيبرد',
+    title_en: 'German Shepherd Dog',
+    description: 'كلب جيرمن شيبرد، عمر سنة، مدرب على الطاعة والحراسة.',
+    description_en: 'German Shepherd dog, 1 year old, trained for obedience and guarding.',
+    price: 400,
+    currency: 'USD',
+    category: 'pets',
+    is_featured: false,
+    created_at: '2025-05-04T11:15:00Z',
+    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: 5, name_ar: 'الجميلية', name_en: 'Al Jamiliyah' },
+    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
+  },
+  {
+    id: '35',
+    title: 'أحواض سمك مع إكسسوارات',
+    title_en: 'Fish Tanks with Accessories',
+    description: 'أحواض سمك مختلفة الأحجام مع إكسسوارات كاملة.',
+    description_en: 'Fish tanks of various sizes with complete accessories.',
+    price: 80,
+    currency: 'USD',
+    category: 'pets',
+    is_featured: true,
+    created_at: '2025-04-30T13:20:00Z',
+    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: 10, name_ar: 'الرمل الشمالي', name_en: 'Northern Sand' },
+    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
+  },
+  {
+    id: '36',
+    title: 'طيور كناري للبيع',
+    title_en: 'Canary Birds for Sale',
+    description: 'طيور كناري مغردة، ألوان متنوعة، صحية وحيوية.',
+    description_en: 'Singing canary birds, various colors, healthy and lively.',
+    price: 40,
+    currency: 'USD',
+    category: 'pets',
+    is_featured: false,
+    created_at: '2025-05-02T10:50:00Z',
+    governorate: { id: 4, name_ar: 'حمص', name_en: 'Homs' },
+    district: { id: 15, name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
+    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
+  },
+  
+  // Sports Listings (4)
+  {
+    id: '37',
+    title: 'دراجة هوائية جبلية',
+    title_en: 'Mountain Bike',
+    description: 'دراجة هوائية جبلية، ماركة عالمية، 21 سرعة، إطارات مقاومة للثقب.',
+    description_en: 'Mountain bike, global brand, 21 speeds, puncture-resistant tires.',
+    price: 300,
+    currency: 'USD',
+    category: 'sports',
+    is_featured: true,
+    created_at: '2025-05-06T11:40:00Z',
+    governorate: { id: 1, name_ar: 'دمشق', name_en: 'Damascus' },
+    district: { id: 2, name_ar: 'المهاجرين', name_en: 'Al Muhajirin' },
+    images: ['/lovable-uploads/1e0deb8b-a2b8-42ab-90b6-ac4374de1d73.png']
+  },
+  {
+    id: '38',
+    title: 'طاولة تنس كاملة',
+    title_en: 'Complete Table Tennis Set',
+    description: 'طاولة تنس كاملة مع مضارب وكرات وشبكة، قابلة للطي.',
+    description_en: 'Complete table tennis set with paddles, balls, and net, foldable.',
+    price: 250,
+    currency: 'USD',
+    category: 'sports',
+    is_featured: false,
+    created_at: '2025-05-01T15:20:00Z',
+    governorate: { id: 2, name_ar: 'حلب', name_en: 'Aleppo' },
+    district: { id: 6, name_ar: 'الشهباء', name_en: 'Al Shahbaa' },
+    images: ['/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png']
+  },
+  {
+    id: '39',
+    title: 'معدات رياضية منزلية',
+    title_en: 'Home Gym Equipment',
+    description: 'معدات رياضية منزلية كاملة، حالة ممتازة، قليلة الاستخدام.',
+    description_en: 'Complete home gym equipment, excellent condition, lightly used.',
+    price: 500,
+    currency: 'USD',
+    category: 'sports',
+    is_featured: true,
+    created_at: '2025-04-29T12:10:00Z',
+    governorate: { id: 3, name_ar: 'اللاذقية', name_en: 'Latakia' },
+    district: { id: 11, name_ar: 'الأوقاف', name_en: 'Al Awqaf' },
+    images: ['/lovable-uploads/c2543a79-754d-4173-9d08-265638dc66e5.png']
+  },
+  {
+    id: '40',
+    title: 'ملابس رياضية أصلية',
+    title_en: 'Original Sports Clothing',
+    description: 'ملابس رياضية أصلية، ماركات عالمية، مقاسات متنوعة.',
+    description_en: 'Original sports clothing, global brands, various sizes.',
+    price: 100,
+    currency: 'USD',
+    category: 'sports',
+    is_featured: false,
+    created_at: '2025-05-05T09:45:00Z',
+    governorate: { id: 4, name_ar: 'حمص', name_en: 'Homs' },
+    district: { id: 15, name_ar: 'الخالدية', name_en: 'Al Khalidiyah' },
+    images: ['/lovable-uploads/e71c435a-b8b5-4801-b631-a311f24b034f.png']
   }
 ];
 
-export const getListingsByCategory = async (category: string, count = 12): Promise<ListingWithRelations[]> => {
-  try {
-    console.log(`Fetching listings by category: ${category}`);
-    
-    // Use mock data instead of DB call for testing
-    if (process.env.NODE_ENV === 'development' || true) { // Always use mock data for now
-      console.log('Using mock data instead of DB call');
-      
-      let filteredListings = [...mockListings];
-      
-      // Only filter by category if it's not 'all'
-      if (category && category !== 'all') {
-        const dbCategory = mapCategoryToEnum(category);
-        console.log(`Applying category filter: ${category} (mapped to: ${dbCategory})`);
-        filteredListings = filteredListings.filter(listing => listing.category === dbCategory);
-      } else {
-        console.log('Showing all categories - no category filter applied');
-      }
-      
-      // Sort by created_at descending (newest first)
-      filteredListings.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-      
-      // Limit results
-      filteredListings = filteredListings.slice(0, count);
-      
-      console.log(`Retrieved ${filteredListings.length} mock listings for category ${category}`);
-      return filteredListings as ListingWithRelations[];
-    }
-    
-    // Original database query code
-    let query = supabase
-      .from('listings')
-      .select(`
-        *,
-        governorate:governorate_id(*),
-        district:district_id(*)
-      `)
-      .eq('status', 'active')
-      .order('created_at', { ascending: false });
-    
-    // Only filter by category if it's not 'all'
-    if (category && category !== 'all') {
-      const dbCategory = mapCategoryToEnum(category);
-      console.log(`Applying category filter: ${category} (mapped to: ${dbCategory})`);
-      query = query.eq('category', dbCategory);
-    } else {
-      console.log('Showing all categories - no category filter applied');
-    }
-    
-    // Add limit
-    query = query.limit(count);
-    
-    const { data, error } = await query;
-    
-    if (error) {
-      console.error('Error fetching listings by category:', error);
-      throw error;
-    }
-    
-    console.log(`Retrieved ${data?.length || 0} listings for category ${category}`, data);
-    return data || [];
-  } catch (error) {
-    console.error('Error getting listings by category:', error);
-    throw error;
+/**
+ * Search listings based on the provided filters
+ * @param filters The filters to apply to the search
+ * @returns List of listings that match the filters
+ */
+export const searchListings = (filters: ListingFilters): Promise<ListingWithRelations[]> => {
+  console.log('Searching with filters:', filters);
+  
+  // In a real app, this would be an API call to a database
+  // For this example, we'll use mock data
+  console.log('Using mock data instead of DB call for search');
+  
+  let results = [...mockListingsData];
+  
+  // Apply category filter if specified
+  if (filters.category) {
+    console.log('Mapping category \'' + filters.category + '\' to enum value:', filters.category);
+    console.log('Applying category filter:', filters.category, '(mapped to:', filters.category, ')');
+    results = results.filter(listing => listing.category === filters.category);
   }
-};
-
-export const getFeaturedListings = async (count = 8): Promise<ListingWithRelations[]> => {
-  try {
-    // Use mock data instead of DB call for testing
-    if (process.env.NODE_ENV === 'development' || true) { // Always use mock data for now
-      console.log('Using mock data instead of DB call for featured listings');
-      
-      let featuredListings = mockListings.filter(listing => listing.is_featured);
-      
-      // Sort by created_at descending (newest first)
-      featuredListings.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-      
-      // Limit results
-      featuredListings = featuredListings.slice(0, count);
-      
-      console.log(`Retrieved ${featuredListings.length} mock featured listings`);
-      return featuredListings as ListingWithRelations[];
-    }
-    
-    // Original database query
-    const { data, error } = await supabase
-      .from('listings')
-      .select(`
-        *,
-        governorate:governorate_id(*),
-        district:district_id(*)
-      `)
-      .eq('is_featured', true)
-      .eq('status', 'active')
-      .order('created_at', { ascending: false })
-      .limit(count);
-      
-    if (error) {
-      throw error;
-    }
-    
-    return data || [];
-  } catch (error) {
-    console.error('Error getting featured listings:', error);
-    throw error;
+  
+  // Apply query filter if specified
+  if (filters.query) {
+    const query = filters.query.toLowerCase();
+    results = results.filter(listing => 
+      listing.title?.toLowerCase().includes(query) || 
+      listing.description?.toLowerCase().includes(query)
+    );
   }
-};
-
-export const searchListings = async (filters: ListingFilters): Promise<ListingWithRelations[]> => {
-  try {
-    console.log("Searching with filters:", filters);
-    
-    // Use mock data instead of DB call for testing
-    if (process.env.NODE_ENV === 'development' || true) { // Always use mock data for now
-      console.log('Using mock data instead of DB call for search');
-      
-      let results = [...mockListings];
-      
-      // Apply category filter only if category is specified and not 'all'
-      if (filters.category && filters.category !== 'all' && filters.category !== '') {
-        const dbCategory = mapCategoryToEnum(filters.category);
-        console.log("Applying category filter:", filters.category, "(mapped to:", dbCategory, ")");
-        results = results.filter(listing => listing.category === dbCategory);
-      }
-      
-      // Apply governorate filter
-      if (filters.governorate_id) {
-        console.log("Applying governorate filter:", filters.governorate_id);
-        results = results.filter(listing => listing.governorate_id === filters.governorate_id);
-      }
-      
-      // Apply district filter
-      if (filters.district_id) {
-        console.log("Applying district filter:", filters.district_id);
-        results = results.filter(listing => listing.district_id === filters.district_id);
-      }
-      
-      // Apply urgent/featured filter
-      if (filters.urgent === true) {
-        console.log("Applying urgent/featured filter");
-        results = results.filter(listing => listing.is_featured === true);
-      }
-      
-      // Apply currency filter
-      if (filters.currency) {
-        console.log("Applying currency filter:", filters.currency);
-        results = results.filter(listing => listing.currency === filters.currency);
-      }
-      
-      // Apply price range filters
-      if (filters.priceMin !== undefined && filters.priceMin > 0) {
-        console.log("Applying min price filter:", filters.priceMin);
-        results = results.filter(listing => listing.price >= filters.priceMin!);
-      }
-      
-      if (filters.priceMax !== undefined && filters.priceMax > 0) {
-        console.log("Applying max price filter:", filters.priceMax);
-        results = results.filter(listing => listing.price <= filters.priceMax!);
-      }
-      
-      // Apply text search
-      if (filters.query) {
-        const searchQuery = filters.query.toLowerCase();
-        console.log("Applying text search filter:", searchQuery);
-        results = results.filter(listing => {
-          const matchTitle = listing.title.toLowerCase().includes(searchQuery);
-          const matchTitleEn = listing.title_en ? listing.title_en.toLowerCase().includes(searchQuery) : false;
-          const matchDesc = listing.description ? listing.description.toLowerCase().includes(searchQuery) : false;
-          const matchDescEn = (listing as MockListingWithRelations).description_en ? 
-            (listing as MockListingWithRelations).description_en!.toLowerCase().includes(searchQuery) : false;
-            
-          return matchTitle || matchTitleEn || matchDesc || matchDescEn;
-        });
-      }
-      
-      // Apply sorting
-      if (filters.sortBy) {
-        console.log("Applying sort filter:", filters.sortBy);
-        switch (filters.sortBy) {
-          case 'price_low_high':
-            results.sort((a, b) => a.price - b.price);
-            break;
-          case 'price_high_low':
-            results.sort((a, b) => b.price - a.price);
-            break;
-          case 'oldest':
-            results.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-            break;
-          case 'views':
-            results.sort((a, b) => b.views - a.views);
-            break;
-          default:
-            results.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()); // Newest by default
-            break;
-        }
-      } else {
+  
+  // Apply location filter if specified
+  if (filters.governorate_id) {
+    results = results.filter(listing => listing.governorate?.id === Number(filters.governorate_id));
+  }
+  
+  if (filters.district_id) {
+    results = results.filter(listing => listing.district?.id === Number(filters.district_id));
+  }
+  
+  // Apply price filters if specified
+  if (filters.priceMin !== undefined) {
+    results = results.filter(listing => (listing.price || 0) >= (filters.priceMin || 0));
+  }
+  
+  if (filters.priceMax !== undefined) {
+    results = results.filter(listing => (listing.price || 0) <= (filters.priceMax || 0));
+  }
+  
+  // Apply sorting
+  if (filters.sortBy) {
+    console.log('Applying sort filter:', filters.sortBy);
+    switch (filters.sortBy) {
+      case 'newest':
         results.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-      }
-      
-      // Apply condition filter
-      if (filters.condition && filters.condition.length > 0) {
-        console.log("Applying condition filter:", filters.condition);
-        results = results.filter(listing => {
-          const itemCondition = (listing as MockListingWithRelations).condition;
-          return !itemCondition || filters.condition!.includes(itemCondition);
-        });
-      }
-      
-      // Apply images-only filter
-      if (filters.showWithImagesOnly) {
-        console.log("Applying images-only filter");
-        results = results.filter(listing => 
-          listing.images && listing.images.length > 0
-        );
-      }
-      
-      console.log("Search results:", results.length);
-      return results as ListingWithRelations[];
+        break;
+      case 'oldest':
+        results.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        break;
+      case 'price_high_low':
+        results.sort((a, b) => (b.price || 0) - (a.price || 0));
+        break;
+      case 'price_low_high':
+        results.sort((a, b) => (a.price || 0) - (b.price || 0));
+        break;
     }
-    
-    // Original database query code
-    let query = supabase
-      .from('listings')
-      .select(`
-        *,
-        governorate:governorate_id(*),
-        district:district_id(*)
-      `)
-      .eq('status', 'active');
-    
-    // Apply category filter only if category is specified and not 'all'
-    if (filters.category && filters.category !== 'all' && filters.category !== '') {
-      const dbCategory = mapCategoryToEnum(filters.category);
-      console.log("Applying category filter:", filters.category, "(mapped to:", dbCategory, ")");
-      query = query.eq('category', dbCategory);
-    } else {
-      console.log("No category filter applied or showing all categories");
-    }
-    
-    if (filters.governorate_id) {
-      console.log("Applying governorate filter:", filters.governorate_id);
-      query = query.eq('governorate_id', filters.governorate_id);
-    }
-    
-    if (filters.district_id) {
-      console.log("Applying district filter:", filters.district_id);
-      query = query.eq('district_id', filters.district_id);
-    }
-    
-    // Location filter by name if no explicit governorate or district
-    if (filters.location && filters.location !== 'all' && !filters.governorate_id && !filters.district_id) {
-      // This would work better with full-text search or a normalized location field
-      console.log("Applying location name filter:", filters.location);
-      // In a real implementation, this might be complex with joins or specific fields
-    }
-    
-    if (filters.urgent === true) {
-      console.log("Applying urgent/featured filter");
-      query = query.eq('is_featured', true);
-    }
-    
-    if (filters.currency) {
-      console.log("Applying currency filter:", filters.currency);
-      query = query.eq('currency', filters.currency);
-    }
-    
-    // Apply price range filters
-    if (filters.priceMin !== undefined && filters.priceMin > 0) {
-      console.log("Applying min price filter:", filters.priceMin);
-      query = query.gte('price', filters.priceMin);
-    }
-    
-    if (filters.priceMax !== undefined && filters.priceMax > 0) {
-      console.log("Applying max price filter:", filters.priceMax);
-      query = query.lte('price', filters.priceMax);
-    }
-    
-    // Apply sorting
-    if (filters.sortBy) {
-      console.log("Applying sort filter:", filters.sortBy);
-      switch (filters.sortBy) {
-        case 'price_low_high':
-          query = query.order('price', { ascending: true });
-          break;
-        case 'price_high_low':
-          query = query.order('price', { ascending: false });
-          break;
-        case 'oldest':
-          query = query.order('created_at', { ascending: true });
-          break;
-        case 'views':
-          query = query.order('views', { ascending: false });
-          break;
-        default:
-          query = query.order('created_at', { ascending: false }); // Newest by default
-          break;
-      }
-    } else {
-      query = query.order('created_at', { ascending: false });
-    }
-    
-    // Execute query
-    console.log("Executing search query");
-    const { data, error } = await query;
-    
-    if (error) {
-      console.error("Search error:", error);
-      throw error;
-    }
-    
-    let results = data || [];
-    console.log("Search results before filtering:", results.length);
-    
-    // Client-side filtering for text search
-    if (filters.query) {
-      const searchQuery = filters.query.toLowerCase();
-      console.log("Applying text search filter:", searchQuery);
-      results = results.filter(listing => 
-        listing.title.toLowerCase().includes(searchQuery) ||
-        (listing.description && listing.description.toLowerCase().includes(searchQuery))
-      );
-      console.log("Search results after text filtering:", results.length);
-    }
-    
-    // Client-side filtering for condition
-    if (filters.condition && filters.condition.length > 0) {
-      console.log("Applying condition filter:", filters.condition);
-      results = results.filter(listing => {
-        // Since condition doesn't exist on the base type, we'll need alternative handling
-        // This will depend on actual database design
-        return true; // Placeholder - should be implemented based on actual data model
-      });
-      console.log("Search results after condition filtering:", results.length);
-    }
-    
-    // Client-side filtering for images
-    if (filters.showWithImagesOnly) {
-      console.log("Applying images-only filter");
-      results = results.filter(listing => 
-        listing.images && listing.images.length > 0
-      );
-      console.log("Search results after images-only filtering:", results.length);
-    }
-    
-    return results;
-  } catch (error) {
-    console.error('Error searching listings:', error);
-    throw error;
   }
+  
+  // Apply urgent/featured filter
+  if (filters.urgent) {
+    results = results.filter(listing => listing.is_featured);
+  }
+  
+  console.log('Search results:', results.length);
+  return Promise.resolve(results);
+};
+
+/**
+ * Get featured listings
+ * @param count Maximum number of listings to return
+ * @returns Featured listings
+ */
+export const getFeaturedListings = (count: number = 6): Promise<ListingWithRelations[]> => {
+  // In a real app, this would be an API call to a database
+  // For this example, we'll filter and return the mock data
+  const featuredListings = mockListingsData
+    .filter(listing => listing.is_featured)
+    .sort(() => Math.random() - 0.5) // Randomize the order
+    .slice(0, count);
+  
+  return Promise.resolve(featuredListings);
+};
+
+/**
+ * Get listings by category
+ * @param category The category name to filter by
+ * @param count Maximum number of listings to return
+ * @returns List of listings in the specified category
+ */
+export const getListingsByCategory = (category: string, count = 12): Promise<ListingWithRelations[]> => {
+  // In a real app, this would be an API call to the database
+  // For this example, we'll filter the mock data
+  const categoryListings = mockListingsData
+    .filter(listing => listing.category === category)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, count);
+  
+  return Promise.resolve(categoryListings);
 };
