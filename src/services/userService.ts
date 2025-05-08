@@ -83,11 +83,11 @@ export const uploadProfilePicture = async (userId: string, file: File): Promise<
   }
 };
 
-export const getEmailFromUserId = async (userId: string): Promise<string | null> => {
+export const getPhoneFromUserId = async (userId: string): Promise<string | null> => {
   try {
     const { data, error } = await supabase
       .from('profiles')
-      .select('email')
+      .select('phone')
       .eq('id', userId)
       .maybeSingle();
       
@@ -95,9 +95,9 @@ export const getEmailFromUserId = async (userId: string): Promise<string | null>
       return null;
     }
     
-    return data.email || null;
+    return data.phone || null;
   } catch (error) {
-    console.error('Error getting email from user ID:', error);
+    console.error('Error getting phone from user ID:', error);
     return null;
   }
 };

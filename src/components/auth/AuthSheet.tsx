@@ -14,13 +14,14 @@ import { Separator } from "@/components/ui/separator";
 interface AuthSheetProps {
   children: React.ReactNode;
   side?: "top" | "right" | "bottom" | "left";
+  defaultTab?: "login" | "register" | "reset";
 }
 
-const AuthSheet = ({ children, side = "right" }: AuthSheetProps) => {
+const AuthSheet = ({ children, side = "right", defaultTab = "login" }: AuthSheetProps) => {
   const { currentUser } = useAuth();
   const { language } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>("login");
+  const [activeTab, setActiveTab] = useState<string>(defaultTab);
 
   // Close the sheet when a user logs in
   useEffect(() => {

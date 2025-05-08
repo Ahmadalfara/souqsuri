@@ -45,15 +45,15 @@ const AuthButtons = () => {
             </Button>
           </AuthSheet>
           
-          <CreateListingSheet>
+          <AuthSheet defaultTab="register">
             <Button className="bg-syrian-green hover:bg-syrian-dark text-white">
               {language === 'ar' ? (
-                <ArabicText text="إضافة إعلان" />
+                <ArabicText text="إنشاء حساب" />
               ) : (
-                <span>{t('addListing')}</span>
+                <span>{t('register')}</span>
               )}
             </Button>
-          </CreateListingSheet>
+          </AuthSheet>
         </>
       )}
     </div>
