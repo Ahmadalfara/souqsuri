@@ -7,6 +7,7 @@ export const useCurrentRoute = () => {
   return {
     path: location.pathname,
     isActive: (path: string) => {
+      // Handle root path exactly
       if (path === '/') {
         return location.pathname === '/';
       }
@@ -17,15 +18,16 @@ export const useCurrentRoute = () => {
         const params = new URLSearchParams(queryPart);
         const currentParams = new URLSearchParams(location.search);
         
-        // Check if the current URL contains the path
-        if (!location.pathname.includes(pathPart)) {
-          return false;
+        // For category paths, check if we're on the search page and if the category parameter matches
+        if (pathPart === '/search' && params.has('category')) {
+          return (
+            location.pathname === '/search' &&
+            currentParams.get('category') === params.get('category')
+          );
         }
         
-        // For category paths, check if the category parameter matches
-        if (params.has('category')) {
-          return currentParams.get('category') === params.get('category');
-        }
+        // For other query params, just check if the path part matches
+        return location.pathname.includes(pathPart);
       }
       
       // Special case for featured-listings page
@@ -33,6 +35,7 @@ export const useCurrentRoute = () => {
         return true;
       }
       
+      // Default path matching
       return location.pathname.includes(path);
     },
     query: new URLSearchParams(location.search),

@@ -4,3 +4,4 @@ export * from './core';
 export * from './search';
 export * from './user';
 export * from './location';
+export * from './categorySearch';
