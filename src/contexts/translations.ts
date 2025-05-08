@@ -1,4 +1,3 @@
-
 const translations = {
   en: {
     allCategories: 'All Categories',
@@ -11,6 +10,7 @@ const translations = {
     pets: 'Pets',
     hobbies: 'Hobbies',
     other: 'Other',
+    clothes: 'Clothes',
     filterResults: 'Filter Results',
     lessOptions: 'Less Options',
     moreOptions: 'More Options',
@@ -104,6 +104,17 @@ const translations = {
     searchFor: 'Search for listings...',
     advancedSearch: 'Advanced Search',
     all: 'All',
+    // Add translations for the FeaturesSection
+    wantToSellSomething: 'Want to sell something?',
+    joinThousands: 'Join thousands of people successfully selling on our marketplace. Add your listing for free today!',
+    addYourListingNow: 'Add your listing now',
+    login: 'Login',
+    // Add translations for the WelcomeSection
+    featuredListings: 'Featured Listings',
+    viewMoreListings: 'View more listings',
+    viewDetails: 'View details',
+    // Add translations for header labels
+    addListing: 'Add Listing',
   },
   ar: {
     allCategories: 'كل الفئات',
@@ -116,6 +127,7 @@ const translations = {
     pets: 'حيوانات أليفة',
     hobbies: 'هوايات',
     other: 'أخرى',
+    clothes: 'ملابس',
     filterResults: 'فلترة النتائج',
     lessOptions: 'خيارات أقل',
     moreOptions: 'خيارات أكثر',
@@ -209,6 +221,17 @@ const translations = {
     searchFor: 'ابحث عن إعلانات...',
     advancedSearch: 'بحث متقدم',
     all: 'الكل',
+    // Add translations for the FeaturesSection
+    wantToSellSomething: 'هل تريد بيع شيء ما؟',
+    joinThousands: 'انضم إلى آلاف الأشخاص الذين يبيعون منتجاتهم بنجاح على سوقنا. أضف إعلانك مجانًا اليوم!',
+    addYourListingNow: 'أضف إعلانك الآن',
+    login: 'تسجيل الدخول',
+    // Add translations for the WelcomeSection
+    featuredListings: 'إعلانات مميزة',
+    viewMoreListings: 'عرض المزيد من الإعلانات',
+    viewDetails: 'عرض التفاصيل',
+    // Add translations for header labels
+    addListing: 'إضافة إعلان',
   }
 };
 

@@ -23,14 +23,14 @@ const Categories = () => {
 
   // These must match the front-end routing paths
   const categories = [
-    { name: 'all', label: language === 'ar' ? 'الكل' : t('all'), icon: Home },
-    { name: 'real_estate', label: language === 'ar' ? 'العقارات' : t('realEstate'), icon: Home },
-    { name: 'cars', label: language === 'ar' ? 'سيارات' : t('cars'), icon: Car },
-    { name: 'clothes', label: language === 'ar' ? 'ملابس' : t('clothes'), icon: Shirt },
-    { name: 'electronics', label: language === 'ar' ? 'إلكترونيات' : t('electronics'), icon: Tv },
-    { name: 'furniture', label: language === 'ar' ? 'أثاث' : t('furniture'), icon: Sofa },
-    { name: 'jobs', label: language === 'ar' ? 'وظائف' : t('jobs'), icon: Briefcase },
-    { name: 'services', label: language === 'ar' ? 'خدمات' : t('services'), icon: Wrench },
+    { name: 'all', label: t('all'), icon: Home },
+    { name: 'real_estate', label: t('realEstate'), icon: Home },
+    { name: 'cars', label: t('cars'), icon: Car },
+    { name: 'clothes', label: t('clothes'), icon: Shirt },
+    { name: 'electronics', label: t('electronics'), icon: Tv },
+    { name: 'furniture', label: t('furniture'), icon: Sofa },
+    { name: 'jobs', label: t('jobs'), icon: Briefcase },
+    { name: 'services', label: t('services'), icon: Wrench },
   ];
   
   return (

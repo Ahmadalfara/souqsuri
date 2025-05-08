@@ -6,6 +6,7 @@ import ArabicBorder from './ArabicBorder';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 type ListingItem = {
   id: number;
@@ -17,6 +18,8 @@ type ListingItem = {
 };
 
 const FeaturedListing = ({ item }: { item: ListingItem }) => {
+  const { language, t } = useLanguage();
+  
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
       <div className="aspect-square overflow-hidden">
@@ -42,7 +45,11 @@ const FeaturedListing = ({ item }: { item: ListingItem }) => {
             variant="outline" 
             className="w-full border-syrian-green text-syrian-green hover:bg-syrian-green hover:text-white"
           >
-            <ArabicText text="عرض التفاصيل" />
+            {language === 'ar' ? (
+              <ArabicText text={t('viewDetails')} />
+            ) : (
+              t('viewDetails')
+            )}
           </Button>
         </Link>
       </CardFooter>
@@ -51,6 +58,7 @@ const FeaturedListing = ({ item }: { item: ListingItem }) => {
 };
 
 const WelcomeSection = () => {
+  const { language, t } = useLanguage();
   const featuredListings: ListingItem[] = [
     {
       id: 1,
@@ -90,11 +98,15 @@ const WelcomeSection = () => {
     <section className="flex flex-col items-center py-10 px-6 md:px-10 bg-white">
       <div className="max-w-6xl w-full">
         <h1 className="mb-8 text-center">
-          <ArabicText 
-            text="إعلانات مميزة" 
-            size="2xl" 
-            className="font-bold text-syrian-green"
-          />
+          {language === 'ar' ? (
+            <ArabicText 
+              text={t('featuredListings')} 
+              size="2xl" 
+              className="font-bold text-syrian-green"
+            />
+          ) : (
+            <span className="font-bold text-syrian-green text-4xl">{t('featuredListings')}</span>
+          )}
         </h1>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -105,7 +117,11 @@ const WelcomeSection = () => {
         
         <div className="mt-10 text-center">
           <Button className="bg-syrian-green hover:bg-syrian-dark text-white px-8 py-6">
-            <ArabicText text="عرض المزيد من الإعلانات" size="normal" />
+            {language === 'ar' ? (
+              <ArabicText text={t('viewMoreListings')} size="normal" />
+            ) : (
+              t('viewMoreListings')
+            )}
           </Button>
         </div>
       </div>

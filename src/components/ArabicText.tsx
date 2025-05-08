@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -36,11 +37,18 @@ const ArabicText = ({ text, className, size = 'normal', translateKey, textAr, te
   else if (translateKey) {
     displayText = t(translateKey);
   }
+  // If the text is a key in the translations, try to use that
+  else if (language === 'en' && t(text) !== text) {
+    displayText = t(text);
+  }
   // The default case is to just use the provided text, already set above
+
+  // Only apply Arabic font and RTL for Arabic language
+  const shouldUseArabicFont = language === 'ar';
 
   return (
     <span className={cn(
-      'font-arabic',
+      shouldUseArabicFont ? 'font-arabic' : '',
       language === 'ar' ? 'rtl' : '',
       sizeClasses[size],
       className
