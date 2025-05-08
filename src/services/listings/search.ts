@@ -1,3 +1,4 @@
+
 import { ListingWithRelations, ListingFilters } from '@/types/supabase';
 
 // Mock data with more listings across all categories
@@ -451,4 +452,90 @@ const mockListingsData: ListingWithRelations[] = [
     views: 108,
     governorate_id: '1',
     district_id: '2',
-    governorate: { id: '1', name_ar: 'دمشق
+    governorate: { id: '1', name_ar: 'دمشق', name_en: 'Damascus', created_at: '2025-01-01T00:00:00Z' },
+    district: { id: '2', name_ar: 'المهاجرين', name_en: 'Al Muhajirin', governorate_id: '1', created_at: '2025-01-01T00:00:00Z' }
+  }
+];
+
+/**
+ * Search listings based on filters
+ */
+export const searchListings = (filters: ListingFilters): ListingWithRelations[] => {
+  let results = [...mockListingsData];
+  
+  // Filter by query text (search in title and description)
+  if (filters.query) {
+    const query = filters.query.toLowerCase();
+    results = results.filter(listing => 
+      listing.title.toLowerCase().includes(query) || 
+      listing.title_en?.toLowerCase().includes(query) ||
+      listing.description.toLowerCase().includes(query) || 
+      listing.description_en?.toLowerCase().includes(query)
+    );
+  }
+  
+  // Filter by category
+  if (filters.category) {
+    results = results.filter(listing => listing.category === filters.category);
+  }
+  
+  // Filter by governorate
+  if (filters.governorate_id) {
+    results = results.filter(listing => listing.governorate_id === filters.governorate_id);
+  }
+  
+  // Filter by district
+  if (filters.district_id) {
+    results = results.filter(listing => listing.district_id === filters.district_id);
+  }
+  
+  // Filter by price range
+  if (filters.priceMin !== undefined && filters.priceMin !== null) {
+    results = results.filter(listing => listing.price >= filters.priceMin!);
+  }
+  
+  if (filters.priceMax !== undefined && filters.priceMax !== null) {
+    results = results.filter(listing => listing.price <= filters.priceMax!);
+  }
+  
+  // Filter by condition (this is a mock field for this example)
+  if (filters.condition && filters.condition.length > 0) {
+    results = results.filter(listing => {
+      if (!listing.condition) return false;
+      return filters.condition!.includes(listing.condition);
+    });
+  }
+  
+  // Filter by currency
+  if (filters.currency) {
+    results = results.filter(listing => listing.currency === filters.currency);
+  }
+
+  // Sort results
+  if (filters.sortBy) {
+    switch (filters.sortBy) {
+      case 'newest':
+        results.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        break;
+      case 'oldest':
+        results.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        break;
+      case 'price_asc':
+        results.sort((a, b) => a.price - b.price);
+        break;
+      case 'price_desc':
+        results.sort((a, b) => b.price - a.price);
+        break;
+      case 'views':
+        results.sort((a, b) => b.views - a.views);
+        break;
+    }
+  }
+  
+  // Apply limit if specified
+  if (filters.limit !== undefined && filters.limit !== null) {
+    results = results.slice(0, filters.limit);
+  }
+  
+  return results;
+};
