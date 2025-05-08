@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -31,14 +32,15 @@ import {
 } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { X, Filter, Check } from 'lucide-react';
+import { X, Filter } from 'lucide-react';
 import ArabicText from '@/components/ArabicText';
 
-// Mock data for categories and locations
+// Read from environment or services in a real app
 const categories = [
   { id: 'all', nameAr: 'جميع الفئات', nameEn: 'All Categories' },
   { id: 'real_estate', nameAr: 'العقارات', nameEn: 'Real Estate' },
   { id: 'cars', nameAr: 'سيارات', nameEn: 'Cars' },
+  { id: 'clothes', nameAr: 'ملابس', nameEn: 'Clothes' },
   { id: 'electronics', nameAr: 'إلكترونيات', nameEn: 'Electronics' },
   { id: 'furniture', nameAr: 'أثاث', nameEn: 'Furniture' },
   { id: 'jobs', nameAr: 'وظائف', nameEn: 'Jobs' },
@@ -107,7 +109,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
       priceRange,
       sortBy,
       searchWithin,
-      showPromotedOnly,
+      urgent: showPromotedOnly,
       showWithImagesOnly,
     };
     
@@ -135,7 +137,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
         priceRange: [0, 10000],
         sortBy: 'newest',
         searchWithin: '',
-        showPromotedOnly: false,
+        urgent: false,
         showWithImagesOnly: false,
       });
     }
@@ -200,7 +202,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
     if (showPromotedOnly) {
       filters.push({
         id: 'promoted',
-        label: language === 'ar' ? 'الإعلانات المميزة فقط' : 'Promoted Only',
+        label: language === 'ar' ? 'الإعلانات المميزة فقط' : 'Featured Only',
         onRemove: () => setShowPromotedOnly(false),
       });
     }
@@ -236,6 +238,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
             <button 
               onClick={filter.onRemove}
               className="text-syrian-dark/60 hover:text-syrian-dark"
+              aria-label="Remove filter"
             >
               <X size={14} />
             </button>
@@ -278,6 +281,19 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
   // Handle sort by change
   const handleSortByChange = (value: string) => {
     setSortBy(value);
+    
+    // Apply sort immediately for better UX
+    if (onFilterChange) {
+      onFilterChange({
+        category,
+        location,
+        priceRange,
+        sortBy: value,
+        searchWithin,
+        urgent: showPromotedOnly,
+        showWithImagesOnly,
+      });
+    }
   };
   
   // Handle search within change
@@ -285,16 +301,14 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
     setSearchWithin(e.target.value);
   };
   
-  // Handle show promoted only change
-  const handleShowPromotedOnly = (value: string) => {
-    // Fix the type conversion - ensure we're passing a boolean
-    setShowPromotedOnly(value === 'true');
+  // Handle promoted only toggle
+  const handleShowPromotedOnlyChange = (checked: boolean) => {
+    setShowPromotedOnly(checked);
   };
   
-  // Handle show with images only change
-  const handleShowWithImagesOnly = (value: string) => {
-    // Fix the type conversion - ensure we're passing a boolean
-    setShowWithImagesOnly(value === 'true');
+  // Handle with images only toggle
+  const handleShowWithImagesOnlyChange = (checked: boolean) => {
+    setShowWithImagesOnly(checked);
   };
   
   return (
@@ -497,7 +511,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
                           </Label>
                           <Switch
                             checked={showPromotedOnly}
-                            onCheckedChange={(checked) => handleShowPromotedOnly(String(checked))}
+                            onCheckedChange={handleShowPromotedOnlyChange}
                           />
                         </div>
                         
@@ -512,7 +526,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
                           </Label>
                           <Switch
                             checked={showWithImagesOnly}
-                            onCheckedChange={(checked) => handleShowWithImagesOnly(String(checked))}
+                            onCheckedChange={handleShowWithImagesOnlyChange}
                           />
                         </div>
                       </div>
@@ -559,7 +573,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
           </div>
         </div>
         
-        {/* View Toggle (Grid/List) - Placeholder */}
+        {/* View Toggle (Grid/List) */}
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" className="text-syrian-green">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

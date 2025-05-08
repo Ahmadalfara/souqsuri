@@ -67,11 +67,11 @@ const HowToSell = () => {
                   <div className="w-8 h-8 bg-syrian-green rounded-full flex items-center justify-center text-white mr-3">
                     <span>{index + 1}</span>
                   </div>
-                  <h3 className="text-xl font-bold text-syrian-dark text-right">
+                  <h3 className={`text-xl font-bold text-syrian-dark ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                     <ArabicText text={step.title} />
                   </h3>
                 </div>
-                <p className="text-syrian-dark/70 text-right">
+                <p className={`text-syrian-dark/70 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                   <ArabicText text={step.description} />
                 </p>
               </Card>
@@ -79,17 +79,26 @@ const HowToSell = () => {
           </div>
           
           <div className="bg-white rounded-lg p-8 shadow-sm border border-syrian-green/20 mb-12">
-            <h2 className="text-2xl font-bold text-syrian-dark mb-6 text-right">
+            <h2 className={`text-2xl font-bold text-syrian-dark mb-6 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
               <ArabicText text={t('sellingTips')} />
             </h2>
             
             <div className="space-y-4">
               {tips.map((tip, index) => (
-                <div key={index} className="flex items-center justify-end">
-                  <span className="text-right">
-                    <ArabicText text={tip} />
-                  </span>
-                  <Check className="h-5 w-5 text-syrian-green ml-3" />
+                <div key={index} className={`flex items-center ${language === 'ar' ? 'justify-end' : 'justify-start'}`}>
+                  {language === 'ar' ? (
+                    <>
+                      <span className="text-right">
+                        <ArabicText text={tip} />
+                      </span>
+                      <Check className="h-5 w-5 text-syrian-green ml-3" />
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-5 w-5 text-syrian-green mr-3" />
+                      <span>{tip}</span>
+                    </>
+                  )}
                 </div>
               ))}
             </div>

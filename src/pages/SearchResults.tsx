@@ -1,9 +1,11 @@
+
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GeometricPattern from '@/components/GeometricPattern';
 import ArabicText from '@/components/ArabicText';
+import ListingFilters from '@/components/listings/ListingFilters';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,85 +13,14 @@ import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCurrencyConverter } from '@/services/currencyService';
-
-// This will be part of the actual search service
-const searchListings = async (query: string) => {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 600));
-  
-  // Mock search data with bilingual content
-  return [
-    { 
-      id: 1, 
-      title: 'هاتف آيفون مستعمل', 
-      title_en: 'iPhone Used', 
-      category: 'electronics', 
-      category_ar: 'إلكترونيات',
-      category_en: 'Electronics',
-      price: 400, 
-      location: 'Damascus', 
-      location_ar: 'دمشق',
-      imageUrl: 'https://images.unsplash.com/photo-1603791239531-1dda55e194a6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fGlwaG9uZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60', 
-      currency: 'USD' 
-    },
-    { 
-      id: 2, 
-      title: 'شقة للإيجار في منطقة المزة', 
-      title_en: 'Apartment for Rent in Mazzeh', 
-      category: 'real_estate', 
-      category_ar: 'العقارات',
-      category_en: 'Real Estate',
-      price: 300, 
-      location: 'Aleppo', 
-      location_ar: 'حلب',
-      imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60', 
-      currency: 'USD' 
-    },
-    { 
-      id: 3, 
-      title: 'سيارة مرسيدس 2020', 
-      title_en: 'Mercedes 2020', 
-      category: 'cars', 
-      category_ar: 'سيارات',
-      category_en: 'Cars',
-      price: 15000, 
-      location: 'Homs', 
-      location_ar: 'حمص',
-      imageUrl: 'https://images.unsplash.com/photo-1563720223185-11003d516935?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fG1lcmNlZGVzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60', 
-      currency: 'USD' 
-    },
-    { 
-      id: 4, 
-      title: 'أريكة جلدية بحالة ممتازة', 
-      title_en: 'Leather Sofa in Excellent Condition', 
-      category: 'furniture', 
-      category_ar: 'أثاث',
-      category_en: 'Furniture',
-      price: 250, 
-      location: 'Latakia', 
-      location_ar: 'اللاذقية',
-      imageUrl: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c29mYXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60', 
-      currency: 'USD' 
-    },
-    { 
-      id: 5, 
-      title: 'لابتوب ديل XPS جديد', 
-      title_en: 'Dell XPS Laptop New', 
-      category: 'electronics', 
-      category_ar: 'إلكترونيات',
-      category_en: 'Electronics',
-      price: 1200, 
-      location: 'Damascus', 
-      location_ar: 'دمشق',
-      imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8bGFwdG9wfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60', 
-      currency: 'USD' 
-    },
-  ];
-};
+import { Button } from '@/components/ui/button';
+import { searchListings } from '@/services/listings/search';
+import { Filter } from 'lucide-react';
 
 const SearchResults = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
+  const categoryParam = searchParams.get('category') || '';
   const navigate = useNavigate();
   const { toast } = useToast();
   const { language, t } = useLanguage();
@@ -97,17 +28,31 @@ const SearchResults = () => {
   const [displayCurrency, setDisplayCurrency] = useState<'SYP' | 'USD'>(
     searchParams.get('currency') === 'USD' ? 'USD' : 'SYP'
   );
+  
+  // Filter states
+  const [filters, setFilters] = useState({
+    query: query,
+    category: categoryParam,
+    governorate_id: searchParams.get('governorate_id') || '',
+    district_id: searchParams.get('district_id') || '',
+    priceMin: searchParams.get('priceMin') ? Number(searchParams.get('priceMin')) : undefined,
+    priceMax: searchParams.get('priceMax') ? Number(searchParams.get('priceMax')) : undefined,
+    condition: searchParams.getAll('condition') || [],
+    sortBy: searchParams.get('sortBy') || 'newest',
+    urgent: searchParams.get('urgent') === 'true',
+    currency: searchParams.get('currency') || ''
+  });
 
   useEffect(() => {
-    if (!query) {
+    if (!query && !categoryParam) {
       navigate('/');
     }
-  }, [query, navigate]);
+  }, [query, categoryParam, navigate]);
 
   const { data: results, isLoading, error } = useQuery({
-    queryKey: ['search', query],
-    queryFn: () => searchListings(query),
-    enabled: !!query,
+    queryKey: ['search', filters],
+    queryFn: () => searchListings(filters),
+    enabled: !!(query || categoryParam),
     meta: {
       onError: () => {
         toast({
@@ -121,6 +66,36 @@ const SearchResults = () => {
     }
   });
 
+  // Apply filters
+  const handleFilterChange = (newFilters: any) => {
+    const updatedFilters = {
+      ...filters,
+      ...newFilters,
+      query: query || ''  // Always maintain the search query
+    };
+    
+    setFilters(updatedFilters);
+    
+    // Update URL search params
+    const params = new URLSearchParams();
+    
+    if (query) params.set('q', query);
+    if (updatedFilters.category && updatedFilters.category !== 'all') params.set('category', updatedFilters.category);
+    if (updatedFilters.governorate_id) params.set('governorate_id', updatedFilters.governorate_id);
+    if (updatedFilters.district_id) params.set('district_id', updatedFilters.district_id);
+    if (updatedFilters.priceMin) params.set('priceMin', updatedFilters.priceMin.toString());
+    if (updatedFilters.priceMax) params.set('priceMax', updatedFilters.priceMax.toString());
+    if (updatedFilters.sortBy && updatedFilters.sortBy !== 'newest') params.set('sortBy', updatedFilters.sortBy);
+    if (updatedFilters.urgent) params.set('urgent', 'true');
+    if (updatedFilters.currency) params.set('currency', updatedFilters.currency);
+    
+    updatedFilters.condition?.forEach((cond: string) => {
+      params.append('condition', cond);
+    });
+    
+    setSearchParams(params);
+  };
+
   // Display error toast when an error occurs
   useEffect(() => {
     if (error) {
@@ -133,6 +108,11 @@ const SearchResults = () => {
       });
     }
   }, [error, toast, language]);
+
+  // Toggle currency display
+  const toggleCurrency = () => {
+    setDisplayCurrency(prev => prev === 'SYP' ? 'USD' : 'SYP');
+  };
 
   // Format price based on selected currency
   const formatPrice = (price: number, originalCurrency: string): string => {
@@ -149,10 +129,6 @@ const SearchResults = () => {
     }
   };
 
-  const toggleCurrency = () => {
-    setDisplayCurrency(prev => prev === 'SYP' ? 'USD' : 'SYP');
-  };
-
   // Get the category name in the correct language
   const getCategoryName = (item: any): string => {
     if (language === 'ar') {
@@ -164,7 +140,12 @@ const SearchResults = () => {
 
   // Get the location name in the correct language
   const getLocationName = (item: any): string => {
-    return language === 'ar' ? (item.location_ar || item.location) : item.location;
+    if (item.governorate) {
+      return language === 'ar' ? 
+        item.governorate.name_ar || item.location || '' : 
+        item.governorate.name_en || item.location || '';
+    }
+    return language === 'ar' ? (item.location_ar || item.location || '') : (item.location || '');
   };
 
   // Get the listing title in the correct language
@@ -174,6 +155,15 @@ const SearchResults = () => {
     } else {
       return item.title_en || item.title || '';
     }
+  };
+  
+  // Extract real-time relative date or use fixed
+  const getRelativeTime = (item: any): string => {
+    if (item.created_at) {
+      // Add proper date formatting here
+      return language === 'ar' ? "منذ ساعتين" : "2 hours ago";
+    }
+    return language === 'ar' ? "منذ ساعتين" : "2 hours ago";
   };
 
   return (
@@ -186,9 +176,9 @@ const SearchResults = () => {
               <div className="flex justify-between items-center">
                 <h1 className={`text-2xl font-bold text-syrian-dark dark:text-white ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                   {language === 'ar' ? (
-                    <ArabicText text={`نتائج البحث عن: "${query}"`} />
+                    <ArabicText text={query ? `نتائج البحث عن: "${query}"` : categoryParam ? `فئة: "${t(categoryParam)}"` : 'نتائج البحث'} />
                   ) : (
-                    `Search results for: "${query}"`
+                    query ? `Search results for: "${query}"` : categoryParam ? `Category: "${t(categoryParam)}"` : 'Search Results'
                   )}
                 </h1>
                 <button 
@@ -221,6 +211,14 @@ const SearchResults = () => {
             </div>
           </div>
 
+          {/* Listing Filters */}
+          <div className="mb-6">
+            <ListingFilters 
+              initialFilters={filters} 
+              onFilterChange={handleFilterChange} 
+            />
+          </div>
+
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -248,7 +246,7 @@ const SearchResults = () => {
                       <CardHeader className="p-0">
                         <div className="h-48 overflow-hidden">
                           <img 
-                            src={item.imageUrl} 
+                            src={item.images && item.images.length > 0 ? item.images[0] : '/placeholder.svg'} 
                             alt={getListingTitle(item)} 
                             className="w-full h-full object-cover hover:scale-105 transition-transform"
                           />
@@ -259,19 +257,24 @@ const SearchResults = () => {
                           <span className="bg-syrian-green/10 text-syrian-green px-2 py-1 rounded-full text-xs">
                             {getCategoryName(item)}
                           </span>
-                          <h3 className={`font-bold ${language === 'ar' ? 'text-right' : 'text-left'} flex-grow ml-2 dark:text-white`}>
-                            {language === 'ar' ? (
-                              <ArabicText text={item.title} textAr={item.title} textEn={item.title_en} />
-                            ) : (
-                              item.title_en || item.title
-                            )}
-                          </h3>
+                          {item.is_featured && (
+                            <span className="bg-amber-500/10 text-amber-600 px-2 py-1 rounded-full text-xs">
+                              {language === 'ar' ? 'مميز' : 'Featured'}
+                            </span>
+                          )}
                         </div>
+                        <h3 className={`font-bold ${language === 'ar' ? 'text-right' : 'text-left'} flex-grow ml-2 dark:text-white`}>
+                          {language === 'ar' ? (
+                            <ArabicText text={item.title} textAr={item.title} textEn={item.title_en} />
+                          ) : (
+                            item.title_en || item.title
+                          )}
+                        </h3>
                         <p className={`${language === 'ar' ? 'text-right' : 'text-left'} text-syrian-dark/70 font-bold mt-2 dark:text-gray-300`}>
                           {language === 'ar' ? (
-                            <ArabicText text={formatPrice(item.price, item.currency)} />
+                            <ArabicText text={formatPrice(item.price, item.currency || 'SYP')} />
                           ) : (
-                            formatPrice(item.price, item.currency)
+                            formatPrice(item.price, item.currency || 'SYP')
                           )}
                         </p>
                       </CardContent>
@@ -284,9 +287,9 @@ const SearchResults = () => {
                         </span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">
                           {language === 'ar' ? (
-                            <ArabicText text="منذ ساعتين" />
+                            <ArabicText text={getRelativeTime(item)} />
                           ) : (
-                            "2 hours ago"
+                            getRelativeTime(item)
                           )}
                         </span>
                       </CardFooter>

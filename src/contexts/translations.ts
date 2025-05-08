@@ -1,6 +1,7 @@
 
 const translations = {
   en: {
+    // General navigation and categories
     allCategories: 'All Categories',
     realEstate: 'Real Estate',
     cars: 'Cars',
@@ -12,6 +13,10 @@ const translations = {
     hobbies: 'Hobbies',
     other: 'Other',
     clothes: 'Clothes',
+    
+    // Filter related translations
+    filters: 'Filters',
+    filtersDescription: 'Filter listings by various criteria',
     filterResults: 'Filter Results',
     lessOptions: 'Less Options',
     moreOptions: 'More Options',
@@ -75,6 +80,7 @@ const translations = {
     used: 'Used',
     urgent: 'Urgent',
     applyFilter: 'Apply Filter',
+    apply: 'Apply',
     reset: 'Reset',
     listingTitle: 'Listing Title',
     price: 'Price',
@@ -105,18 +111,37 @@ const translations = {
     searchFor: 'Search for listings...',
     advancedSearch: 'Advanced Search',
     all: 'All',
-    // Add translations for the FeaturesSection
+    
+    // Additional filter options
+    additionalFilters: 'Additional Filters',
+    searchWithin: 'Search Within Results',
+    showPromotedOnly: 'Show Featured Listings Only',
+    showWithImagesOnly: 'Show Listings With Images Only',
+    
+    // Common website sections
+    home: 'Home',
+    help: 'Help',
+    customerSupport: 'Customer Support',
+    contactUs: 'Contact Us',
+    legal: 'Legal',
+    termsOfService: 'Terms of Service',
+    privacyPolicy: 'Privacy Policy',
+    
+    // Features section translations
     wantToSellSomething: 'Want to sell something?',
     joinThousands: 'Join thousands of people successfully selling on our marketplace. Add your listing for free today!',
     addYourListingNow: 'Add your listing now',
     login: 'Login',
-    // Add translations for the WelcomeSection
+    
+    // Welcome section translations
     featuredListings: 'Featured Listings',
     viewMoreListings: 'View more listings',
     viewDetails: 'View details',
-    // Add translations for header labels
+    
+    // Header labels
     addListing: 'Add Listing',
-    // Add translations for How To Sell page
+    
+    // How To Sell page translations
     howToSell: 'How to Sell With Us',
     sellingProcess: 'A very easy and simple process that allows you to reach thousands of potential buyers',
     createAccount: 'Create Account',
@@ -137,9 +162,11 @@ const translations = {
     tip3: 'Set a reasonable and appropriate price for the market.',
     tip4: 'Respond quickly to buyer inquiries.',
     tip5: 'Add correct contact information.',
-    // Add translations for FAQ
+    
+    // FAQ translations
     faq: 'Frequently Asked Questions',
     faqDesc: 'Answers to the most common questions about using our site',
+    
     // FAQ questions and answers
     howToCreateAccount: 'How can I create an account?',
     howToCreateAccountAnswer: 'You can create an account by clicking on the "Login" button at the top, then selecting "Create Account" and entering your personal information and following the instructions.',
@@ -161,6 +188,7 @@ const translations = {
     howToReportListingAnswer: 'You can report a violating listing by clicking on the "Report Listing" button on the listing details page.',
     canChangeAccountInfo: 'Can I change my account information?',
     canChangeAccountInfoAnswer: 'Yes, you can change your account information at any time by going to your profile page, then clicking on "Account Settings".',
+    
     // Listing details translations
     apartmentForRent: 'Apartment for Rent in Central Damascus',
     hyundaiSonata: 'Hyundai Sonata 2018',
@@ -171,10 +199,37 @@ const translations = {
     electronicsCategory: 'Electronics',
     furnitureCategory: 'Furniture',
     viewDetailsButton: 'View Details',
-    syrianPound: 'SYP',
-    featuredLabel: 'Featured'
+    featuredLabel: 'Featured',
+    
+    // Privacy Policy sections
+    privacyPolicyTitle: 'Privacy Policy',
+    privacyPolicyIntro: 'We value your trust in providing us with your personal information. We are committed to protecting it.',
+    introduction: 'Introduction',
+    introductionText: 'We appreciate your trust in providing us with your personal information, and we are committed to protecting it. This policy describes how we collect and use your personal information.',
+    informationWeCollect: 'Information We Collect',
+    informationList: 'We may collect the following information:',
+    contactInfo: 'Contact information including email address and phone number',
+    demographicInfo: 'Demographic information such as preferences and interests',
+    otherInfo: 'Other information relevant to customer surveys and/or offers',
+    
+    // Terms of Service sections
+    termsOfServiceTitle: 'Terms of Service',
+    termsIntro: 'By accessing and using our services, you agree to comply with these terms and conditions.',
+    termsText: 'These terms govern your use of our platform and services.',
+    
+    // Customer Support sections
+    customerSupportTitle: 'Customer Support',
+    customerSupportDesc: 'We\'re here to help with any issues or questions',
+    contactFormTitle: 'Contact Form',
+    contactInfoTitle: 'Contact Information',
+    phoneNumber: 'Phone Number',
+    email: 'Email',
+    address: 'Address',
+    message: 'Message',
+    send: 'Send'
   },
   ar: {
+    // General navigation and categories
     allCategories: 'كل الفئات',
     realEstate: 'عقارات',
     cars: 'سيارات',
@@ -186,6 +241,10 @@ const translations = {
     hobbies: 'هوايات',
     other: 'أخرى',
     clothes: 'ملابس',
+    
+    // Filter related translations
+    filters: 'الفلاتر',
+    filtersDescription: 'تصفية الإعلانات حسب معايير مختلفة',
     filterResults: 'فلترة النتائج',
     lessOptions: 'خيارات أقل',
     moreOptions: 'خيارات أكثر',
@@ -249,6 +308,7 @@ const translations = {
     used: 'مستعمل',
     urgent: 'عاجل',
     applyFilter: 'تطبيق الفلتر',
+    apply: 'تطبيق',
     reset: 'إعادة تعيين',
     listingTitle: 'عنوان الإعلان',
     price: 'السعر',
@@ -279,17 +339,110 @@ const translations = {
     searchFor: 'ابحث عن إعلانات...',
     advancedSearch: 'بحث متقدم',
     all: 'الكل',
-    // Add translations for the FeaturesSection
+    
+    // Additional filter options
+    additionalFilters: 'خيارات إضافية للتصفية',
+    searchWithin: 'البحث ضمن النتائج',
+    showPromotedOnly: 'عرض الإعلانات المميزة فقط',
+    showWithImagesOnly: 'عرض الإعلانات مع صور فقط',
+    
+    // Common website sections
+    home: 'الرئيسية',
+    help: 'المساعدة',
+    customerSupport: 'خدمة العملاء',
+    contactUs: 'تواصل معنا',
+    legal: 'قانوني',
+    termsOfService: 'شروط الخدمة',
+    privacyPolicy: 'سياسة الخصوصية',
+    
+    // Features section translations
     wantToSellSomething: 'هل تريد بيع شيء ما؟',
     joinThousands: 'انضم إلى آلاف الأشخاص الذين يبيعون منتجاتهم بنجاح على سوقنا. أضف إعلانك مجانًا اليوم!',
     addYourListingNow: 'أضف إعلانك الآن',
     login: 'تسجيل الدخول',
-    // Add translations for the WelcomeSection
+    
+    // Welcome section translations
     featuredListings: 'إعلانات مميزة',
     viewMoreListings: 'عرض المزيد من الإعلانات',
     viewDetails: 'عرض التفاصيل',
-    // Add translations for header labels
+    
+    // Header labels
     addListing: 'إضافة إعلان',
+    
+    // How To Sell page
+    howToSell: 'كيفية البيع معنا',
+    sellingProcess: 'عملية بسيطة وسهلة تتيح لك الوصول إلى آلاف المشترين المحتملين',
+    createAccount: 'إنشاء حساب',
+    createAccountDesc: 'قم بإنشاء حساب جديد أو تسجيل الدخول إلى حسابك الحالي.',
+    addListing2: 'إضافة إعلان',
+    addListingDesc: 'انقر على "إضافة إعلان" وادخل المعلومات المطلوبة.',
+    uploadImages: 'تحميل الصور',
+    uploadImagesDesc: 'أضف صوراً واضحة وجذابة لمنتجك أو خدمتك.',
+    setPrice: 'تحديد السعر',
+    setPriceDesc: 'حدد سعراً مناسباً لمنتجك.',
+    publishListing: 'نشر الإعلان',
+    publishListingDesc: 'اضغط على زر "نشر الإعلان" وسيظهر إعلانك للمستخدمين.',
+    communicateWithBuyers: 'التواصل مع المشترين',
+    communicateWithBuyersDesc: 'تابع الردود على إعلانك وتواصل مع المشترين المهتمين.',
+    sellingTips: 'نصائح للبيع السريع',
+    tip1: 'استخدم صوراً واضحة وجذابة للمنتج.',
+    tip2: 'كن دقيقاً وصادقاً في وصف المنتج.',
+    tip3: 'حدد سعراً معقولاً ومناسباً للسوق.',
+    tip4: 'استجب سريعاً لاستفسارات المشترين.',
+    tip5: 'أضف معلومات الاتصال الصحيحة.',
+    
+    // FAQ
+    faq: 'الأسئلة الشائعة',
+    faqDesc: 'إجابات لأكثر الأسئلة شيوعاً حول استخدام موقعنا',
+    
+    // FAQ questions and answers
+    howToCreateAccount: 'كيف يمكنني إنشاء حساب؟',
+    howToCreateAccountAnswer: 'يمكنك إنشاء حساب بالنقر على زر "تسجيل الدخول" في الأعلى، ثم اختيار "إنشاء حساب" وإدخال معلوماتك الشخصية واتباع التعليمات.',
+    howToAddListing: 'كيف يمكنني إضافة إعلان جديد؟',
+    howToAddListingAnswer: 'بعد تسجيل الدخول، انقر على زر "إضافة إعلان" في الأعلى، ثم املأ النموذج وأضف الصور واضغط على زر "نشر الإعلان".',
+    canEditListing: 'هل يمكنني تعديل إعلاني بعد نشره؟',
+    canEditListingAnswer: 'نعم، يمكنك تعديل إعلانك في أي وقت بالذهاب إلى صفحة ملفك الشخصي، ثم النقر على "إعلاناتي" واختيار الإعلان الذي تريد تعديله.',
+    howLongListingActive: 'كم من الوقت يبقى الإعلان نشطاً؟',
+    howLongListingActiveAnswer: 'تبقى الإعلانات نشطة لمدة 30 يوماً ويمكن تجديدها بسهولة من صفحة ملفك الشخصي.',
+    howToMakeListingFeatured: 'كيف أجعل إعلاني مميزاً؟',
+    howToMakeListingFeaturedAnswer: 'يمكنك ترقية إعلانك ليكون مميزاً بالذهاب إلى تفاصيل الإعلان، ثم النقر على زر "جعل الإعلان مميزاً" واختيار إحدى حزم الترويج.',
+    howToContactSeller: 'كيف يمكنني التواصل مع البائع؟',
+    howToContactSellerAnswer: 'يمكنك التواصل مع البائع بالنقر على زر "اتصال" أو "رسالة" في صفحة تفاصيل الإعلان.',
+    canDeleteListing: 'هل يمكنني حذف إعلاني؟',
+    canDeleteListingAnswer: 'نعم، يمكنك حذف إعلانك في أي وقت بالذهاب إلى صفحة ملفك الشخصي، ثم النقر على "إعلاناتي" واختيار الإعلان الذي تريد حذفه، ثم الضغط على زر "حذف".',
+    isSiteSafe: 'هل الموقع آمن للبيع والشراء؟',
+    isSiteSafeAnswer: 'نعم، نتخذ جميع الإجراءات اللازمة لضمان سلامة المعاملات، لكننا ننصح دائماً بالتحقق من البائع أو المشتري قبل إتمام أي عملية بيع أو شراء.',
+    howToReportListing: 'كيف يمكنني الإبلاغ عن إعلان مخالف؟',
+    howToReportListingAnswer: 'يمكنك الإبلاغ عن إعلان مخالف بالنقر على زر "الإبلاغ عن الإعلان" في صفحة تفاصيل الإعلان.',
+    canChangeAccountInfo: 'هل يمكنني تغيير معلومات حسابي؟',
+    canChangeAccountInfoAnswer: 'نعم، يمكنك تغيير معلومات حسابك في أي وقت بالذهاب إلى صفحة ملفك الشخصي، ثم النقر على "إعدادات الحساب".',
+    
+    // Privacy Policy sections
+    privacyPolicyTitle: 'سياسة الخصوصية',
+    privacyPolicyIntro: 'نلتزم بحماية خصوصيتك وبياناتك الشخصية',
+    introduction: 'مقدمة',
+    introductionText: 'نحن نقدر ثقتك في تزويدنا ببياناتك الشخصية، ونحن ملتزمون بضمان حمايتها. تصف هذه السياسة كيفية جمع واستخدام البيانات الشخصية التي تقدمها لنا.',
+    informationWeCollect: 'البيانات التي نجمعها',
+    informationList: 'قد نقوم بجمع البيانات التالية:',
+    contactInfo: 'معلومات الاتصال بما في ذلك عنوان البريد الإلكتروني ورقم الهاتف',
+    demographicInfo: 'معلومات ديموغرافية مثل التفضيلات والاهتمامات',
+    otherInfo: 'معلومات أخرى ذات صلة باستطلاعات العملاء و/أو العروض',
+    
+    // Terms of Service sections
+    termsOfServiceTitle: 'شروط الخدمة',
+    termsIntro: 'بالوصول إلى خدماتنا واستخدامها، فإنك توافق على الالتزام بهذه الشروط والأحكام.',
+    termsText: 'تحكم هذه الشروط استخدامك لمنصتنا وخدماتنا.',
+    
+    // Customer Support sections
+    customerSupportTitle: 'خدمة العملاء',
+    customerSupportDesc: 'نحن هنا للمساعدة في أي مشاكل أو أسئلة',
+    contactFormTitle: 'نموذج الاتصال',
+    contactInfoTitle: 'معلومات الاتصال',
+    phoneNumber: 'رقم الهاتف',
+    email: 'البريد الإلكتروني',
+    address: 'العنوان',
+    message: 'الرسالة',
+    send: 'إرسال'
   }
 };
 

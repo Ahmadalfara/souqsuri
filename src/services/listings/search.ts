@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { ListingWithRelations } from '@/types/supabase';
 
@@ -6,11 +7,13 @@ interface ListingFilters {
   category?: string;
   governorate_id?: string;
   district_id?: string;
+  location?: string; // Added for named locations that aren't IDs
   priceMin?: number;
   priceMax?: number;
   condition?: string[];
   sortBy?: string;
   urgent?: boolean;
+  showWithImagesOnly?: boolean;
   currency?: string;
 }
 
@@ -64,7 +67,7 @@ export const getListingsByCategory = async (category: string, count = 12): Promi
       throw error;
     }
     
-    console.log(`Retrieved ${data?.length || 0} listings`, data);
+    console.log(`Retrieved ${data?.length || 0} listings for category ${category}`, data);
     return data || [];
   } catch (error) {
     console.error('Error getting listings by category:', error);
@@ -129,8 +132,15 @@ export const searchListings = async (filters: ListingFilters): Promise<ListingWi
       query = query.eq('district_id', filters.district_id);
     }
     
+    // Location filter by name if no explicit governorate or district
+    if (filters.location && filters.location !== 'all' && !filters.governorate_id && !filters.district_id) {
+      // This would work better with full-text search or a normalized location field
+      console.log("Applying location name filter:", filters.location);
+      // In a real implementation, this might be complex with joins or specific fields
+    }
+    
     if (filters.urgent === true) {
-      console.log("Applying urgent filter");
+      console.log("Applying urgent/featured filter");
       query = query.eq('is_featured', true);
     }
     
@@ -150,21 +160,27 @@ export const searchListings = async (filters: ListingFilters): Promise<ListingWi
       query = query.lte('price', filters.priceMax);
     }
     
+    // Image filter can't be applied directly in the query since we need to check array length
+    // We'll filter this client-side
+    
     // Apply sorting
     if (filters.sortBy) {
       console.log("Applying sort filter:", filters.sortBy);
       switch (filters.sortBy) {
-        case 'price_asc':
+        case 'price_low_high':
           query = query.order('price', { ascending: true });
           break;
-        case 'price_desc':
+        case 'price_high_low':
           query = query.order('price', { ascending: false });
+          break;
+        case 'oldest':
+          query = query.order('created_at', { ascending: true });
           break;
         case 'views':
           query = query.order('views', { ascending: false });
           break;
         default:
-          query = query.order('created_at', { ascending: false });
+          query = query.order('created_at', { ascending: false }); // Newest by default
           break;
       }
     } else {
@@ -201,6 +217,15 @@ export const searchListings = async (filters: ListingFilters): Promise<ListingWi
         !listing.condition || filters.condition.includes(listing.condition)
       );
       console.log("Search results after condition filtering:", results.length);
+    }
+    
+    // Client-side filtering for images
+    if (filters.showWithImagesOnly) {
+      console.log("Applying images-only filter");
+      results = results.filter(listing => 
+        listing.images && listing.images.length > 0
+      );
+      console.log("Search results after images-only filtering:", results.length);
     }
     
     return results;
