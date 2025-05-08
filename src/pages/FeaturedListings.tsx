@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -21,15 +22,20 @@ const FeaturedListings = () => {
     queryKey: ['featuredListings'],
     queryFn: () => getFeaturedListings(12),
     retry: 1,
-    onError: (err) => {
-      console.error('Failed to fetch featured listings:', err);
-      toast({
-        variant: "destructive",
-        title: language === 'ar' ? "خطأ في جلب الإعلانات" : "Error fetching listings",
-        description: language === 'ar' 
-          ? "حدث خطأ أثناء جلب الإعلانات المميزة. يرجى المحاولة مرة أخرى لاحقاً."
-          : "An error occurred while fetching featured listings. Please try again later."
-      });
+    onSuccess: (data) => {
+      console.info('Successfully retrieved featured listings');
+    },
+    onSettled: (data, error) => {
+      if (error) {
+        console.error('Failed to fetch featured listings:', error);
+        toast({
+          variant: "destructive",
+          title: language === 'ar' ? "خطأ في جلب الإعلانات" : "Error fetching listings",
+          description: language === 'ar' 
+            ? "حدث خطأ أثناء جلب الإعلانات المميزة. يرجى المحاولة مرة أخرى لاحقاً."
+            : "An error occurred while fetching featured listings. Please try again later."
+        });
+      }
     }
   });
 
