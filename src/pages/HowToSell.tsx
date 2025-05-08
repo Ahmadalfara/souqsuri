@@ -6,33 +6,44 @@ import GeometricPattern from '@/components/GeometricPattern';
 import ArabicText from '@/components/ArabicText';
 import { Card } from '@/components/ui/card';
 import { Check } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const HowToSell = () => {
+  const { language, t } = useLanguage();
+  
   const steps = [
     {
-      title: 'إنشاء حساب',
-      description: 'قم بإنشاء حساب جديد أو تسجيل الدخول إلى حسابك الحالي.'
+      title: t('createAccount'),
+      description: t('createAccountDesc')
     },
     {
-      title: 'إضافة إعلان',
-      description: 'انقر على زر "إضافة إعلان" وأدخل البيانات المطلوبة.'
+      title: t('addListing2'),
+      description: t('addListingDesc')
     },
     {
-      title: 'رفع الصور',
-      description: 'قم بإضافة صور واضحة وجذابة لمنتجك أو خدمتك.'
+      title: t('uploadImages'),
+      description: t('uploadImagesDesc')
     },
     {
-      title: 'تحديد السعر',
-      description: 'ضع سعراً مناسباً للمنتج الخاص بك.'
+      title: t('setPrice'),
+      description: t('setPriceDesc')
     },
     {
-      title: 'نشر الإعلان',
-      description: 'اضغط على زر "نشر الإعلان" وسيظهر إعلانك للمستخدمين.'
+      title: t('publishListing'),
+      description: t('publishListingDesc')
     },
     {
-      title: 'التواصل مع المشترين',
-      description: 'تابع الردود على إعلانك وتواصل مع المشترين المهتمين.'
+      title: t('communicateWithBuyers'),
+      description: t('communicateWithBuyersDesc')
     },
+  ];
+
+  const tips = [
+    t('tip1'),
+    t('tip2'),
+    t('tip3'),
+    t('tip4'),
+    t('tip5'),
   ];
 
   return (
@@ -42,10 +53,10 @@ const HowToSell = () => {
         <main className="container mx-auto py-8 px-4">
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-syrian-dark mb-4">
-              <ArabicText text="كيفية البيع معنا" size="large" />
+              <ArabicText text={t('howToSell')} size="large" />
             </h1>
             <p className="text-lg text-syrian-dark/70 max-w-2xl mx-auto">
-              <ArabicText text="عملية سهلة وبسيطة للغاية تتيح لك الوصول إلى آلاف المشترين المحتملين" />
+              <ArabicText text={t('sellingProcess')} />
             </p>
           </div>
           
@@ -69,17 +80,11 @@ const HowToSell = () => {
           
           <div className="bg-white rounded-lg p-8 shadow-sm border border-syrian-green/20 mb-12">
             <h2 className="text-2xl font-bold text-syrian-dark mb-6 text-right">
-              <ArabicText text="نصائح لبيع أسرع" />
+              <ArabicText text={t('sellingTips')} />
             </h2>
             
             <div className="space-y-4">
-              {[
-                'استخدم صوراً واضحة وجذابة للمنتج.',
-                'كن دقيقاً وصادقاً في وصف المنتج.',
-                'حدد سعراً معقولاً ومناسباً للسوق.',
-                'قم بالرد السريع على استفسارات المشترين.',
-                'أضف معلومات الاتصال الصحيحة.',
-              ].map((tip, index) => (
+              {tips.map((tip, index) => (
                 <div key={index} className="flex items-center justify-end">
                   <span className="text-right">
                     <ArabicText text={tip} />

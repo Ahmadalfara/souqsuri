@@ -38,7 +38,7 @@ const ArabicText = ({ text, className, size = 'normal', translateKey, textAr, te
     displayText = t(translateKey);
   }
   // If the text is a key in the translations, try to use that
-  else if (language === 'en' && t(text) !== text) {
+  else if (t(text) !== text) {
     displayText = t(text);
   }
   // The default case is to just use the provided text, already set above

@@ -10,9 +10,11 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const FeaturedListings = () => {
   const navigate = useNavigate();
+  const { language, t } = useLanguage();
   const { data: listings, isLoading } = useQuery({
     queryKey: ['featuredListings'],
     queryFn: () => getFeaturedListings(12)
@@ -21,12 +23,30 @@ const FeaturedListings = () => {
   // Helper function to get location display string
   const getLocationString = (listing: any) => {
     if (listing.governorate && listing.district) {
-      return `${listing.governorate.name_ar} - ${listing.district.name_ar}`;
+      return language === 'ar' 
+        ? `${listing.governorate.name_ar} - ${listing.district.name_ar}`
+        : `${listing.governorate.name_en || listing.governorate.name_ar} - ${listing.district.name_en || listing.district.name_ar}`;
     } else if (listing.governorate) {
-      return listing.governorate.name_ar;
+      return language === 'ar'
+        ? listing.governorate.name_ar
+        : (listing.governorate.name_en || listing.governorate.name_ar);
     }
     return '';
   };
+
+  const pageTitle = language === 'ar' ? 'الإعلانات المميزة' : 'Featured Listings';
+  const pageDescription = language === 'ar' 
+    ? 'اكتشف أفضل العروض المميزة المتاحة حالياً'
+    : 'Discover the best featured offers available now';
+  const noListingsTitle = language === 'ar' 
+    ? 'لا توجد إعلانات مميزة حالياً'
+    : 'No featured listings available now';
+  const noListingsDescription = language === 'ar'
+    ? 'سيتم إضافة إعلانات مميزة قريباً'
+    : 'Featured listings will be added soon';
+  
+  const detailsButtonText = language === 'ar' ? 'التفاصيل' : 'Details';
+  const featuredLabel = language === 'ar' ? 'مميز' : t('featuredLabel');
 
   return (
     <div className="min-h-screen flex flex-col bg-syrian-light">
@@ -35,10 +55,10 @@ const FeaturedListings = () => {
         <main className="container mx-auto py-8 px-4">
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-syrian-dark mb-4">
-              <ArabicText text="الإعلانات المميزة" size="large" />
+              <ArabicText text={pageTitle} size="large" />
             </h1>
             <p className="text-lg text-syrian-dark/70 max-w-2xl mx-auto">
-              <ArabicText text="اكتشف أفضل العروض المميزة المتاحة حالياً" />
+              <ArabicText text={pageDescription} />
             </p>
           </div>
 
@@ -70,7 +90,7 @@ const FeaturedListings = () => {
                       className="overflow-hidden border border-syrian-gold/30 hover:border-syrian-gold transition-colors hover:shadow-lg"
                     >
                       <div className="absolute top-0 right-0 bg-syrian-gold text-white text-xs px-2 py-1 rounded-bl-lg">
-                        <ArabicText text="مميز" />
+                        <ArabicText text={featuredLabel} />
                       </div>
                       <CardHeader className="p-0">
                         <div className="h-48 overflow-hidden">
@@ -82,14 +102,23 @@ const FeaturedListings = () => {
                         </div>
                       </CardHeader>
                       <CardContent className="p-4">
-                        <h3 className="font-bold text-lg mb-2 text-right">
-                          <ArabicText text={listing.title} />
+                        <h3 className={`font-bold text-lg mb-2 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                          <ArabicText 
+                            text={listing.title} 
+                            textEn={listing.title_en || listing.title}
+                          />
                         </h3>
-                        <p className="text-syrian-dark/70 line-clamp-2 text-right">
-                          <ArabicText text={listing.description} />
+                        <p className={`text-syrian-dark/70 line-clamp-2 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                          <ArabicText 
+                            text={listing.description} 
+                            textEn={listing.description_en || listing.description}
+                          />
                         </p>
-                        <p className="text-syrian-green font-bold mt-2 text-right">
-                          <ArabicText text={`${listing.price} ${listing.currency || 'دولار'}`} />
+                        <p className={`text-syrian-green font-bold mt-2 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                          <ArabicText 
+                            text={`${listing.price} ${listing.currency || 'دولار'}`}
+                            textEn={`${listing.price} ${listing.currency === 'دولار' ? 'USD' : (listing.currency || 'USD')}`}
+                          />
                         </p>
                       </CardContent>
                       <CardFooter className="p-4 pt-0 flex justify-between items-center">
@@ -97,10 +126,12 @@ const FeaturedListings = () => {
                           variant="outline"
                           onClick={() => navigate(`/listing/${listing.id}`)}
                         >
-                          <ArabicText text="التفاصيل" />
+                          <ArabicText text={detailsButtonText} />
                         </Button>
                         <div className="text-sm text-gray-500">
-                          <ArabicText text={getLocationString(listing)} />
+                          <ArabicText 
+                            text={getLocationString(listing)} 
+                          />
                         </div>
                       </CardFooter>
                     </Card>
@@ -113,8 +144,8 @@ const FeaturedListings = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
                   </div>
-                  <ArabicText text="لا توجد إعلانات مميزة حالياً" size="large" className="block mb-4 font-bold" />
-                  <ArabicText text="سيتم إضافة إعلانات مميزة قريباً" className="text-gray-500" />
+                  <ArabicText text={noListingsTitle} size="large" className="block mb-4 font-bold" />
+                  <ArabicText text={noListingsDescription} className="text-gray-500" />
                 </div>
               )}
             </>
