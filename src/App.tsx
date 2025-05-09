@@ -15,6 +15,9 @@ const FeaturedListings = lazy(() => import('./pages/FeaturedListings'));
 const UserProfile = lazy(() => import('./pages/UserProfile'));
 const ListingDetails = lazy(() => import('./pages/ListingDetails'));
 const SearchResults = lazy(() => import('./pages/SearchResults'));
+const FAQ = lazy(() => import('./pages/FAQ'));
+const HowToSell = lazy(() => import('./pages/HowToSell'));
+const CustomerSupport = lazy(() => import('./pages/CustomerSupport'));
 
 function App() {
   return (
@@ -30,6 +33,9 @@ function App() {
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/listing/:listingId" element={<ListingDetails />} />
                 <Route path="/search" element={<SearchResults />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/how-to-sell" element={<HowToSell />} />
+                <Route path="/customer-support" element={<CustomerSupport />} />
               </Routes>
             </Suspense>
             <Toaster />
