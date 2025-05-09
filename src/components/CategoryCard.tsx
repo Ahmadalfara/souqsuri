@@ -12,7 +12,7 @@ interface CategoryCardProps {
   slug: string;
 }
 
-const CategoryCard = ({ icon: Icon, name, count, slug }: CategoryCardProps) => {
+const CategoryCard = ({ icon: Icon, name, slug }: CategoryCardProps) => {
   return (
     <Link to={`/category/${slug}`}>
       <Card className="p-6 hover:shadow-md transition-all hover:border-syrian-green/50 border border-syrian-green/20">
@@ -23,9 +23,7 @@ const CategoryCard = ({ icon: Icon, name, count, slug }: CategoryCardProps) => {
           <h3 className="font-bold text-lg mb-1">
             <ArabicText text={name} />
           </h3>
-          <p className="text-sm text-syrian-dark/60">
-            <ArabicText text={`${count} إعلان`} />
-          </p>
+          {/* Removed the count display that was here */}
         </div>
       </Card>
     </Link>
