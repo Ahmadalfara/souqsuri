@@ -18,6 +18,9 @@ const SearchResults = lazy(() => import('./pages/SearchResults'));
 const FAQ = lazy(() => import('./pages/FAQ'));
 const HowToSell = lazy(() => import('./pages/HowToSell'));
 const CustomerSupport = lazy(() => import('./pages/CustomerSupport'));
+const TermsOfService = lazy(() => import('./pages/TermsOfService'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const ContactUs = lazy(() => import('./pages/ContactUs'));
 
 function App() {
   return (
@@ -36,6 +39,9 @@ function App() {
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/how-to-sell" element={<HowToSell />} />
                 <Route path="/customer-support" element={<CustomerSupport />} />
+                <Route path="/terms-of-service" element={<TermsOfService />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/contact" element={<ContactUs />} />
               </Routes>
             </Suspense>
             <Toaster />

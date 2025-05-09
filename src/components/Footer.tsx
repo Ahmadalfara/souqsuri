@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import ArabicText from './ArabicText';
@@ -43,7 +42,11 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div className={`col-span-2 md:col-span-1 ${language === 'ar' ? 'text-right' : ''}`}>
             <div className={`flex items-center ${language === 'ar' ? 'flex-row-reverse justify-end' : ''}`}>
-              <img src="/placeholder.svg" alt="Logo" className={`h-10 w-10 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+              <img 
+                src="/lovable-uploads/bb819a7c-7051-46c6-b20e-8ffef70e45d0.png" 
+                alt="Logo" 
+                className={`h-10 w-10 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} 
+              />
               <div>
                 <h3 className={`font-bold text-lg text-syrian-dark dark:text-white`}>
                   {language === 'ar' ? (
