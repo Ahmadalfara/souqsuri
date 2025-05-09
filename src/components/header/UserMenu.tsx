@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, LogOut } from 'lucide-react';
 import ArabicText from '@/components/ArabicText';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -15,11 +15,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useQuery } from '@tanstack/react-query';
+import { getUserProfile } from '@/services/userService';
 
 const UserMenu = () => {
   const { language } = useLanguage();
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+
+  const { data: profile } = useQuery({
+    queryKey: ['userProfile', currentUser?.id],
+    queryFn: () => currentUser ? getUserProfile(currentUser.id) : null,
+    enabled: !!currentUser,
+  });
 
   const handleLogout = async () => {
     try {
@@ -50,9 +58,13 @@ const UserMenu = () => {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="rounded-full w-10 h-10 p-0">
           <Avatar>
-            <AvatarFallback className="bg-syrian-green text-white">
-              {getInitials(displayName)}
-            </AvatarFallback>
+            {profile?.profile_picture ? (
+              <AvatarImage src={profile.profile_picture} alt="Profile" />
+            ) : (
+              <AvatarFallback className="bg-syrian-green text-white">
+                {getInitials(displayName)}
+              </AvatarFallback>
+            )}
           </Avatar>
         </Button>
       </DropdownMenuTrigger>

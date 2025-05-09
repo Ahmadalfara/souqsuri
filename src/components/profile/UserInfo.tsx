@@ -7,6 +7,7 @@ import ArabicText from '@/components/ArabicText';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface UserData {
   name: string;
@@ -14,6 +15,7 @@ interface UserData {
   phone: string;
   location: string;
   createdAt: string;
+  profilePicture?: string;
 }
 
 interface UserInfoProps {
@@ -34,11 +36,29 @@ const UserInfo = ({ userData }: UserInfoProps) => {
     }
   };
 
+  const getInitials = (name: string) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
   return (
     <Card className="overflow-hidden">
       <div className="bg-syrian-green p-6 text-white text-center">
-        <div className="w-24 h-24 rounded-full bg-white text-syrian-green flex items-center justify-center mx-auto mb-4">
-          <User size={48} />
+        <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden">
+          <Avatar className="w-full h-full">
+            {userData?.profilePicture ? (
+              <AvatarImage src={userData.profilePicture} alt="Profile Picture" />
+            ) : (
+              <AvatarFallback className="w-full h-full bg-white text-syrian-green text-4xl flex items-center justify-center">
+                {getInitials(userData?.name || currentUser?.user_metadata?.name || "U")}
+              </AvatarFallback>
+            )}
+          </Avatar>
         </div>
         <h2 className="text-xl font-bold">
           {language === 'ar' ? (
@@ -105,7 +125,11 @@ const UserInfo = ({ userData }: UserInfoProps) => {
         </div>
         
         <div className="mt-6 space-y-2">
-          <Button variant="outline" className="w-full justify-start">
+          <Button 
+            variant="outline" 
+            className="w-full justify-start"
+            onClick={() => document.getElementById('profile-tab-trigger')?.click()}
+          >
             <Settings size={16} className={`${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
             {language === 'ar' ? (
               <ArabicText text="إعدادات الحساب" />
