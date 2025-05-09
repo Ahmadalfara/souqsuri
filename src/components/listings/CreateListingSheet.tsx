@@ -47,25 +47,19 @@ const CreateListingSheet = ({ children }: CreateListingSheetProps) => {
     }
   };
 
-  const handleContinueAsGuest = () => {
-    // Hide the prompt and show the form
-    document.getElementById('listing-form-container')?.classList.remove('hidden');
-    document.getElementById('guest-prompt-container')?.classList.add('hidden');
-  };
-
   const renderContent = () => {
     if (!currentUser) {
       return (
-        <div className="flex flex-col items-center justify-center py-10 px-4 text-center" id="guest-prompt-container">
+        <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
           <p className="mb-4">
             {language === 'ar' ? (
-              <ArabicText text="يمكنك تسجيل الدخول أولاً قبل إضافة إعلان جديد" />
+              <ArabicText text="يجب عليك تسجيل الدخول أولاً قبل إضافة إعلان جديد" />
             ) : (
-              "You can sign in first before adding a new listing"
+              "You must sign in first before adding a new listing"
             )}
           </p>
           <AuthSheet>
-            <Button className="bg-syrian-green hover:bg-syrian-dark mb-4">
+            <Button className="bg-syrian-green hover:bg-syrian-dark">
               {language === 'ar' ? (
                 <ArabicText text="تسجيل الدخول" />
               ) : (
@@ -73,43 +67,6 @@ const CreateListingSheet = ({ children }: CreateListingSheetProps) => {
               )}
             </Button>
           </AuthSheet>
-          
-          <p className="text-sm text-muted-foreground">
-            {language === 'ar' ? (
-              <ArabicText text="أو يمكنك المتابعة كضيف" />
-            ) : (
-              "Or you can continue as a guest"
-            )}
-          </p>
-          
-          <Button 
-            variant="outline" 
-            className="mt-2" 
-            onClick={handleContinueAsGuest}
-          >
-            {language === 'ar' ? (
-              <ArabicText text="الاستمرار كضيف" />
-            ) : (
-              "Continue as Guest"
-            )}
-          </Button>
-          
-          {/* Hidden form container that will be shown when continuing as guest */}
-          <div id="listing-form-container" className="hidden w-full">
-            <SheetHeader className={`text-${language === 'ar' ? 'right' : 'left'}`}>
-              <SheetTitle>
-                {language === 'ar' ? (
-                  <ArabicText text="إضافة إعلان جديد" size="large" />
-                ) : (
-                  "Add New Listing"
-                )}
-              </SheetTitle>
-            </SheetHeader>
-            
-            <div className="mt-6">
-              <ListingForm />
-            </div>
-          </div>
         </div>
       );
     }
