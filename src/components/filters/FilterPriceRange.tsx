@@ -28,6 +28,16 @@ const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) 
   const handlePriceRangeChange = (newValue: number[]) => {
     onChange([newValue[0], newValue[1]]);
   };
+
+  const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = parseInt(e.target.value) || 0;
+    onChange([newValue, value[1]]);
+  };
+
+  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = parseInt(e.target.value) || 0;
+    onChange([value[0], newValue]);
+  };
   
   return (
     <div className="space-y-4">
@@ -50,19 +60,29 @@ const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) 
         className="my-6"
       />
       
-      <div className="flex justify-between">
-        <Input
-          type="number"
-          value={value[0]}
-          onChange={(e) => onChange([parseInt(e.target.value) || 0, value[1]])}
-          className="w-24 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-        />
-        <Input
-          type="number"
-          value={value[1]}
-          onChange={(e) => onChange([value[0], parseInt(e.target.value) || 0])}
-          className="w-24 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-        />
+      <div className="flex justify-between gap-2">
+        <div className="relative flex-1">
+          <Input
+            type="number"
+            value={value[0]}
+            onChange={handleMinPriceChange}
+            className="w-full pr-16 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+          />
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+            {language === 'ar' ? 'ل.س' : 'SYP'}
+          </span>
+        </div>
+        <div className="relative flex-1">
+          <Input
+            type="number"
+            value={value[1]}
+            onChange={handleMaxPriceChange}
+            className="w-full pr-16 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+          />
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+            {language === 'ar' ? 'ل.س' : 'SYP'}
+          </span>
+        </div>
       </div>
     </div>
   );

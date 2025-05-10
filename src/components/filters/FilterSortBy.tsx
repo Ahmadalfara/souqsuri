@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const sortOptions = [
@@ -40,11 +41,13 @@ const FilterSortBy: React.FC<FilterSortByProps> = ({ value, onChange }) => {
           <SelectValue />
         </SelectTrigger>
         <SelectContent className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
-          {sortOptions.map((option) => (
-            <SelectItem key={option.id} value={option.id}>
-              {getName(option)}
-            </SelectItem>
-          ))}
+          <ScrollArea className="max-h-60">
+            {sortOptions.map((option) => (
+              <SelectItem key={option.id} value={option.id}>
+                {getName(option)}
+              </SelectItem>
+            ))}
+          </ScrollArea>
         </SelectContent>
       </Select>
     </div>

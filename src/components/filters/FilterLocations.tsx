@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Updated Syrian governorates
@@ -52,11 +53,13 @@ const FilterLocations: React.FC<FilterLocationsProps> = ({ value, onChange }) =>
           <SelectValue />
         </SelectTrigger>
         <SelectContent className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
-          {locations.map((loc) => (
-            <SelectItem key={loc.id} value={loc.id}>
-              {getName(loc)}
-            </SelectItem>
-          ))}
+          <ScrollArea className="h-60">
+            {locations.map((loc) => (
+              <SelectItem key={loc.id} value={loc.id}>
+                {getName(loc)}
+              </SelectItem>
+            ))}
+          </ScrollArea>
         </SelectContent>
       </Select>
     </div>

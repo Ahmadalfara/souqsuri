@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Categories data
@@ -45,11 +46,13 @@ const FilterCategories: React.FC<FilterCategoriesProps> = ({ value, onChange }) 
           <SelectValue />
         </SelectTrigger>
         <SelectContent className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
-          {categories.map((cat) => (
-            <SelectItem key={cat.id} value={cat.id}>
-              {getName(cat)}
-            </SelectItem>
-          ))}
+          <ScrollArea className="h-60">
+            {categories.map((cat) => (
+              <SelectItem key={cat.id} value={cat.id}>
+                {getName(cat)}
+              </SelectItem>
+            ))}
+          </ScrollArea>
         </SelectContent>
       </Select>
     </div>

@@ -14,7 +14,7 @@ const FilterBadge: React.FC<FilterBadgeProps> = ({ label, onRemove }) => {
       variant="outline" 
       className="flex items-center gap-1 px-3 py-1 bg-syrian-green/10 border-syrian-green/20 dark:bg-syrian-green/20 dark:border-syrian-green/30"
     >
-      <span>{label}</span>
+      <span className="dark:text-white">{label}</span>
       <button 
         onClick={onRemove}
         className="text-syrian-dark/60 hover:text-syrian-dark dark:text-white/60 dark:hover:text-white"

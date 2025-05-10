@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -30,15 +30,22 @@ const AdditionalFilters: React.FC<AdditionalFiltersProps> = ({
   onImagesOnlyChange
 }) => {
   const { language, t } = useLanguage();
+  const [accordionValue, setAccordionValue] = useState<string>("additional");
   
   return (
-    <Accordion type="single" collapsible defaultValue="additional">
+    <Accordion 
+      type="single" 
+      collapsible 
+      value={accordionValue} 
+      onValueChange={setAccordionValue}
+      className="border-b-0"
+    >
       <AccordionItem value="additional" className="border-b-0">
-        <AccordionTrigger className="dark:text-white hover:no-underline">
+        <AccordionTrigger className="py-2 dark:text-white hover:no-underline">
           {language === 'ar' ? (
-            <ArabicText text={t('additionalFilters')} />
+            <ArabicText text="خيارات إضافية للتصفية" />
           ) : (
-            t('additionalFilters')
+            'Additional Filter Options'
           )}
         </AccordionTrigger>
         <AccordionContent>
@@ -47,9 +54,9 @@ const AdditionalFilters: React.FC<AdditionalFiltersProps> = ({
             <div className="space-y-2">
               <Label className="dark:text-white">
                 {language === 'ar' ? (
-                  <ArabicText text={t('searchWithin')} />
+                  <ArabicText text="البحث ضمن النتائج" />
                 ) : (
-                  t('searchWithin')
+                  'Search Within Results'
                 )}
               </Label>
               <Input
@@ -64,9 +71,9 @@ const AdditionalFilters: React.FC<AdditionalFiltersProps> = ({
             <div className="flex items-center justify-between">
               <Label className="dark:text-white">
                 {language === 'ar' ? (
-                  <ArabicText text={t('showPromotedOnly')} />
+                  <ArabicText text="الإعلانات المميزة فقط" />
                 ) : (
-                  t('showPromotedOnly')
+                  'Featured Listings Only'
                 )}
               </Label>
               <Switch
@@ -79,9 +86,9 @@ const AdditionalFilters: React.FC<AdditionalFiltersProps> = ({
             <div className="flex items-center justify-between">
               <Label className="dark:text-white">
                 {language === 'ar' ? (
-                  <ArabicText text={t('showWithImagesOnly')} />
+                  <ArabicText text="مع صور فقط" />
                 ) : (
-                  t('showWithImagesOnly')
+                  'With Images Only'
                 )}
               </Label>
               <Switch
