@@ -12,12 +12,16 @@ const FilterBadge: React.FC<FilterBadgeProps> = ({ label, onRemove }) => {
   return (
     <Badge 
       variant="outline" 
-      className="flex items-center gap-1 px-3 py-1 bg-syrian-green/10 border-syrian-green/20 dark:bg-syrian-green/20 dark:border-syrian-green/30"
+      className="flex items-center gap-1 px-2 py-1 text-xs sm:text-sm sm:px-3 bg-syrian-green/10 border-syrian-green/20 dark:bg-syrian-green/20 dark:border-syrian-green/30 max-w-[150px] sm:max-w-none"
     >
-      <span className="dark:text-white">{label}</span>
+      <span className="dark:text-white truncate">{label}</span>
       <button 
-        onClick={onRemove}
-        className="text-syrian-dark/60 hover:text-syrian-dark dark:text-white/60 dark:hover:text-white"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onRemove();
+        }}
+        className="text-syrian-dark/60 hover:text-syrian-dark dark:text-white/60 dark:hover:text-white flex-shrink-0"
         aria-label="Remove filter"
       >
         <X size={14} />

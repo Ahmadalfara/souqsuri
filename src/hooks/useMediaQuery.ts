@@ -29,25 +29,24 @@ export function useMediaQuery(query: string): boolean {
     // Triggered at the first client-side load and if query changes
     handleChange();
 
-    // Add listener for subsequent changes
-    if (matchMedia.addListener) {
-      // For older browsers
-      matchMedia.addListener(handleChange);
-    } else {
-      // Modern browsers
-      matchMedia.addEventListener('change', handleChange);
-    }
+    // Use addEventListener for better compatibility
+    matchMedia.addEventListener('change', handleChange);
 
     return () => {
-      if (matchMedia.removeListener) {
-        // For older browsers
-        matchMedia.removeListener(handleChange);
-      } else {
-        // Modern browsers
-        matchMedia.removeEventListener('change', handleChange);
-      }
+      matchMedia.removeEventListener('change', handleChange);
     };
   }, [query]);
 
   return matches;
 }
+
+export const breakpoints = {
+  sm: '(min-width: 640px)',
+  md: '(min-width: 768px)',
+  lg: '(min-width: 1024px)',
+  xl: '(min-width: 1280px)',
+  '2xl': '(min-width: 1536px)',
+  mobile: '(max-width: 767px)',
+  tablet: '(min-width: 768px) and (max-width: 1023px)',
+  desktop: '(min-width: 1024px)',
+};

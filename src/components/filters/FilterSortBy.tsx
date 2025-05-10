@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 const sortOptions = [
   { id: 'newest', nameAr: 'الأحدث', nameEn: 'Newest' },
@@ -25,6 +26,7 @@ interface FilterSortByProps {
 
 const FilterSortBy: React.FC<FilterSortByProps> = ({ value, onChange }) => {
   const { language } = useLanguage();
+  const isMobile = useMediaQuery('(max-width: 640px)');
   
   // Get name based on language
   const getName = (item: any) => {
@@ -32,15 +34,15 @@ const FilterSortBy: React.FC<FilterSortByProps> = ({ value, onChange }) => {
   };
   
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 w-full">
       <Label className="dark:text-white">
         {language === 'ar' ? 'ترتيب حسب' : 'Sort By'}
       </Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
+        <SelectTrigger className="dark:bg-gray-700 dark:text-white dark:border-gray-600 w-full">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
+        <SelectContent className="dark:bg-gray-700 dark:text-white dark:border-gray-600" position={isMobile ? "popper" : "item-aligned"} side={isMobile ? "bottom" : undefined}>
           <ScrollArea className="max-h-60">
             {sortOptions.map((option) => (
               <SelectItem key={option.id} value={option.id}>

@@ -9,9 +9,10 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface MobileMenuProps {
   isOpen: boolean;
+  onClose?: () => void;
 }
 
-const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen }) => {
+const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
   const { language } = useLanguage();
   
   // Check if we're within AuthProvider context
@@ -26,30 +27,34 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen }) => {
   const isAuthReady = authContext !== undefined;
   
   if (!isOpen) return null;
+
+  const handleLinkClick = () => {
+    if (onClose) onClose();
+  };
   
   return (
-    <div className={`md:hidden fixed inset-0 bg-white dark:bg-gray-900 z-40 flex flex-col p-6 pt-20
+    <div className={`md:hidden fixed inset-0 bg-white dark:bg-gray-900 z-40 flex flex-col p-4 pt-16 overflow-y-auto
                      ${language === 'ar' ? 'text-right' : 'text-left'}`}>
-      <div className={`flex items-center justify-between mb-8 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+      <div className={`flex items-center justify-between mb-6 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
         <ThemeSwitcher />
         <LanguageSwitcher />
       </div>
       
       {isAuthReady && (
-        <div className="mb-8">
+        <div className="mb-6">
           <AuthButtons />
         </div>
       )}
       
-      <nav className={`flex flex-col space-y-6 ${language === 'ar' ? 'items-end' : 'items-start'}`}>
+      <nav className={`flex flex-col space-y-5 ${language === 'ar' ? 'items-end' : 'items-start'}`}>
         {/* Navigation links */}
-        <Link to="/" className="font-medium">
+        <Link to="/" className="font-medium text-lg" onClick={handleLinkClick}>
           {language === 'ar' ? 'الرئيسية' : 'Home'}
         </Link>
-        <Link to="/featured-listings" className="font-medium">
+        <Link to="/featured-listings" className="font-medium text-lg" onClick={handleLinkClick}>
           {language === 'ar' ? 'الإعلانات المميزة' : 'Featured Listings'}
         </Link>
-        <Link to="/contact" className="font-medium">
+        <Link to="/contact" className="font-medium text-lg" onClick={handleLinkClick}>
           {language === 'ar' ? 'اتصل بنا' : 'Contact Us'}
         </Link>
       </nav>
