@@ -1,7 +1,7 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile, useIsTouch } from '@/hooks/use-mobile';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 type Theme = 'light' | 'dark';
@@ -27,13 +27,16 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const systemTheme: Theme = prefersDarkMode ? 'dark' : 'light';
   const isMobile = useIsMobile();
+  const isTouch = useIsTouch();
   const { language } = useLanguage();
   
   // Initialize with stored theme or system preference
   const [theme, setThemeState] = useState<Theme>(() => {
-    const storedTheme = localStorage.getItem('theme');
-    if (storedTheme === 'dark' || storedTheme === 'light') {
-      return storedTheme as Theme;
+    if (typeof window !== 'undefined') {
+      const storedTheme = localStorage.getItem('theme');
+      if (storedTheme === 'dark' || storedTheme === 'light') {
+        return storedTheme as Theme;
+      }
     }
     return systemTheme;
   });
@@ -47,12 +50,16 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
     
     // Save theme preference to localStorage
-    localStorage.setItem('theme', theme);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('theme', theme);
+    }
   }, [theme]);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem('theme', newTheme);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('theme', newTheme);
+    }
   };
 
   const toggleTheme = () => {

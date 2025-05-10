@@ -45,14 +45,25 @@ const Header = () => {
                       dark:bg-gray-900 dark:border-gray-800 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
         <Logo />
 
-        {/* Mobile menu toggle */}
-        <button 
-          className="md:hidden text-syrian-dark dark:text-white p-1"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        {/* Mobile display controls */}
+        <div className={`flex items-center space-x-2 ${language === 'ar' ? 'space-x-reverse flex-row-reverse' : ''}`}>
+          <ThemeSwitcher id="mobile-theme-switcher" className="md:hidden" />
+          
+          {isAuthReady && (
+            <div className="md:hidden">
+              <AuthButtons />
+            </div>
+          )}
+          
+          {/* Mobile menu toggle */}
+          <button 
+            className="md:hidden text-syrian-dark dark:text-white p-1"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
         
         <div className={`hidden md:flex items-center space-x-4 ${language === 'ar' ? 'space-x-reverse flex-row-reverse' : ''}`}>
           <ThemeSwitcher />

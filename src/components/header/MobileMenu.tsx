@@ -33,7 +33,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
   };
   
   return (
-    <div className={`md:hidden fixed inset-0 bg-white dark:bg-gray-900 z-40 flex flex-col p-4 pt-16 overflow-y-auto
+    <div className={`md:hidden fixed inset-0 bg-white dark:bg-gray-900 z-50 flex flex-col p-4 pt-16 overflow-y-auto
                      ${language === 'ar' ? 'text-right' : 'text-left'}`}>
       <div className={`flex items-center justify-between mb-6 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
         <ThemeSwitcher />

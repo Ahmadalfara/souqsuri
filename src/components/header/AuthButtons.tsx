@@ -14,13 +14,13 @@ const AuthButtons = () => {
   const { currentUser } = useAuth();
 
   return (
-    <div className={`hidden md:flex items-center ${language === 'ar' ? 'space-x-reverse space-x-4 flex-row-reverse' : 'space-x-4'}`}>
+    <div className={`flex items-center ${language === 'ar' ? 'space-x-reverse space-x-4 flex-row-reverse' : 'space-x-4'}`}>
       {currentUser ? (
         <div className={`flex items-center ${language === 'ar' ? 'space-x-reverse space-x-4 flex-row-reverse' : 'space-x-4'}`}>
           <UserMenu />
           
           <CreateListingSheet>
-            <Button className="bg-syrian-green hover:bg-syrian-dark text-white">
+            <Button size="sm" className="bg-syrian-green hover:bg-syrian-dark text-white text-xs sm:text-sm">
               {language === 'ar' ? (
                 <ArabicText text="إضافة إعلان" />
               ) : (
@@ -33,8 +33,9 @@ const AuthButtons = () => {
         <>
           <AuthSheet>
             <Button 
-              variant="outline" 
-              className="border-syrian-gold text-syrian-dark hover:bg-syrian-gold/10"
+              variant="outline"
+              size="sm"
+              className="border-syrian-gold text-syrian-dark hover:bg-syrian-gold/10 text-xs sm:text-sm"
             >
               <User className={`${language === 'ar' ? 'ml-1' : 'mr-1'} h-4 w-4`} />
               {language === 'ar' ? (
@@ -46,7 +47,7 @@ const AuthButtons = () => {
           </AuthSheet>
           
           <AuthSheet defaultTab="register">
-            <Button className="bg-syrian-green hover:bg-syrian-dark text-white">
+            <Button size="sm" className="bg-syrian-green hover:bg-syrian-dark text-white text-xs sm:text-sm">
               {language === 'ar' ? (
                 <ArabicText text="إنشاء حساب" />
               ) : (
