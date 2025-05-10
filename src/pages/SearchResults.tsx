@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useCurrencyConverter } from '@/services/currencyService';
 import { searchListings } from '@/services/listings/search';
 import { getListingsByCategoryId } from '@/services/listings/categorySearch';
@@ -38,6 +39,7 @@ const SearchResults = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { language, t } = useLanguage();
+  const { theme } = useTheme();
   const { formatCurrency, convert, exchangeRate } = useCurrencyConverter();
   const [displayCurrency, setDisplayCurrency] = useState<'SYP' | 'USD'>(
     searchParams.get('currency') === 'USD' ? 'USD' : 'SYP'
@@ -155,7 +157,7 @@ const SearchResults = () => {
       <GeometricPattern className="flex-grow">
         <Header />
         <main className="container mx-auto px-4 pb-8">
-          <div className="mb-6 mt-4 bg-white rounded-lg p-5 shadow-sm border border-syrian-green/20 dark:bg-gray-800 dark:border-gray-700">
+          <div className="mb-6 mt-4 bg-white rounded-lg p-5 shadow-sm border border-syrian-green/20 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
             <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
               <h1 className={`text-2xl font-bold text-syrian-dark dark:text-white ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                 {language === 'ar' ? (
@@ -166,7 +168,7 @@ const SearchResults = () => {
               </h1>
               <button 
                 onClick={toggleCurrency}
-                className="text-sm px-3 py-1 rounded-full bg-syrian-green/10 text-syrian-green hover:bg-syrian-green/20 transition-colors"
+                className="text-sm px-3 py-1 rounded-full bg-syrian-green/10 text-syrian-green hover:bg-syrian-green/20 transition-colors dark:bg-syrian-green/20 dark:hover:bg-syrian-green/30"
               >
                 {language === 'ar' ? (
                   <ArabicText text={`عرض بـ: ${displayCurrency === 'USD' ? 'دولار' : 'ليرة سورية'}`} />

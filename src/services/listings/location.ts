@@ -1,23 +1,32 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/types/supabase';
-import { getDistrictById, getGovernorateById } from '@/services/locationService';
+import { getDistrictById, getGovernorateById, syrianGovernorates } from '@/services/locationService';
 
 export const getGovernorates = async (): Promise<Database['public']['Tables']['governorates']['Row'][]> => {
   try {
+    // First try to get from Supabase
     const { data, error } = await supabase
       .from('governorates')
       .select('*')
       .order('name_ar', { ascending: true });
       
     if (error) {
-      throw error;
+      console.error('Error getting governorates from Supabase:', error);
+      // If Supabase fails, return the static list
+      return syrianGovernorates as Database['public']['Tables']['governorates']['Row'][];
     }
     
-    return data || [];
+    // If Supabase returned no data, return the static list
+    if (!data || data.length === 0) {
+      return syrianGovernorates as Database['public']['Tables']['governorates']['Row'][];
+    }
+    
+    return data;
   } catch (error) {
     console.error('Error getting governorates:', error);
-    throw error;
+    // In case of any error, fall back to the static list
+    return syrianGovernorates as Database['public']['Tables']['governorates']['Row'][];
   }
 };
 
@@ -36,7 +45,7 @@ export const getDistricts = async (governorateId: string): Promise<Database['pub
     return data || [];
   } catch (error) {
     console.error('Error getting districts:', error);
-    throw error;
+    return [];
   }
 };
 

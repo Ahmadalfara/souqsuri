@@ -47,14 +47,23 @@ const categories = [
   { id: 'services', nameAr: 'خدمات', nameEn: 'Services' },
 ];
 
+// Updated Syrian governorates
 const locations = [
   { id: 'all', nameAr: 'جميع المناطق', nameEn: 'All Locations' },
   { id: 'damascus', nameAr: 'دمشق', nameEn: 'Damascus' },
+  { id: 'damascus_countryside', nameAr: 'ريف دمشق', nameEn: 'Damascus Countryside' },
   { id: 'aleppo', nameAr: 'حلب', nameEn: 'Aleppo' },
   { id: 'homs', nameAr: 'حمص', nameEn: 'Homs' },
   { id: 'hama', nameAr: 'حماة', nameEn: 'Hama' },
   { id: 'latakia', nameAr: 'اللاذقية', nameEn: 'Latakia' },
   { id: 'tartus', nameAr: 'طرطوس', nameEn: 'Tartus' },
+  { id: 'idlib', nameAr: 'إدلب', nameEn: 'Idlib' },
+  { id: 'deir_ez_zor', nameAr: 'دير الزور', nameEn: 'Deir ez-Zor' },
+  { id: 'raqqa', nameAr: 'الرقة', nameEn: 'Raqqa' },
+  { id: 'hasakah', nameAr: 'الحسكة', nameEn: 'Hasakah' },
+  { id: 'daraa', nameAr: 'درعا', nameEn: 'Daraa' },
+  { id: 'sweida', nameAr: 'السويداء', nameEn: 'Sweida' },
+  { id: 'quneitra', nameAr: 'القنيطرة', nameEn: 'Quneitra' }
 ];
 
 const sortOptions = [
@@ -63,6 +72,9 @@ const sortOptions = [
   { id: 'price_high_low', nameAr: 'السعر: من الأعلى إلى الأقل', nameEn: 'Price: High to Low' },
   { id: 'price_low_high', nameAr: 'السعر: من الأقل إلى الأعلى', nameEn: 'Price: Low to High' },
 ];
+
+// Increased price range to 100 billion SYP
+const MAX_PRICE = 100000000000; // 100 billion
 
 interface ListingFiltersProps {
   onFilterChange?: (filters: any) => void;
@@ -78,7 +90,9 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
   // Filter states
   const [category, setCategory] = useState(initialFilters.category || 'all');
   const [location, setLocation] = useState(initialFilters.location || 'all');
-  const [priceRange, setPriceRange] = useState<[number, number]>(initialFilters.priceRange || [0, 10000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>(
+    initialFilters.priceRange || [0, MAX_PRICE / 10]
+  );
   const [sortBy, setSortBy] = useState(initialFilters.sortBy || 'newest');
   const [searchWithin, setSearchWithin] = useState(initialFilters.searchWithin || '');
   const [showPromotedOnly, setShowPromotedOnly] = useState(initialFilters.showPromotedOnly || false);
@@ -92,7 +106,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
     let count = 0;
     if (category !== 'all') count++;
     if (location !== 'all') count++;
-    if (priceRange[0] > 0 || priceRange[1] < 10000) count++;
+    if (priceRange[0] > 0 || priceRange[1] < MAX_PRICE) count++;
     if (sortBy !== 'newest') count++;
     if (searchWithin) count++;
     if (showPromotedOnly) count++;
@@ -124,7 +138,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
   const resetFilters = () => {
     setCategory('all');
     setLocation('all');
-    setPriceRange([0, 10000]);
+    setPriceRange([0, MAX_PRICE / 10]);
     setSortBy('newest');
     setSearchWithin('');
     setShowPromotedOnly(false);
@@ -134,7 +148,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
       onFilterChange({
         category: 'all',
         location: 'all',
-        priceRange: [0, 10000],
+        priceRange: [0, MAX_PRICE / 10],
         sortBy: 'newest',
         searchWithin: '',
         urgent: false,
@@ -183,11 +197,11 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
       }
     }
     
-    if (priceRange[0] > 0 || priceRange[1] < 10000) {
+    if (priceRange[0] > 0 || priceRange[1] < MAX_PRICE) {
       filters.push({
         id: 'price',
         label: `${formatPrice(priceRange[0])} - ${formatPrice(priceRange[1])}`,
-        onRemove: () => setPriceRange([0, 10000]),
+        onRemove: () => setPriceRange([0, MAX_PRICE / 10]),
       });
     }
     
@@ -232,12 +246,12 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
           <Badge 
             key={filter.id} 
             variant="outline" 
-            className="flex items-center gap-1 px-3 py-1 bg-syrian-green/10 border-syrian-green/20"
+            className="flex items-center gap-1 px-3 py-1 bg-syrian-green/10 border-syrian-green/20 dark:bg-syrian-green/20 dark:border-syrian-green/30"
           >
             <span>{filter.label}</span>
             <button 
               onClick={filter.onRemove}
-              className="text-syrian-dark/60 hover:text-syrian-dark"
+              className="text-syrian-dark/60 hover:text-syrian-dark dark:text-white/60 dark:hover:text-white"
               aria-label="Remove filter"
             >
               <X size={14} />
@@ -250,7 +264,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
             variant="ghost" 
             size="sm" 
             onClick={resetFilters}
-            className="text-syrian-dark/60 hover:text-syrian-dark hover:bg-syrian-green/10"
+            className="text-syrian-dark/60 hover:text-syrian-dark hover:bg-syrian-green/10 dark:text-white/60 dark:hover:text-white dark:hover:bg-syrian-green/20"
           >
             {language === 'ar' ? (
               <ArabicText text="مسح الكل" />
@@ -312,7 +326,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
   };
   
   return (
-    <div className={className}>
+    <div className={`${className} dark:text-white`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -321,8 +335,8 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
                 variant="outline" 
                 size="sm" 
                 className={`
-                  flex items-center gap-2 
-                  ${activeFilterCount > 0 ? 'border-syrian-green text-syrian-green' : ''}
+                  flex items-center gap-2 dark:bg-gray-800 dark:text-white dark:border-gray-700
+                  ${activeFilterCount > 0 ? 'border-syrian-green text-syrian-green dark:border-syrian-green dark:text-syrian-green' : ''}
                 `}
               >
                 <Filter size={16} />
@@ -340,17 +354,17 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
             </SheetTrigger>
             <SheetContent 
               side={language === 'ar' ? 'right' : 'left'} 
-              className={`w-full sm:max-w-md ${language === 'ar' ? 'rtl' : 'ltr'}`}
+              className={`w-full sm:max-w-md ${language === 'ar' ? 'rtl' : 'ltr'} dark:bg-gray-800 dark:text-white dark:border-gray-700`}
             >
               <SheetHeader>
-                <SheetTitle>
+                <SheetTitle className="dark:text-white">
                   {language === 'ar' ? (
                     <ArabicText text={t('filters')} />
                   ) : (
                     t('filters')
                   )}
                 </SheetTitle>
-                <SheetDescription>
+                <SheetDescription className="dark:text-gray-400">
                   {language === 'ar' ? (
                     <ArabicText text={t('filtersDescription')} />
                   ) : (
@@ -362,7 +376,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
               <div className="mt-6 space-y-6">
                 {/* Category Filter */}
                 <div className="space-y-2">
-                  <Label>
+                  <Label className="dark:text-white">
                     {language === 'ar' ? (
                       <ArabicText text={t('category')} />
                     ) : (
@@ -370,10 +384,10 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
                     )}
                   </Label>
                   <Select value={category} onValueChange={handleCategoryChange}>
-                    <SelectTrigger>
+                    <SelectTrigger className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
                       {categories.map((cat) => (
                         <SelectItem key={cat.id} value={cat.id}>
                           {getName(cat)}
@@ -385,7 +399,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
                 
                 {/* Location Filter */}
                 <div className="space-y-2">
-                  <Label>
+                  <Label className="dark:text-white">
                     {language === 'ar' ? (
                       <ArabicText text={t('location')} />
                     ) : (
@@ -393,10 +407,10 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
                     )}
                   </Label>
                   <Select value={location} onValueChange={handleLocationChange}>
-                    <SelectTrigger>
+                    <SelectTrigger className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
                       {locations.map((loc) => (
                         <SelectItem key={loc.id} value={loc.id}>
                           {getName(loc)}
@@ -409,22 +423,22 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
                 {/* Price Range Filter */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label>
+                    <Label className="dark:text-white">
                       {language === 'ar' ? (
                         <ArabicText text={t('priceRange')} />
                       ) : (
                         t('priceRange')
                       )}
                     </Label>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
                     </span>
                   </div>
                   <Slider
                     defaultValue={priceRange}
                     min={0}
-                    max={10000}
-                    step={100}
+                    max={MAX_PRICE / 10} // Display a more reasonable range in the UI
+                    step={1000000} // Steps of 1 million
                     value={priceRange}
                     onValueChange={handlePriceRangeChange}
                     className="my-6"
@@ -434,22 +448,22 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
                       type="number"
                       value={priceRange[0]}
                       onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
-                      className="w-24"
+                      className="w-24 dark:bg-gray-700 dark:text-white dark:border-gray-600"
                     />
                     <Input
                       type="number"
                       value={priceRange[1]}
                       onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                      className="w-24"
+                      className="w-24 dark:bg-gray-700 dark:text-white dark:border-gray-600"
                     />
                   </div>
                 </div>
                 
-                <Separator />
+                <Separator className="dark:bg-gray-600" />
                 
                 {/* Sort By */}
                 <div className="space-y-2">
-                  <Label>
+                  <Label className="dark:text-white">
                     {language === 'ar' ? (
                       <ArabicText text={t('sortBy')} />
                     ) : (
@@ -457,10 +471,10 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
                     )}
                   </Label>
                   <Select value={sortBy} onValueChange={handleSortByChange}>
-                    <SelectTrigger>
+                    <SelectTrigger className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
                       {sortOptions.map((option) => (
                         <SelectItem key={option.id} value={option.id}>
                           {getName(option)}
@@ -470,12 +484,12 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
                   </Select>
                 </div>
                 
-                <Separator />
+                <Separator className="dark:bg-gray-600" />
                 
                 {/* Additional Filters */}
                 <Accordion type="single" collapsible defaultValue="additional">
-                  <AccordionItem value="additional">
-                    <AccordionTrigger>
+                  <AccordionItem value="additional" className="border-b-0">
+                    <AccordionTrigger className="dark:text-white hover:no-underline">
                       {language === 'ar' ? (
                         <ArabicText text={t('additionalFilters')} />
                       ) : (
@@ -486,7 +500,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
                       <div className="space-y-4 pt-2">
                         {/* Search Within */}
                         <div className="space-y-2">
-                          <Label>
+                          <Label className="dark:text-white">
                             {language === 'ar' ? (
                               <ArabicText text={t('searchWithin')} />
                             ) : (
@@ -497,12 +511,13 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
                             value={searchWithin}
                             onChange={handleSearchWithinChange}
                             placeholder={language === 'ar' ? 'البحث ضمن النتائج' : 'Search within results'}
+                            className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
                           />
                         </div>
                         
                         {/* Show Promoted Only */}
                         <div className="flex items-center justify-between">
-                          <Label>
+                          <Label className="dark:text-white">
                             {language === 'ar' ? (
                               <ArabicText text={t('showPromotedOnly')} />
                             ) : (
@@ -517,7 +532,7 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
                         
                         {/* Show With Images Only */}
                         <div className="flex items-center justify-between">
-                          <Label>
+                          <Label className="dark:text-white">
                             {language === 'ar' ? (
                               <ArabicText text={t('showWithImagesOnly')} />
                             ) : (
@@ -537,7 +552,11 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
               
               <SheetFooter className="mt-6 flex-row justify-between">
                 <SheetClose asChild>
-                  <Button variant="outline" onClick={resetFilters}>
+                  <Button 
+                    variant="outline" 
+                    onClick={resetFilters}
+                    className="dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600"
+                  >
                     {language === 'ar' ? (
                       <ArabicText text={t('reset')} />
                     ) : (
@@ -559,10 +578,10 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
           {/* Sort By Quick Select (Desktop) */}
           <div className="hidden md:block">
             <Select value={sortBy} onValueChange={handleSortByChange}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] dark:bg-gray-700 dark:text-white dark:border-gray-600">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
                 {sortOptions.map((option) => (
                   <SelectItem key={option.id} value={option.id}>
                     {getName(option)}
@@ -575,7 +594,11 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
         
         {/* View Toggle (Grid/List) */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="text-syrian-green">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-syrian-green dark:text-syrian-green dark:hover:bg-gray-700"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="7" height="7" />
               <rect x="14" y="3" width="7" height="7" />
@@ -583,7 +606,11 @@ const ListingFilters = ({ onFilterChange, initialFilters = {}, className = '' }:
               <rect x="3" y="14" width="7" height="7" />
             </svg>
           </Button>
-          <Button variant="ghost" size="icon">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="dark:hover:bg-gray-700"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="21" y1="6" x2="3" y2="6" />
               <line x1="21" y1="12" x2="3" y2="12" />

@@ -29,8 +29,14 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const isMobile = useIsMobile();
   const { language } = useLanguage();
   
-  // Always initialize with light mode
-  const [theme, setThemeState] = useState<Theme>('light');
+  // Initialize with stored theme or system preference
+  const [theme, setThemeState] = useState<Theme>(() => {
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme === 'dark' || storedTheme === 'light') {
+      return storedTheme as Theme;
+    }
+    return systemTheme;
+  });
 
   useEffect(() => {
     // Update document theme class based on selected theme
@@ -52,18 +58,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   };
-  
-  // If on mobile and dark mode isn't available, make it available
-  useEffect(() => {
-    if (isMobile) {
-      // Make dark mode available, but don't switch to it automatically
-      // The user can still choose dark mode if they prefer
-      const darkModeBtn = document.getElementById('dark-mode-toggle');
-      if (darkModeBtn) {
-        darkModeBtn.classList.remove('hidden');
-      }
-    }
-  }, [isMobile]);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, systemTheme }}>

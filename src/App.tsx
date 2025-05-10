@@ -2,6 +2,7 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import './index.css';
 import { Toaster } from '@/components/ui/toaster';
@@ -26,27 +27,29 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <AuthProvider>
-          <Router>
-            <Suspense fallback={<div>Loading...</div>}>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/category/:categoryName" element={<Index />} />
-                <Route path="/featured-listings" element={<FeaturedListings />} />
-                <Route path="/profile" element={<UserProfile />} />
-                <Route path="/listing/:listingId" element={<ListingDetails />} />
-                <Route path="/search" element={<SearchResults />} />
-                <Route path="/faq" element={<FAQ />} />
-                <Route path="/how-to-sell" element={<HowToSell />} />
-                <Route path="/customer-support" element={<CustomerSupport />} />
-                <Route path="/terms-of-service" element={<TermsOfService />} />
-                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                <Route path="/contact" element={<ContactUs />} />
-              </Routes>
-            </Suspense>
-            <Toaster />
-          </Router>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <Router>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/category/:categoryName" element={<Index />} />
+                  <Route path="/featured-listings" element={<FeaturedListings />} />
+                  <Route path="/profile" element={<UserProfile />} />
+                  <Route path="/listing/:listingId" element={<ListingDetails />} />
+                  <Route path="/search" element={<SearchResults />} />
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/how-to-sell" element={<HowToSell />} />
+                  <Route path="/customer-support" element={<CustomerSupport />} />
+                  <Route path="/terms-of-service" element={<TermsOfService />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/contact" element={<ContactUs />} />
+                </Routes>
+              </Suspense>
+              <Toaster />
+            </Router>
+          </AuthProvider>
+        </ThemeProvider>
       </LanguageProvider>
     </QueryClientProvider>
   );

@@ -162,7 +162,7 @@ const SearchBar = ({ className = '', onSearch, initialQuery = '' }: SearchBarPro
           <Input
             type="text"
             placeholder={language === 'ar' ? 'ابحث هنا...' : 'Search...'}
-            className={`pl-10 pr-4 py-6 w-full border-2 border-syrian-green/20 focus:border-syrian-green rounded-lg bg-white 
+            className={`pl-10 pr-4 py-6 w-full border-2 border-syrian-green/20 focus:border-syrian-green rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white
                       ${language === 'ar' ? 'text-right pr-10 pl-4' : ''}`}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -173,7 +173,7 @@ const SearchBar = ({ className = '', onSearch, initialQuery = '' }: SearchBarPro
             }}
           />
           <Search 
-            className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 
+            className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-400
                         ${language === 'ar' ? 'right-3' : 'left-3'}`} 
             size={20} 
           />
@@ -183,15 +183,15 @@ const SearchBar = ({ className = '', onSearch, initialQuery = '' }: SearchBarPro
         <Button
           type="button"
           variant="outline"
-          className={`px-3 py-6 border-2 hover:bg-syrian-green/5 rounded-lg transition-colors
-                     ${showInlineFilters ? 'border-syrian-green bg-syrian-green/5' : 'border-syrian-green/20'}`}
+          className={`px-3 py-6 border-2 hover:bg-syrian-green/5 rounded-lg transition-colors dark:bg-gray-800 dark:text-white dark:border-gray-700
+                     ${showInlineFilters ? 'border-syrian-green bg-syrian-green/5 dark:border-syrian-green' : 'border-syrian-green/20'}`}
           aria-label="Filter"
           onClick={toggleFilters}
         >
           {showInlineFilters ? (
-            <X size={20} className="text-syrian-green" />
+            <X size={20} className="text-syrian-green dark:text-syrian-green" />
           ) : (
-            <Filter size={20} className="text-syrian-green" />
+            <Filter size={20} className="text-syrian-green dark:text-syrian-green" />
           )}
         </Button>
         
@@ -216,7 +216,7 @@ const SearchBar = ({ className = '', onSearch, initialQuery = '' }: SearchBarPro
 
       {/* Inline filters panel */}
       {showInlineFilters && (
-        <div className="absolute z-40 mt-2 w-full bg-white rounded-lg border border-syrian-green/20 shadow-lg p-4 dark:bg-gray-800">
+        <div className="absolute z-40 mt-2 w-full bg-white dark:bg-gray-800 rounded-lg border border-syrian-green/20 dark:border-gray-700 shadow-lg p-4">
           <ListingFilters
             initialFilters={filters}
             onFilterChange={handleFilterChange}
