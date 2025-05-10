@@ -30,8 +30,7 @@ export function useIsTouch() {
   React.useEffect(() => {
     // Check if device supports touch
     const hasTouch = 'ontouchstart' in window || 
-      navigator.maxTouchPoints > 0 ||
-      navigator.msMaxTouchPoints > 0;
+      navigator.maxTouchPoints > 0;
       
     setIsTouch(hasTouch);
   }, [])

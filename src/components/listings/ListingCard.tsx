@@ -12,13 +12,15 @@ interface ListingCardProps {
   isFeatured?: boolean;
   displayCurrency?: 'SYP' | 'USD';
   formatPrice?: (price: number, currency: string) => string;
+  compact?: boolean; // Added compact prop
 }
 
 const ListingCard = ({ 
   listing, 
   isFeatured = false,
   displayCurrency,
-  formatPrice 
+  formatPrice,
+  compact = false // Set default to false
 }: ListingCardProps) => {
   const navigate = useNavigate();
   const { language } = useLanguage();
@@ -61,7 +63,7 @@ const ListingCard = ({
         </div>
       )}
       <CardHeader className="p-0">
-        <div className="h-48 overflow-hidden">
+        <div className={`${compact ? 'h-36' : 'h-48'} overflow-hidden`}>
           <img 
             src={listing.images && listing.images.length > 0 ? listing.images[0] : '/placeholder.svg'} 
             alt={listing.title} 
@@ -69,14 +71,14 @@ const ListingCard = ({
           />
         </div>
       </CardHeader>
-      <CardContent className="p-4">
-        <h3 className={`font-bold text-lg mb-2 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+      <CardContent className={`${compact ? 'p-3' : 'p-4'}`}>
+        <h3 className={`font-bold ${compact ? 'text-base' : 'text-lg'} mb-2 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
           <ArabicText 
             text={listing.title} 
             textEn={listing.title_en || listing.title}
           />
         </h3>
-        <p className={`text-syrian-dark/70 line-clamp-2 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+        <p className={`text-syrian-dark/70 line-clamp-2 ${compact ? 'text-sm' : 'text-base'} ${language === 'ar' ? 'text-right' : 'text-left'}`}>
           <ArabicText 
             text={listing.description} 
             textEn={listing.description_en || listing.description}
@@ -88,14 +90,16 @@ const ListingCard = ({
           />
         </p>
       </CardContent>
-      <CardFooter className="p-4 pt-0 flex justify-between items-center">
+      <CardFooter className={`${compact ? 'p-3 pt-0' : 'p-4 pt-0'} flex justify-between items-center ${compact ? 'flex-col space-y-2' : ''}`}>
         <Button 
           variant="outline"
+          size={compact ? "sm" : "default"}
           onClick={() => navigate(`/listing/${listing.id}`)}
+          className={compact ? "w-full" : ""}
         >
           <ArabicText text={detailsButtonText} />
         </Button>
-        <div className="text-sm text-gray-500">
+        <div className={`text-${compact ? 'xs' : 'sm'} text-gray-500 ${compact ? 'w-full text-center' : ''}`}>
           <ArabicText 
             text={getLocationString(listing)} 
           />
