@@ -287,9 +287,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // If verification successful, update Supabase auth
-      // Fix: Use correct property from Supabase user attributes
+      // Update user metadata to mark phone as confirmed
       const { error: updateError } = await supabase.auth.updateUser({
-        data: { phone_confirmed: true }
+        data: { phone_confirmed: true } // This is stored in user metadata
       });
       
       if (updateError) {
