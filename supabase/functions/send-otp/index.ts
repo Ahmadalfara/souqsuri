@@ -43,7 +43,7 @@ serve(async (req) => {
     const otpCode = generateOTPCode();
     
     // Create a message for the SMS
-    const message = `Your verification code is: ${otpCode}. It will expire in 5 minutes.`;
+    const message = `رمز التحقق الخاص بك هو: ${otpCode}`;
 
     // Format the phone number to ensure it has a '+' prefix if needed
     const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
@@ -77,16 +77,26 @@ serve(async (req) => {
       );
     }
 
-    // Prepare the EasySendSMS API request
-    const apiUrl = new URL('https://www.easysendsms.com/sms/api');
-    apiUrl.searchParams.append('action', 'send-sms');
-    apiUrl.searchParams.append('api_key', apiKey);
-    apiUrl.searchParams.append('to', formattedPhone);
-    apiUrl.searchParams.append('from', 'SyrianDL');
-    apiUrl.searchParams.append('sms', message);
+    // Prepare the EasySendSMS API request (using the new REST API URL)
+    const smsRequestBody = {
+      from: "SOUQNA",
+      to: formattedPhone.replace('+', ''), // Remove the '+' prefix as per API requirements
+      text: message,
+      type: "1"
+    };
 
-    // Send the SMS
-    const smsResponse = await fetch(apiUrl.toString());
+    console.log('Sending SMS with body:', JSON.stringify(smsRequestBody));
+
+    // Send the SMS using the new REST API format
+    const smsResponse = await fetch("https://restapi.easysendsms.app/v1/rest/sms/send", {
+      method: "POST",
+      headers: {
+        "apikey": apiKey,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(smsRequestBody)
+    });
     
     if (!smsResponse.ok) {
       const errorText = await smsResponse.text();
@@ -97,7 +107,7 @@ serve(async (req) => {
       );
     }
 
-    const smsResult = await smsResponse.text();
+    const smsResult = await smsResponse.json();
     console.log('SMS sent successfully:', smsResult);
 
     // Return success response
