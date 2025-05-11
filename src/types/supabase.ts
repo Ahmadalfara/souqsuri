@@ -155,6 +155,29 @@ export interface Database {
           created_at?: string
         }
       }
+      otp_codes: {
+        Row: {
+          id: string
+          phone: string
+          code: string
+          expires_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          phone: string
+          code: string
+          expires_at: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          phone?: string
+          code?: string
+          expires_at?: string
+          created_at?: string
+        }
+      }
       profiles: {
         Row: {
           id: string
@@ -243,6 +266,7 @@ export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Favorite = Database['public']['Tables']['favorites']['Row'];
 export type Message = Database['public']['Tables']['messages']['Row'];
 export type Report = Database['public']['Tables']['reports']['Row'];
+export type OtpCode = Database['public']['Tables']['otp_codes']['Row'];
 
 export type ListingCategory = Database['public']['Enums']['listing_category'];
 export type ListingStatus = Database['public']['Enums']['listing_status'];

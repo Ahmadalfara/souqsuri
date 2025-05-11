@@ -198,6 +198,30 @@ export type Database = {
           },
         ]
       }
+      otps: {
+        Row: {
+          code: string
+          created_at: string | null
+          expires_at: string | null
+          id: number
+          phone: string
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: number
+          phone: string
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: number
+          phone?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
