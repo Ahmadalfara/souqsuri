@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../integrations/supabase/client';
@@ -287,8 +288,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // If verification successful, update Supabase auth
+      // Fix: Use correct property from Supabase user attributes
       const { error: updateError } = await supabase.auth.updateUser({
-        phone_confirm: true
+        data: { phone_confirmed: true }
       });
       
       if (updateError) {
