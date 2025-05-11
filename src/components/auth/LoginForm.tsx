@@ -39,11 +39,12 @@ interface LoginFormProps {
 
 const LoginForm = ({ onForgotPassword }: LoginFormProps) => {
   const { toast } = useToast();
-  const { login, verifyOtp } = useAuth();
+  const { login, verifyCustomOtp } = useAuth();
   const { language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [showOtpForm, setShowOtpForm] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
 
   // Regular login form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -71,6 +72,7 @@ const LoginForm = ({ onForgotPassword }: LoginFormProps) => {
         : `+${values.phone}`;
       
       setPhoneNumber(formattedPhone);
+      setPassword(values.password);
       
       // Login will either complete the login or set up for OTP verification
       const needsOtp = await login(formattedPhone, values.password);
@@ -96,8 +98,14 @@ const LoginForm = ({ onForgotPassword }: LoginFormProps) => {
   async function onOtpSubmit(values: z.infer<typeof otpSchema>) {
     setIsLoading(true);
     try {
-      await verifyOtp(phoneNumber, values.otp);
-      // Success toast is handled in the AuthContext
+      // First verify the OTP with our custom service
+      const verified = await verifyCustomOtp(phoneNumber, values.otp);
+      
+      if (verified) {
+        // If verified, try to log in again with the saved credentials
+        await login(phoneNumber, password);
+        // Success toast is handled in the AuthContext
+      }
     } catch (error) {
       console.error('OTP verification error:', error);
     } finally {

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../integrations/supabase/client';
@@ -16,6 +15,8 @@ interface AuthContextType {
   updateUserProfile: (data: {[key: string]: any}) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updatePassword: (newPassword: string) => Promise<void>;
+  sendCustomOtp: (phone: string) => Promise<boolean>; // New function for custom OTP
+  verifyCustomOtp: (phone: string, code: string) => Promise<boolean>; // New function to verify custom OTP
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -104,18 +105,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (!data.user?.phone_confirmed_at) {
-        // If phone is not confirmed, trigger OTP verification
-        const { error: otpError } = await supabase.auth.signInWithOtp({
-          phone,
-        });
+        // If phone is not confirmed, use our custom OTP verification
+        const otpSent = await sendCustomOtp(phone);
         
-        if (otpError) {
+        if (!otpSent) {
           toast({
             title: t('error'),
-            description: otpError.message || t('otpSendFailed'),
+            description: t('otpSendFailed'),
             variant: "destructive"
           });
-          throw otpError;
+          throw new Error('Failed to send OTP');
         }
         
         return true; // OTP verification needed
@@ -164,9 +163,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw error;
       }
 
-      // If user was created but phone is not confirmed, trigger OTP verification
+      // If user was created but phone is not confirmed, use our custom OTP verification
       if (!data.user?.phone_confirmed_at) {
-        // Registration requires verification
+        // Send custom OTP
+        const otpSent = await sendCustomOtp(phone);
+        
+        if (!otpSent) {
+          toast({
+            title: t('error'),
+            description: t('otpSendFailed'),
+            variant: "destructive"
+          });
+          throw new Error('Failed to send OTP');
+        }
+        
         toast({
           title: t('registrationStarted'),
           description: t('pleaseVerifyPhone'),
@@ -191,9 +201,141 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Send custom OTP via our Edge Function
+  const sendCustomOtp = async (phone: string): Promise<boolean> => {
+    try {
+      // Format phone number to include +
+      const formattedPhone = phone.startsWith('+') 
+        ? phone 
+        : `+${phone}`;
+      
+      const { data, error } = await supabase.functions.invoke('send-otp', {
+        body: { phone: formattedPhone },
+      });
+      
+      if (error) {
+        console.error('Error sending OTP:', error);
+        toast({
+          title: t('error'),
+          description: error.message || t('otpSendFailed'),
+          variant: "destructive"
+        });
+        return false;
+      }
+      
+      if (!data.success) {
+        console.error('OTP send failed:', data);
+        toast({
+          title: t('error'),
+          description: data.error || t('otpSendFailed'),
+          variant: "destructive"
+        });
+        return false;
+      }
+      
+      return true;
+    } catch (error: any) {
+      console.error('Error in sendCustomOtp:', error);
+      toast({
+        title: t('error'),
+        description: error.message || t('otpSendFailed'),
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
+
+  // Verify custom OTP via our Edge Function
+  const verifyCustomOtp = async (phone: string, code: string): Promise<boolean> => {
+    try {
+      // Format phone number to include +
+      const formattedPhone = phone.startsWith('+') 
+        ? phone 
+        : `+${phone}`;
+      
+      const { data, error } = await supabase.functions.invoke('verify-otp', {
+        body: { phone: formattedPhone, code },
+      });
+      
+      if (error) {
+        console.error('Error verifying OTP:', error);
+        toast({
+          title: t('error'),
+          description: error.message || t('otpVerificationFailed'),
+          variant: "destructive"
+        });
+        return false;
+      }
+      
+      if (!data.success) {
+        console.error('OTP verification failed:', data);
+        
+        let errorMessage = t('otpVerificationFailed');
+        
+        if (data.expired) {
+          errorMessage = t('otpExpired');
+        } else if (data.invalid) {
+          errorMessage = t('invalidOtp');
+        }
+        
+        toast({
+          title: t('error'),
+          description: data.error || errorMessage,
+          variant: "destructive"
+        });
+        return false;
+      }
+      
+      // If verification successful, update Supabase auth
+      const { error: updateError } = await supabase.auth.updateUser({
+        phone_confirm: true
+      });
+      
+      if (updateError) {
+        console.error('Error updating user phone confirmation:', updateError);
+        // Continue anyway as the verification was successful
+      }
+      
+      toast({
+        title: t('success'),
+        description: t('phoneVerified'),
+      });
+      
+      return true;
+    } catch (error: any) {
+      console.error('Error in verifyCustomOtp:', error);
+      toast({
+        title: t('error'),
+        description: error.message || t('otpVerificationFailed'),
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
+
   // Verify OTP token
   const verifyOtp = async (phone: string, token: string): Promise<User> => {
     try {
+      // First try our custom OTP verification
+      const customVerified = await verifyCustomOtp(phone, token);
+      
+      if (customVerified) {
+        // If custom verification succeeded, try to sign in again
+        const { data, error } = await supabase.auth.signInWithPassword({
+          phone,
+          password: '', // We don't have the password here, but the verification should work if phone is confirmed
+        });
+        
+        if (error) {
+          // If we can't sign in automatically, throw an error
+          // The user can try logging in manually
+          throw error;
+        }
+        
+        return data.user;
+      }
+      
+      // Fall back to Supabase OTP verification
       const { data, error } = await supabase.auth.verifyOtp({
         phone,
         token,
@@ -332,7 +474,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logout,
     updateUserProfile,
     resetPassword,
-    updatePassword
+    updatePassword,
+    sendCustomOtp,
+    verifyCustomOtp
   };
   
   return (
