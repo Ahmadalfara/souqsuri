@@ -81,7 +81,7 @@ serve(async (req) => {
     const smsRequestBody = {
       api_key: apiKey,
       to: formattedPhone.replace('+', ''), // Remove the '+' prefix as per API requirements
-      sender: "SOUQNA",
+      sender: "Souqsuri",  // Changed from "SOUQNA" to "Souqsuri" as requested
       message
     };
 

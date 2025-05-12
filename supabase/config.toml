@@ -64,7 +64,7 @@ enable_refresh_token_rotation = false
 refresh_token_reuse_interval = 10
 # Allow/disallow new user signups to your project.
 enable_signup = true
-# Enable phone authentication
+# Enable phone authentication - EXPLICITLY ENABLED
 enable_phone_signup = true
 enable_phone_signin = true
 
