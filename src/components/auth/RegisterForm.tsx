@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -42,13 +43,14 @@ const otpSchema = z.object({
 
 const RegisterForm = () => {
   const { toast } = useToast();
-  const { register, verifyOtp } = useAuth();
+  const { register, verifyOtp, sendCustomOtp } = useAuth();
   const { language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [showOtpForm, setShowOtpForm] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [registeredName, setRegisteredName] = useState("");
   const [registeredPassword, setRegisteredPassword] = useState("");
+  const [otpSendAttempts, setOtpSendAttempts] = useState(0);
 
   // Regular registration form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -81,10 +83,13 @@ const RegisterForm = () => {
       setRegisteredName(values.name);
       setRegisteredPassword(values.password);
       
+      console.log("Attempting to register with phone:", formattedPhone);
+      
       // Register will either complete registration or set up for OTP verification
       const needsOtp = await register(values.name, formattedPhone, values.password, formattedPhone);
       
       if (needsOtp) {
+        setOtpSendAttempts(prev => prev + 1);
         setShowOtpForm(true);
         toast({
           title: language === 'ar' ? 'تم إرسال رمز التحقق' : 'Verification code sent',
@@ -105,10 +110,30 @@ const RegisterForm = () => {
   async function onOtpSubmit(values: z.infer<typeof otpSchema>) {
     setIsLoading(true);
     try {
+      console.log("Attempting to verify OTP for phone:", phoneNumber);
       await verifyOtp(phoneNumber, values.otp);
       // Success toast is handled in the AuthContext
     } catch (error) {
       console.error('OTP verification error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function resendOtp() {
+    setIsLoading(true);
+    try {
+      console.log("Resending OTP to phone:", phoneNumber);
+      await sendCustomOtp(phoneNumber);
+      setOtpSendAttempts(prev => prev + 1);
+      toast({
+        title: language === 'ar' ? 'تم إرسال رمز جديد' : 'New code sent',
+        description: language === 'ar' 
+          ? 'تم إرسال رمز تحقق جديد إلى هاتفك.'
+          : 'A new verification code has been sent to your phone.',
+      });
+    } catch (error) {
+      console.error('Failed to resend OTP:', error);
     } finally {
       setIsLoading(false);
     }
@@ -291,6 +316,22 @@ const RegisterForm = () => {
                   "Verify"
                 )}
               </Button>
+              
+              {otpSendAttempts < 3 && (
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={resendOtp}
+                  disabled={isLoading}
+                >
+                  {language === 'ar' ? (
+                    <ArabicText text="إعادة إرسال الرمز" />
+                  ) : (
+                    "Resend Code"
+                  )}
+                </Button>
+              )}
               
               <Button 
                 type="button" 

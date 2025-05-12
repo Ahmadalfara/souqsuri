@@ -23,6 +23,7 @@ serve(async (req) => {
     // Get the API key from environment variables
     const apiKey = Deno.env.get('EASYSEND_SMS_API_KEY');
     if (!apiKey) {
+      console.error('API key is not configured');
       return new Response(
         JSON.stringify({ error: 'API key is not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -33,6 +34,7 @@ serve(async (req) => {
     const { phone } = await req.json();
     
     if (!phone) {
+      console.error('Phone number is missing');
       return new Response(
         JSON.stringify({ error: 'Phone number is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -42,7 +44,7 @@ serve(async (req) => {
     // Generate OTP code
     const otpCode = generateOTPCode();
     
-    // Create a message for the SMS
+    // Create a message for the SMS - using Arabic text as per your app
     const message = `رمز التحقق الخاص بك هو: ${otpCode}`;
 
     // Format the phone number to ensure it has a '+' prefix if needed
@@ -53,7 +55,10 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Store the OTP in Supabase with an expiration timestamp (5 minutes from now)
+    console.log(`Sending OTP to ${formattedPhone}`);
+
+    // Store the OTP in Supabase with a SHORT expiration timestamp (5 minutes from now)
+    // This addresses the "Auth OTP Long Expiry" warning
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 5);
     
@@ -85,7 +90,10 @@ serve(async (req) => {
       message
     };
 
-    console.log('Sending SMS with body:', JSON.stringify(smsRequestBody));
+    console.log('Sending SMS with body:', JSON.stringify({
+      ...smsRequestBody,
+      api_key: "[REDACTED]" // Don't log the API key
+    }));
 
     // Send the SMS using the API endpoint
     const smsResponse = await fetch("https://www.easysendsms.app/api/v1/send", {

@@ -64,9 +64,11 @@ enable_refresh_token_rotation = false
 refresh_token_reuse_interval = 10
 # Allow/disallow new user signups to your project.
 enable_signup = true
-# Explicitly enable phone authentication (CRITICAL setting - must be true)
+# CRITICAL: Explicitly enable phone authentication
 enable_phone_signup = true
 enable_phone_signin = true
+# Address the OTP expiry warning by setting a shorter expiry time (in seconds)
+otp_expiry = 300  # 5 minutes instead of the default which might be too long
 
 [analytics]
 enabled = false

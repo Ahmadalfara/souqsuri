@@ -19,6 +19,3 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     debug: true // Enable debug mode to help identify issues
   }
 });
-
-// Note: Bucket initialization removed to prevent RLS policy errors
-// Storage buckets should be created via SQL in the Supabase dashboard instead

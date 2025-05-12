@@ -1,19 +1,15 @@
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { User } from "@supabase/supabase-js";
+import { useAuthActions } from "@/hooks/useAuthActions";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '../integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
-import { useLanguage } from './LanguageContext';
-import { useAuthActions } from '@/hooks/useAuthActions';
-
+// Define the auth context type
 interface AuthContextType {
   currentUser: User | null;
-  session: Session | null;
-  loading: boolean;
+  userLoading: boolean;
   login: (phone: string, password: string) => Promise<boolean>;
   register: (name: string, phone: string, password: string, phoneForProfile: string) => Promise<boolean>;
-  verifyOtp: (phone: string, token: string) => Promise<User>;
   logout: () => Promise<void>;
+  verifyOtp: (phone: string, token: string) => Promise<User>;
   updateUserProfile: (data: {[key: string]: any}) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updatePassword: (newPassword: string) => Promise<void>;
@@ -21,76 +17,73 @@ interface AuthContextType {
   verifyCustomOtp: (phone: string, code: string) => Promise<boolean>;
 }
 
+// Create the auth context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// Create the auth provider
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
-  const { t } = useLanguage();
+  const [userLoading, setUserLoading] = useState(true);
   
-  // Get auth actions from our custom hook
-  const authActions = useAuthActions();
-  
-  useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, newSession) => {
-        setSession(newSession);
-        setCurrentUser(newSession?.user ?? null);
-        
-        if (event === 'SIGNED_IN') {
-          toast({
-            title: t('loginSuccess'),
-            description: t('welcomeBack'),
-          });
-        }
-        
-        if (event === 'SIGNED_OUT') {
-          toast({
-            title: t('logoutSuccess'),
-            description: t('comeBackSoon'),
-          });
-        }
+  const { 
+    login, 
+    register, 
+    verifyOtp, 
+    logout,
+    updateUserProfile,
+    resetPassword,
+    updatePassword,
+    sendCustomOtp,
+    verifyCustomOtp
+  } = useAuthActions();
 
-        if (event === 'USER_UPDATED') {
-          toast({
-            title: t('profileUpdated'),
-            description: t('profileUpdateSuccess'),
-          });
-        }
+  useEffect(() => {
+    const getSession = async () => {
+      setUserLoading(true);
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error("Error getting session:", error);
       }
-    );
-    
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      setSession(currentSession);
-      setCurrentUser(currentSession?.user ?? null);
-      setLoading(false);
+
+      setCurrentUser(session?.user ?? null);
+      setUserLoading(false);
+    };
+
+    getSession();
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUser(session?.user ?? null);
     });
-    
-    return () => subscription.unsubscribe();
-  }, [toast, t]);
-  
-  const value: AuthContextType = {
-    currentUser,
-    session,
-    loading,
-    ...authActions
-  };
-  
+  }, []);
+
+  // Return the provider
   return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
+    <AuthContext.Provider
+      value={{
+        currentUser,
+        userLoading,
+        login,
+        register,
+        logout,
+        verifyOtp,
+        updateUserProfile,
+        resetPassword,
+        updatePassword,
+        sendCustomOtp,
+        verifyCustomOtp
+      }}
+    >
+      {children}
     </AuthContext.Provider>
   );
+};
+
+// Custom hook to use the auth context
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 };
