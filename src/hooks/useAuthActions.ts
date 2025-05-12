@@ -1,3 +1,4 @@
+
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -37,7 +38,7 @@ export function useAuthActions() {
         throw error;
       }
 
-      if (!data.user?.phone_confirmed_at) {
+      if (!data?.user?.phone_confirmed_at) {
         // If phone is not confirmed, use our custom OTP verification
         const otpSent = await sendCustomOtp(phone);
         
@@ -97,7 +98,7 @@ export function useAuthActions() {
       }
 
       // If user was created but phone is not confirmed, use our custom OTP verification
-      if (!data.user?.phone_confirmed_at) {
+      if (!data?.user?.phone_confirmed_at) {
         // Send custom OTP
         const otpSent = await sendCustomOtp(phone);
         
