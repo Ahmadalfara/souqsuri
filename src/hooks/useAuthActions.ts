@@ -154,8 +154,8 @@ export function useAuthActions() {
           throw error;
         }
         
-        // Fix here - access user properly from data
-        if (!data.user) {
+        // Access user property correctly from UserResponse
+        if (!data?.user) {
           throw new Error(t('userNotFound'));
         }
         
@@ -176,6 +176,11 @@ export function useAuthActions() {
           variant: "destructive"
         });
         throw error;
+      }
+
+      // Access user property correctly here too
+      if (!data?.user) {
+        throw new Error(t('userNotFound'));
       }
 
       toast({
