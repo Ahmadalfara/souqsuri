@@ -1,3 +1,4 @@
+
 import { User, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -213,14 +214,14 @@ export function useAuthActions() {
 
   const updateUserProfile = async (data: {[key: string]: any}): Promise<void> => {
     try {
-      const { user } = await supabase.auth.getUser();
-      if (!user) throw new Error(t('notLoggedIn'));
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData?.user) throw new Error(t('notLoggedIn'));
       
       // Update profile in our profiles table
       const { error } = await supabase
         .from('profiles')
         .update(data)
-        .eq('id', user.id);
+        .eq('id', userData.user.id);
       
       if (error) throw error;
       
