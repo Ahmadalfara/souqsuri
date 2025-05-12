@@ -154,6 +154,11 @@ export function useAuthActions() {
           throw error;
         }
         
+        // Fix here - access user properly from data
+        if (!data.user) {
+          throw new Error(t('userNotFound'));
+        }
+        
         return data.user;
       }
       

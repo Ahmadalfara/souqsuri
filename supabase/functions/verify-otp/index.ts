@@ -2,7 +2,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.1";
 
-// CORS headers for the function
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -20,7 +19,7 @@ serve(async (req) => {
     
     if (!phone || !code) {
       return new Response(
-        JSON.stringify({ error: 'Phone number and verification code are required' }),
+        JSON.stringify({ error: 'Phone number and code are required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -33,26 +32,27 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get the stored OTP code
-    const { data: otpData, error: fetchError } = await supabase
+    // Get the OTP from the database
+    const { data: otpData, error: otpError } = await supabase
       .from('otp_codes')
-      .select('code, expires_at')
+      .select('*')
       .eq('phone', formattedPhone)
       .single();
     
-    if (fetchError) {
-      console.error('Error fetching OTP:', fetchError);
+    if (otpError || !otpData) {
+      console.error('Error retrieving OTP:', otpError);
       return new Response(
-        JSON.stringify({ error: 'No verification code found for this phone number' }),
+        JSON.stringify({ error: 'Invalid verification code', invalid: true }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Check if OTP has expired
-    const now = new Date();
+    // Check if OTP is expired
     const expiresAt = new Date(otpData.expires_at);
+    const now = new Date();
     
     if (now > expiresAt) {
+      console.error('OTP expired');
       return new Response(
         JSON.stringify({ error: 'Verification code has expired', expired: true }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -61,6 +61,7 @@ serve(async (req) => {
 
     // Check if OTP matches
     if (otpData.code !== code) {
+      console.error('Invalid OTP');
       return new Response(
         JSON.stringify({ error: 'Invalid verification code', invalid: true }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -75,15 +76,14 @@ serve(async (req) => {
     
     if (deleteError) {
       console.error('Error deleting OTP:', deleteError);
-      // Continue anyway as this is not critical
+      // Continue anyway as the verification was successful
     }
 
     // Return success response
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'OTP verification successful',
-        verified: true
+        message: 'Phone verified successfully'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

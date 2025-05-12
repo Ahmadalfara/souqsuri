@@ -57,7 +57,7 @@ serve(async (req) => {
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 5);
     
-    // Store the OTP in a table
+    // Store the OTP in the new otp_codes table
     const { error: storeError } = await supabase
       .from('otp_codes')
       .upsert(
@@ -77,23 +77,21 @@ serve(async (req) => {
       );
     }
 
-    // Prepare the EasySendSMS API request (using the new REST API URL)
+    // Prepare the EasySendSMS API request using the API provided in the example
     const smsRequestBody = {
-      from: "SOUQNA",
+      api_key: apiKey,
       to: formattedPhone.replace('+', ''), // Remove the '+' prefix as per API requirements
-      text: message,
-      type: "1"
+      sender: "SOUQNA",
+      message
     };
 
     console.log('Sending SMS with body:', JSON.stringify(smsRequestBody));
 
-    // Send the SMS using the new REST API format
-    const smsResponse = await fetch("https://restapi.easysendsms.app/v1/rest/sms/send", {
+    // Send the SMS using the API endpoint from the example
+    const smsResponse = await fetch("https://www.easysendsms.app/api/v1/send", {
       method: "POST",
       headers: {
-        "apikey": apiKey,
-        "Content-Type": "application/json",
-        "Accept": "application/json"
+        "Content-Type": "application/json"
       },
       body: JSON.stringify(smsRequestBody)
     });
