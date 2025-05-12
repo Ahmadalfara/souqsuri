@@ -1,4 +1,3 @@
-
 import { User, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -154,7 +153,7 @@ export function useAuthActions() {
           throw error;
         }
         
-        // Access user property correctly from UserResponse
+        // Access user property correctly from UserResponse with optional chaining
         if (!data?.user) {
           throw new Error(t('userNotFound'));
         }
@@ -178,7 +177,7 @@ export function useAuthActions() {
         throw error;
       }
 
-      // Access user property correctly here too
+      // Access user property correctly here too with optional chaining
       if (!data?.user) {
         throw new Error(t('userNotFound'));
       }
