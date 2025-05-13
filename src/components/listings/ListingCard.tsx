@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import ArabicText from '@/components/ArabicText';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ListingWithRelations } from '@/types/supabase';
+import { formatLargeNumber } from '@/lib/utils';
 
 interface ListingCardProps {
   listing: any;
@@ -18,7 +19,7 @@ interface ListingCardProps {
 const ListingCard = ({ 
   listing, 
   isFeatured = false,
-  displayCurrency,
+  displayCurrency = 'SYP',
   formatPrice,
   compact = false // Set default to false
 }: ListingCardProps) => {
@@ -42,15 +43,22 @@ const ListingCard = ({
   const detailsButtonText = language === 'ar' ? 'التفاصيل' : 'Details';
   const featuredLabel = language === 'ar' ? 'مميز' : 'Featured';
   
-  // Format price if a formatter function is provided, otherwise use default format
+  // Format price with our new utility or use provided formatter
   const getPriceDisplay = () => {
+    // Default currency from the listing or fallback to SYP
+    const currency = listing.currency === 'USD' ? 'USD' : 'SYP';
+    
+    // Use custom formatter if provided, otherwise use our utility
     if (formatPrice) {
-      return formatPrice(listing.price, listing.currency || 'SYP');
+      return formatPrice(listing.price, currency);
     }
     
-    return language === 'ar'
-      ? `${listing.price} ${listing.currency || 'دولار'}`
-      : `${listing.price} ${listing.currency === 'دولار' ? 'USD' : (listing.currency || 'USD')}`;
+    // Use the new formatLargeNumber utility
+    return formatLargeNumber(
+      listing.price, 
+      language as 'en' | 'ar',
+      displayCurrency || currency as 'SYP' | 'USD'
+    );
   };
 
   return (

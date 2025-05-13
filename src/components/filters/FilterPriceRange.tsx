@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { formatLargeNumber } from '@/lib/utils';
 
 // Increased price range to 100 billion SYP
 const MAX_PRICE = 100000000000; // 100 billion
@@ -16,13 +17,9 @@ interface FilterPriceRangeProps {
 const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) => {
   const { language } = useLanguage();
   
-  // Format price for display
+  // Format price for display using our new utility
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat(language === 'ar' ? 'ar-SY' : 'en-US', {
-      style: 'currency',
-      currency: 'SYP',
-      maximumFractionDigits: 0,
-    }).format(price);
+    return formatLargeNumber(price, language as 'en' | 'ar', 'SYP');
   };
   
   const handlePriceRangeChange = (newValue: number[]) => {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatLargeNumber } from '@/lib/utils';
 
 // Exchange rate cache
 let cachedExchangeRate: number | null = null;
@@ -127,12 +128,9 @@ export const useCurrencyConverter = () => {
     convert,
     exchangeRate,
     isLoading,
-    formatCurrency: (amount: number, currency: 'SYP' | 'USD'): string => {
-      if (currency === 'USD') {
-        return `$${amount.toFixed(2)}`;
-      } else {
-        return `${amount.toLocaleString()} SYP`;
-      }
+    formatCurrency: (amount: number, currency: 'SYP' | 'USD', language?: 'en' | 'ar'): string => {
+      // Use the new formatLargeNumber utility
+      return formatLargeNumber(amount, language, currency);
     }
   };
 };

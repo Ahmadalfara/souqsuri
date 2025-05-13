@@ -8,6 +8,7 @@ import { Edit, Trash2 } from 'lucide-react';
 import ArabicText from '@/components/ArabicText';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Listing } from '@/services/listingService';
+import { formatLargeNumber } from '@/lib/utils';
 
 interface ListingCardProps {
   listing: Listing;
@@ -22,6 +23,16 @@ const ListingCard = ({ listing, onToggleStatus, onDeleteClick }: ListingCardProp
   // Helper function to check if a listing is active
   const isListingActive = (listing: Listing): boolean => {
     return listing.status === 'active';
+  };
+
+  // Format price with our new utility
+  const getPriceDisplay = () => {
+    const currency = listing.currency === 'USD' ? 'USD' : 'SYP';
+    return formatLargeNumber(
+      listing.price, 
+      language as 'en' | 'ar',
+      currency as 'SYP' | 'USD'
+    );
   };
 
   return (
@@ -67,7 +78,7 @@ const ListingCard = ({ listing, onToggleStatus, onDeleteClick }: ListingCardProp
               )}
             </span>
           </div>
-          <p className="text-lg font-bold text-syrian-green">{listing.price} {language === 'ar' ? 'ل.س' : 'SYP'}</p>
+          <p className="text-lg font-bold text-syrian-green">{getPriceDisplay()}</p>
           <div className="mt-4 flex gap-2">
             <Button 
               variant="outline" 
