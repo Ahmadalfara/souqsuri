@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatLargeNumber } from '@/lib/utils';
+import { toast } from '@/components/ui/use-toast';
 
 // Increased price range to 100 billion SYP
 const MAX_PRICE = 100000000000; // 100 billion
@@ -17,7 +18,7 @@ interface FilterPriceRangeProps {
 const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) => {
   const { language } = useLanguage();
   
-  // Format price for display using our new utility
+  // Format price for display using our utility
   const formatPrice = (price: number) => {
     return formatLargeNumber(price, language as 'en' | 'ar', 'SYP');
   };
@@ -28,12 +29,41 @@ const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) 
 
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseInt(e.target.value) || 0;
+    
+    if (newValue >= value[1]) {
+      toast({
+        title: language === 'ar' ? 'خطأ في نطاق السعر' : 'Price Range Error',
+        description: language === 'ar' 
+          ? 'يجب أن يكون الحد الأدنى أقل من الحد الأقصى' 
+          : 'Minimum price should be less than maximum price',
+        variant: "destructive",
+      });
+      return;
+    }
+    
     onChange([newValue, value[1]]);
   };
 
   const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseInt(e.target.value) || 0;
+    
+    if (newValue <= value[0]) {
+      toast({
+        title: language === 'ar' ? 'خطأ في نطاق السعر' : 'Price Range Error',
+        description: language === 'ar' 
+          ? 'يجب أن يكون الحد الأقصى أكبر من الحد الأدنى' 
+          : 'Maximum price should be greater than minimum price',
+        variant: "destructive",
+      });
+      return;
+    }
+    
     onChange([value[0], newValue]);
+  };
+
+  // Reset price range
+  const handleReset = () => {
+    onChange([0, MAX_PRICE / 10]);
   };
   
   return (
@@ -42,8 +72,21 @@ const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) 
         <Label className="dark:text-white">
           {language === 'ar' ? 'نطاق السعر' : 'Price Range'}
         </Label>
+        <button 
+          onClick={handleReset}
+          className="text-xs text-gray-500 hover:text-syrian-green dark:text-gray-400 dark:hover:text-syrian-green"
+        >
+          {language === 'ar' ? 'إعادة ضبط' : 'Reset'}
+        </button>
+      </div>
+      
+      <div className="flex items-center justify-between">
         <span className="text-sm text-gray-500 dark:text-gray-400">
-          {formatPrice(value[0])} - {formatPrice(value[1])}
+          {formatPrice(value[0])}
+        </span>
+        <span className="text-sm font-medium text-syrian-green">⟷</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400">
+          {formatPrice(value[1])}
         </span>
       </div>
       
@@ -63,7 +106,7 @@ const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) 
             type="number"
             value={value[0]}
             onChange={handleMinPriceChange}
-            className="w-full pr-16 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+            className={`w-full ${language === 'ar' ? 'pl-4 pr-16' : 'pr-16'} dark:bg-gray-700 dark:text-white dark:border-gray-600`}
           />
           <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
             {language === 'ar' ? 'ل.س' : 'SYP'}
@@ -74,7 +117,7 @@ const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) 
             type="number"
             value={value[1]}
             onChange={handleMaxPriceChange}
-            className="w-full pr-16 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+            className={`w-full ${language === 'ar' ? 'pl-4 pr-16' : 'pr-16'} dark:bg-gray-700 dark:text-white dark:border-gray-600`}
           />
           <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
             {language === 'ar' ? 'ل.س' : 'SYP'}
