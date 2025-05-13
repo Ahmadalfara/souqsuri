@@ -1,19 +1,12 @@
 
-import { Toast, ToastActionElement, ToastProps } from "@/components/ui/toast";
-import {
-  useToast as useToastOriginal,
-  toast as toastOriginal,
-} from "@/components/ui/toaster";
+import { type ToastProps } from "@/components/ui/toast"
+import { 
+  useToast as useToastPrimitive,
+  toast as toastPrimitive,
+  type ToasterToast
+} from "@/hooks/use-toast-primitive"
 
-export type ToasterToast = Toast & {
-  id: string;
-  title?: React.ReactNode;
-  description?: React.ReactNode;
-  action?: ToastActionElement;
-  className?: string;
-};
+export const useToast = useToastPrimitive
+export const toast = toastPrimitive
 
-export const useToast = useToastOriginal;
-export const toast = toastOriginal;
-
-export type { ToastProps };
+export type { ToasterToast, ToastProps }

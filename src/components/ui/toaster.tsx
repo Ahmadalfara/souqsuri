@@ -1,4 +1,5 @@
-import { useToast } from "@/hooks/use-toast"
+
+import * as React from "react"
 import {
   Toast,
   ToastClose,
@@ -7,9 +8,10 @@ import {
   ToastTitle,
   ToastViewport,
 } from "@/components/ui/toast"
+import { useToast as useToastPrimitive } from "@/hooks/use-toast-primitive"
 
 export function Toaster() {
-  const { toasts } = useToast()
+  const { toasts } = useToastPrimitive()
 
   return (
     <ToastProvider>
@@ -31,3 +33,6 @@ export function Toaster() {
     </ToastProvider>
   )
 }
+
+export { useToastPrimitive as useToast }
+export { toast } from "@/hooks/use-toast-primitive"
