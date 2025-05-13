@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -10,6 +10,11 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Calendar, User, Phone, MessageSquare, Share } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GeometricPattern from '@/components/GeometricPattern';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/components/ui/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useNavigate } from 'react-router-dom';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 const mockListingData = {
   id: 1,
@@ -22,6 +27,7 @@ const mockListingData = {
   sellerName: "أحمد محمود",
   sellerPhone: "+963 912 345 678",
   sellerJoined: "2022-01-10",
+  sellerId: "seller-123", // Added mock seller ID for messaging
   images: [
     "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
     "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YXBhcnRtZW50fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
@@ -31,8 +37,79 @@ const mockListingData = {
 
 const ListingDetails = () => {
   const { id } = useParams();
+  const { currentUser } = useAuth();
+  const { t, language } = useLanguage();
+  const navigate = useNavigate();
+  
   // In a real app, we would fetch the listing details based on the ID
   const listing = mockListingData;
+  
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [phoneVisible, setPhoneVisible] = useState(false);
+  
+  // Function to handle showing the phone number
+  const handleShowPhone = () => {
+    setPhoneVisible(true);
+    toast({
+      title: language === 'ar' ? "تم إظهار رقم الهاتف" : "Phone number revealed",
+      description: language === 'ar' ? "يمكنك الآن التواصل مع البائع" : "You can now contact the seller",
+    });
+  };
+  
+  // Function to handle messaging the seller
+  const handleMessageSeller = () => {
+    if (!currentUser) {
+      toast({
+        title: language === 'ar' ? "يرجى تسجيل الدخول" : "Please login",
+        description: language === 'ar' ? "يجب عليك تسجيل الدخول لمراسلة البائع" : "You need to login to message the seller",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Navigate to the chat page or open a chat modal
+    // Here we're just showing a toast for demonstration
+    toast({
+      title: language === 'ar' ? "إرسال رسالة" : "Send message",
+      description: language === 'ar' ? "سيتم الانتقال إلى صفحة المحادثة قريباً" : "You'll be redirected to the conversation page soon",
+    });
+    
+    // In a real app, you would navigate to the chat page with the seller ID and listing ID
+    // navigate(`/messages/${listing.sellerId}?listing=${listing.id}`);
+  };
+  
+  // Function to handle sharing
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: listing.title,
+        text: `${listing.title} - ${listing.price} ل.س`,
+        url: window.location.href,
+      })
+      .then(() => {
+        toast({
+          title: language === 'ar' ? "تمت المشاركة بنجاح" : "Successfully shared",
+          description: "",
+        });
+      })
+      .catch((error) => {
+        console.error('Error sharing:', error);
+      });
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        toast({
+          title: language === 'ar' ? "تم نسخ الرابط" : "Link copied",
+          description: language === 'ar' ? "تم نسخ الرابط إلى الحافظة" : "Link copied to clipboard",
+        });
+      });
+    }
+  };
+  
+  // Function to change the active image
+  const changeImage = (index) => {
+    setActiveImageIndex(index);
+  };
   
   return (
     <div className="min-h-screen flex flex-col bg-syrian-light">
@@ -87,19 +164,25 @@ const ListingDetails = () => {
               <div className="md:col-span-2">
                 <div className="bg-white rounded-lg overflow-hidden shadow-md">
                   <div className="aspect-w-16 aspect-h-9 overflow-hidden">
-                    <img 
-                      src={listing.images[0]} 
-                      alt={listing.title} 
-                      className="w-full h-96 object-cover"
-                    />
+                    <AspectRatio ratio={16/9} className="bg-muted">
+                      <img 
+                        src={listing.images[activeImageIndex]} 
+                        alt={listing.title} 
+                        className="w-full h-full object-cover"
+                      />
+                    </AspectRatio>
                   </div>
                   <div className="grid grid-cols-3 gap-2 p-2">
                     {listing.images.map((img, idx) => (
-                      <div key={idx} className="aspect-w-1 aspect-h-1">
+                      <div 
+                        key={idx} 
+                        className={`aspect-square overflow-hidden rounded-md cursor-pointer border-2 ${activeImageIndex === idx ? 'border-syrian-green' : 'border-transparent'}`}
+                        onClick={() => changeImage(idx)}
+                      >
                         <img 
                           src={img} 
                           alt={`${listing.title} ${idx + 1}`} 
-                          className="w-full h-24 object-cover rounded-md cursor-pointer hover:opacity-80 transition-opacity"
+                          className="w-full h-full object-cover hover:opacity-90 transition-opacity"
                         />
                       </div>
                     ))}
@@ -173,16 +256,27 @@ const ListingDetails = () => {
                         <ArabicText text={`عضو منذ ${listing.sellerJoined}`} />
                       </span>
                     </div>
-                    <Button variant="outline" className="w-full border-syrian-green text-syrian-green hover:bg-syrian-green hover:text-white">
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-syrian-green text-syrian-green hover:bg-syrian-green hover:text-white"
+                      onClick={handleShowPhone}
+                    >
                       <Phone className="ml-2 h-4 w-4" />
-                      <ArabicText text="إظهار رقم الهاتف" />
+                      <ArabicText text={phoneVisible ? listing.sellerPhone : "إظهار رقم الهاتف"} />
                     </Button>
-                    <Button className="w-full bg-syrian-green hover:bg-syrian-dark">
+                    <Button 
+                      className="w-full bg-syrian-green hover:bg-syrian-dark"
+                      onClick={handleMessageSeller}
+                    >
                       <MessageSquare className="ml-2 h-4 w-4" />
                       <ArabicText text="راسل البائع" />
                     </Button>
                     <div className="mt-4 flex justify-center">
-                      <Button variant="ghost" size="sm">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={handleShare}
+                      >
                         <Share className="ml-1 h-4 w-4" />
                         <ArabicText text="مشاركة" size="small" />
                       </Button>
@@ -220,7 +314,7 @@ const ListingDetails = () => {
               
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {[1, 2, 3, 4].map((i) => (
-                  <Card key={i} className="overflow-hidden hover:shadow-lg transition-shadow">
+                  <Card key={i} className="overflow-hidden hover:shadow-lg transition-shadow" onClick={() => navigate(`/listing/${i + 1}`)}>
                     <div className="aspect-square overflow-hidden">
                       <img 
                         src={`https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8${i*2}%7C%7CYXBhcnRtZW50fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60`}
