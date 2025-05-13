@@ -6,6 +6,7 @@ import { Slider } from '@/components/ui/slider';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatLargeNumber } from '@/lib/utils';
 import { toast } from '@/components/ui/use-toast';
+import ArabicText from '@/components/ArabicText';
 
 // Increased price range to 100 billion SYP
 const MAX_PRICE = 100000000000; // 100 billion
@@ -16,7 +17,7 @@ interface FilterPriceRangeProps {
 }
 
 const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) => {
-  const { language } = useLanguage();
+  const { language, direction } = useLanguage();
   
   // Format price for display using our utility
   const formatPrice = (price: number) => {
@@ -64,23 +65,27 @@ const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) 
   // Reset price range
   const handleReset = () => {
     onChange([0, MAX_PRICE / 10]);
+    toast({
+      title: language === 'ar' ? 'تم إعادة ضبط نطاق السعر' : 'Price Range Reset',
+      description: language === 'ar' ? 'تم إعادة ضبط نطاق السعر بنجاح' : 'Price range has been reset successfully',
+    });
   };
   
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className={`flex items-center justify-between ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}>
         <Label className="dark:text-white">
-          {language === 'ar' ? 'نطاق السعر' : 'Price Range'}
+          {language === 'ar' ? <ArabicText text="نطاق السعر" /> : 'Price Range'}
         </Label>
         <button 
           onClick={handleReset}
           className="text-xs text-gray-500 hover:text-syrian-green dark:text-gray-400 dark:hover:text-syrian-green"
         >
-          {language === 'ar' ? 'إعادة ضبط' : 'Reset'}
+          {language === 'ar' ? <ArabicText text="إعادة ضبط" /> : 'Reset'}
         </button>
       </div>
       
-      <div className="flex items-center justify-between">
+      <div className={`flex items-center justify-between ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}>
         <span className="text-sm text-gray-500 dark:text-gray-400">
           {formatPrice(value[0])}
         </span>
@@ -100,15 +105,16 @@ const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) 
         className="my-6"
       />
       
-      <div className="flex justify-between gap-2">
+      <div className={`flex justify-between gap-2 ${direction === 'rtl' ? 'flex-row-reverse' : ''}`}>
         <div className="relative flex-1">
           <Input
             type="number"
             value={value[0]}
             onChange={handleMinPriceChange}
-            className={`w-full ${language === 'ar' ? 'pl-4 pr-16' : 'pr-16'} dark:bg-gray-700 dark:text-white dark:border-gray-600`}
+            className={`w-full ${direction === 'rtl' ? 'text-right pl-16' : 'pr-16'} dark:bg-gray-700 dark:text-white dark:border-gray-600`}
+            dir={direction}
           />
-          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+          <span className={`absolute top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 ${direction === 'rtl' ? 'left-2' : 'right-2'}`}>
             {language === 'ar' ? 'ل.س' : 'SYP'}
           </span>
         </div>
@@ -117,9 +123,10 @@ const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) 
             type="number"
             value={value[1]}
             onChange={handleMaxPriceChange}
-            className={`w-full ${language === 'ar' ? 'pl-4 pr-16' : 'pr-16'} dark:bg-gray-700 dark:text-white dark:border-gray-600`}
+            className={`w-full ${direction === 'rtl' ? 'text-right pl-16' : 'pr-16'} dark:bg-gray-700 dark:text-white dark:border-gray-600`}
+            dir={direction}
           />
-          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+          <span className={`absolute top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 ${direction === 'rtl' ? 'left-2' : 'right-2'}`}>
             {language === 'ar' ? 'ل.س' : 'SYP'}
           </span>
         </div>
