@@ -33,13 +33,13 @@ function App() {
         <ThemeProvider>
           <AuthProvider>
             <Router>
-              <Routes>
-                {/* Use the Index component directly without Suspense */}
-                <Route path="/" element={<Index />} />
-                <Route path="/category/:categoryName" element={<Index />} />
-                
-                {/* Wrap other lazy loaded routes in Suspense */}
-                <Suspense fallback={<div>Loading...</div>}>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Routes>
+                  {/* Use the Index component directly since it's not lazy loaded */}
+                  <Route path="/" element={<Index />} />
+                  <Route path="/category/:categoryName" element={<Index />} />
+                  
+                  {/* Lazy loaded routes */}
                   <Route path="/featured-listings" element={<FeaturedListings />} />
                   <Route path="/profile" element={<UserProfile />} />
                   <Route path="/listing/:listingId" element={<ListingDetails />} />
@@ -50,8 +50,8 @@ function App() {
                   <Route path="/terms-of-service" element={<TermsOfService />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                   <Route path="/contact" element={<ContactUs />} />
-                </Suspense>
-              </Routes>
+                </Routes>
+              </Suspense>
               <Toaster />
             </Router>
           </AuthProvider>
