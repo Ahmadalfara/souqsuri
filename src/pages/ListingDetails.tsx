@@ -1,19 +1,18 @@
 
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ArabicText from '@/components/ArabicText';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Calendar, User, MessageSquare, Share } from 'lucide-react';
+import { MapPin, Calendar, User, MessageSquare, Share2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GeometricPattern from '@/components/GeometricPattern';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useNavigate } from 'react-router-dom';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 const mockListingData = {
@@ -57,21 +56,19 @@ const ListingDetails = () => {
       return;
     }
     
-    // Navigate to the chat page or open a chat modal
-    // Here we're just showing a toast for demonstration
-    toast({
-      title: language === 'ar' ? "إرسال رسالة" : "Send message",
-      description: language === 'ar' ? "سيتم الانتقال إلى صفحة المحادثة قريباً" : "You'll be redirected to the conversation page soon",
-    });
+    // Navigate to the chat page with the seller ID and listing ID
+    navigate(`/messages/${listing.sellerId}?listing=${listing.id}`);
     
-    // In a real app, you would navigate to the chat page with the seller ID and listing ID
-    // navigate(`/messages/${listing.sellerId}?listing=${listing.id}`);
+    toast({
+      title: language === 'ar' ? "تم فتح المحادثة" : "Conversation opened",
+      description: language === 'ar' ? "يمكنك الآن التواصل مع البائع" : "You can now chat with the seller",
+    });
   };
   
   // Function to handle sharing
   const handleShare = async () => {
-    // تحسين وظيفة المشاركة
     try {
+      // Try to use the Web Share API first
       if (navigator.share) {
         await navigator.share({
           title: listing.title,
@@ -85,11 +82,17 @@ const ListingDetails = () => {
         });
       } else {
         // Fallback for browsers that don't support Web Share API
-        await navigator.clipboard.writeText(window.location.href);
-        toast({
-          title: language === 'ar' ? "تم نسخ الرابط" : "Link copied",
-          description: language === 'ar' ? "تم نسخ الرابط إلى الحافظة" : "Link copied to clipboard",
-        });
+        navigator.clipboard.writeText(window.location.href)
+          .then(() => {
+            toast({
+              title: language === 'ar' ? "تم نسخ الرابط" : "Link copied",
+              description: language === 'ar' ? "تم نسخ الرابط إلى الحافظة" : "Link copied to clipboard",
+            });
+          })
+          .catch(err => {
+            console.error('Failed to copy: ', err);
+            throw new Error('Failed to copy link');
+          });
       }
     } catch (error) {
       console.error('Error sharing:', error);
@@ -251,13 +254,6 @@ const ListingDetails = () => {
                         <ArabicText text={`عضو منذ ${listing.sellerJoined}`} />
                       </span>
                     </div>
-                    {/* تمت إزالة زر إظهار رقم الهاتف */}
-                    <div className="flex items-center">
-                      <User className="h-5 w-5 ml-2 text-syrian-green" />
-                      <span>
-                        <ArabicText text={listing.sellerPhone} />
-                      </span>
-                    </div>
                     <Button 
                       className="w-full bg-syrian-green hover:bg-syrian-dark"
                       onClick={handleMessageSeller}
@@ -271,7 +267,7 @@ const ListingDetails = () => {
                         size="sm"
                         onClick={handleShare}
                       >
-                        <Share className="ml-1 h-4 w-4" />
+                        <Share2 className="ml-1 h-4 w-4" />
                         <ArabicText text="مشاركة" size="small" />
                       </Button>
                     </div>
