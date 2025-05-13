@@ -7,7 +7,7 @@ import ArabicText from '@/components/ArabicText';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Calendar, User, Phone, MessageSquare, Share } from 'lucide-react';
+import { MapPin, Calendar, User, MessageSquare, Share } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GeometricPattern from '@/components/GeometricPattern';
 import { useAuth } from '@/contexts/AuthContext';
@@ -45,16 +45,6 @@ const ListingDetails = () => {
   const listing = mockListingData;
   
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [phoneVisible, setPhoneVisible] = useState(false);
-  
-  // Function to handle showing the phone number
-  const handleShowPhone = () => {
-    setPhoneVisible(true);
-    toast({
-      title: language === 'ar' ? "تم إظهار رقم الهاتف" : "Phone number revealed",
-      description: language === 'ar' ? "يمكنك الآن التواصل مع البائع" : "You can now contact the seller",
-    });
-  };
   
   // Function to handle messaging the seller
   const handleMessageSeller = () => {
@@ -79,29 +69,34 @@ const ListingDetails = () => {
   };
   
   // Function to handle sharing
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: listing.title,
-        text: `${listing.title} - ${listing.price} ل.س`,
-        url: window.location.href,
-      })
-      .then(() => {
+  const handleShare = async () => {
+    // تحسين وظيفة المشاركة
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: listing.title,
+          text: `${listing.title} - ${listing.price} ل.س`,
+          url: window.location.href,
+        });
+        
         toast({
           title: language === 'ar' ? "تمت المشاركة بنجاح" : "Successfully shared",
           description: "",
         });
-      })
-      .catch((error) => {
-        console.error('Error sharing:', error);
-      });
-    } else {
-      // Fallback for browsers that don't support Web Share API
-      navigator.clipboard.writeText(window.location.href).then(() => {
+      } else {
+        // Fallback for browsers that don't support Web Share API
+        await navigator.clipboard.writeText(window.location.href);
         toast({
           title: language === 'ar' ? "تم نسخ الرابط" : "Link copied",
           description: language === 'ar' ? "تم نسخ الرابط إلى الحافظة" : "Link copied to clipboard",
         });
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+      toast({
+        title: language === 'ar' ? "حدث خطأ" : "Error occurred",
+        description: language === 'ar' ? "حدث خطأ أثناء محاولة المشاركة" : "An error occurred while trying to share",
+        variant: "destructive"
       });
     }
   };
@@ -256,14 +251,13 @@ const ListingDetails = () => {
                         <ArabicText text={`عضو منذ ${listing.sellerJoined}`} />
                       </span>
                     </div>
-                    <Button 
-                      variant="outline" 
-                      className="w-full border-syrian-green text-syrian-green hover:bg-syrian-green hover:text-white"
-                      onClick={handleShowPhone}
-                    >
-                      <Phone className="ml-2 h-4 w-4" />
-                      <ArabicText text={phoneVisible ? listing.sellerPhone : "إظهار رقم الهاتف"} />
-                    </Button>
+                    {/* تمت إزالة زر إظهار رقم الهاتف */}
+                    <div className="flex items-center">
+                      <User className="h-5 w-5 ml-2 text-syrian-green" />
+                      <span>
+                        <ArabicText text={listing.sellerPhone} />
+                      </span>
+                    </div>
                     <Button 
                       className="w-full bg-syrian-green hover:bg-syrian-dark"
                       onClick={handleMessageSeller}
