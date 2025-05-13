@@ -8,10 +8,13 @@ import './index.css';
 import { Toaster } from '@/components/ui/toaster';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+// Import the Index component directly to avoid chunk loading issues
+import Index from './pages/Index';
+
 // Create a client
 const queryClient = new QueryClient();
 
-const Index = lazy(() => import('./pages/Index'));
+// Lazy load other pages
 const FeaturedListings = lazy(() => import('./pages/FeaturedListings'));
 const UserProfile = lazy(() => import('./pages/UserProfile'));
 const ListingDetails = lazy(() => import('./pages/ListingDetails'));
@@ -30,10 +33,13 @@ function App() {
         <ThemeProvider>
           <AuthProvider>
             <Router>
-              <Suspense fallback={<div>Loading...</div>}>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/category/:categoryName" element={<Index />} />
+              <Routes>
+                {/* Use the Index component directly without Suspense */}
+                <Route path="/" element={<Index />} />
+                <Route path="/category/:categoryName" element={<Index />} />
+                
+                {/* Wrap other lazy loaded routes in Suspense */}
+                <Suspense fallback={<div>Loading...</div>}>
                   <Route path="/featured-listings" element={<FeaturedListings />} />
                   <Route path="/profile" element={<UserProfile />} />
                   <Route path="/listing/:listingId" element={<ListingDetails />} />
@@ -44,8 +50,8 @@ function App() {
                   <Route path="/terms-of-service" element={<TermsOfService />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                   <Route path="/contact" element={<ContactUs />} />
-                </Routes>
-              </Suspense>
+                </Suspense>
+              </Routes>
               <Toaster />
             </Router>
           </AuthProvider>
