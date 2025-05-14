@@ -319,7 +319,44 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      search_listings: {
+        Args: {
+          search_query?: string
+          category_filter?: string
+          min_price?: number
+          max_price?: number
+          currency_filter?: string
+          sort_field?: string
+          sort_direction?: string
+          page_size?: number
+          page_number?: number
+          governorate_id_filter?: string
+          district_id_filter?: string
+        }
+        Returns: {
+          id: string
+          user_id: string
+          title: string
+          description: string
+          price: number
+          images: string[]
+          category: string
+          governorate_id: string
+          district_id: string
+          created_at: string
+          updated_at: string
+          is_featured: boolean
+          status: string
+          currency: string
+          views: number
+          governorate_name_ar: string
+          governorate_name_en: string
+          district_name_ar: string
+          district_name_en: string
+          user_name: string
+          user_profile_picture: string
+        }[]
+      }
     }
     Enums: {
       listing_category:

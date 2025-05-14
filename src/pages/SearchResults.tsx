@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -14,6 +13,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useCurrencyConverter } from '@/services/currencyService';
 import { searchListings } from '@/services/listings/search';
 import { getListingsByCategoryId } from '@/services/listings/categorySearch';
+import { formatSearchParams } from '@/services/listings/advancedSearch';
 import ListingGrid from '@/components/listings/ListingGrid';
 import LoadingState from '@/components/listings/LoadingState';
 import EmptyState from '@/components/listings/EmptyState';
@@ -65,12 +65,21 @@ const SearchResults = () => {
     }
   }, [query, categoryParam, navigate]);
 
-  // Use the appropriate search function based on whether we have a category or query
-  const searchFunction = () => {
-    if (categoryParam && !query) {
-      return getListingsByCategoryId(categoryParam);
-    } else {
-      return searchListings(filters);
+  // Use the appropriate search function based on the query parameters
+  const searchFunction = async () => {
+    try {
+      if (categoryParam && !query) {
+        // If only category is specified, use getListingsByCategoryId
+        console.log('Searching by category:', categoryParam);
+        return getListingsByCategoryId(categoryParam);
+      } else {
+        // For normal search, we'll use our enhanced search functionality
+        console.log('Using advanced search with filters:', filters);
+        return searchListings(filters);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      throw error;
     }
   };
 
@@ -79,7 +88,8 @@ const SearchResults = () => {
     queryFn: searchFunction,
     enabled: !!(query || categoryParam),
     meta: {
-      onError: () => {
+      onError: (error) => {
+        console.error('Search query error:', error);
         toast({
           title: language === 'ar' ? "خطأ في البحث" : "Search Error",
           description: language === 'ar' ? 

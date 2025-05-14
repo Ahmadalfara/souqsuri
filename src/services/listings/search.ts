@@ -1,7 +1,7 @@
-
 import { ListingWithRelations, ListingFilters } from '@/types/supabase';
+import { advancedSearchListings, SearchListingsParams } from './advancedSearch';
 
-// Mock data with more listings across all categories
+// Keep the mock data for fallback purposes
 const mockListingsData: ListingWithRelations[] = [
   // Real Estate Listings (4)
   {
@@ -458,9 +458,49 @@ const mockListingsData: ListingWithRelations[] = [
 ];
 
 /**
- * Search listings based on filters
+ * Search listings based on filters - tries to use the database first, falls back to mock data
  */
-export const searchListings = (filters: ListingFilters): ListingWithRelations[] => {
+export const searchListings = async (filters: ListingFilters): Promise<ListingWithRelations[]> => {
+  try {
+    // Try to use the database search first
+    const searchParams: SearchListingsParams = {
+      search_query: filters.query,
+      category_filter: filters.category,
+      min_price: filters.priceMin,
+      max_price: filters.priceMax,
+      currency_filter: filters.currency,
+      sort_field: getSortField(filters.sortBy),
+      sort_direction: getSortDirection(filters.sortBy),
+      governorate_id_filter: filters.governorate_id,
+      district_id_filter: filters.district_id
+    };
+    
+    return await advancedSearchListings(searchParams);
+  } catch (error) {
+    console.error('Error using database search, falling back to mock data:', error);
+    
+    // If database search failed, fall back to the original mock data implementation
+    return searchMockListings(filters);
+  }
+};
+
+// Helper function to get sort field from sortBy string
+const getSortField = (sortBy?: string): 'created_at' | 'price' | 'views' => {
+  if (!sortBy) return 'created_at';
+  if (sortBy.includes('price')) return 'price';
+  if (sortBy === 'views') return 'views';
+  return 'created_at';
+};
+
+// Helper function to get sort direction from sortBy string
+const getSortDirection = (sortBy?: string): 'asc' | 'desc' => {
+  if (!sortBy) return 'desc';
+  if (sortBy === 'oldest' || sortBy === 'price_asc') return 'asc';
+  return 'desc';
+};
+
+// Original mock search implementation for fallback
+const searchMockListings = (filters: ListingFilters): ListingWithRelations[] => {
   let results = [...mockListingsData];
   
   // Filter by query text (search in title and description)
@@ -541,19 +581,22 @@ export const searchListings = (filters: ListingFilters): ListingWithRelations[] 
 };
 
 /**
- * Get featured listings
- * @param count Maximum number of listings to return
- * @returns Array of featured listings
+ * Get featured listings - tries to use the database first, falls back to mock data
  */
-export const getFeaturedListings = (count: number = 12): Promise<ListingWithRelations[]> => {
-  console.log(`Getting featured listings, limit: ${count}`);
-  
-  // Use the existing search function with is_featured filter
-  const featuredListings = mockListingsData
-    .filter(listing => listing.is_featured === true)
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, count);
-  
-  // Return as Promise to match expected return type in components
-  return Promise.resolve(featuredListings);
+export const getFeaturedListings = async (count: number = 12): Promise<ListingWithRelations[]> => {
+  try {
+    // Try to use the real database first
+    const { getFeaturedListingsFromDB } = await import('./advancedSearch');
+    return await getFeaturedListingsFromDB(count);
+  } catch (error) {
+    console.log('Error fetching featured listings from DB, using mock data:', error);
+    
+    // Fallback to mock data
+    const featuredListings = mockListingsData
+      .filter(listing => listing.is_featured === true)
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, count);
+    
+    return Promise.resolve(featuredListings);
+  }
 };

@@ -19,10 +19,10 @@ const FeaturedListings = () => {
   const { data: listings, isLoading, error, refetch } = useQuery({
     queryKey: ['featuredListings'],
     queryFn: () => getFeaturedListings(12),
-    retry: 1,
+    retry: 2,
     meta: {
-      onSuccess: () => {
-        console.info('Successfully retrieved featured listings');
+      onSuccess: (data) => {
+        console.info('Successfully retrieved featured listings:', data?.length);
       },
       onError: (error) => {
         console.error('Failed to fetch featured listings:', error);

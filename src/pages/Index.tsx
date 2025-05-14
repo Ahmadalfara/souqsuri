@@ -52,10 +52,16 @@ const CategoryView = ({ categoryName }: CategoryViewProps) => {
   // Use React Query for better data fetching, caching and state management
   const { data: listings, isLoading } = useQuery({
     queryKey: ['categoryListings', categoryName],
-    queryFn: () => {
+    queryFn: async () => {
       if (!categoryName) return Promise.resolve([]);
       console.log(`Fetching listings for category: ${categoryName}`);
-      return getListingsByCategoryId(categoryName, 12);
+      try {
+        // Using the updated function that now attempts to use the database
+        return await getListingsByCategoryId(categoryName, 12);
+      } catch (error) {
+        console.error('Error fetching category listings:', error);
+        throw error;
+      }
     },
     enabled: !!categoryName,
     staleTime: 1000 * 60 * 5, // 5 minutes
