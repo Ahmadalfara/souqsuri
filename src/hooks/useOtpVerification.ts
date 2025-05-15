@@ -7,7 +7,7 @@ export function useOtpVerification() {
   const { toast } = useToast();
   const { t } = useLanguage();
 
-  // Send custom OTP via our Edge Function
+  // Send OTP via Edge Function
   const sendCustomOtp = async (phone: string): Promise<boolean> => {
     try {
       // Format phone number to include +
@@ -51,7 +51,7 @@ export function useOtpVerification() {
     }
   };
 
-  // Verify custom OTP via our Edge Function
+  // Verify OTP via Edge Function
   const verifyCustomOtp = async (phone: string, code: string): Promise<boolean> => {
     try {
       // Format phone number to include +
@@ -90,17 +90,6 @@ export function useOtpVerification() {
           variant: "destructive"
         });
         return false;
-      }
-      
-      // If verification successful, update Supabase auth
-      // Update user metadata to mark phone as confirmed
-      const { error: updateError } = await supabase.auth.updateUser({
-        data: { phone_confirmed: true } // This is stored in user metadata
-      });
-      
-      if (updateError) {
-        console.error('Error updating user phone confirmation:', updateError);
-        // Continue anyway as the verification was successful
       }
       
       toast({

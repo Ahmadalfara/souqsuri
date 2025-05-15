@@ -357,6 +357,40 @@ export type Database = {
           user_profile_picture: string
         }[]
       }
+      search_normalized_ads: {
+        Args: {
+          search_query?: string
+          category_filter?: string
+          location_filter?: string
+          currency_filter?: string
+          min_price?: number
+          max_price?: number
+          sort_field?: string
+          sort_direction?: string
+          page_size?: number
+          page_number?: number
+        }
+        Returns: {
+          id: string
+          title: string
+          description: string
+          price: number
+          currency_id: string
+          currency_name: string
+          currency_symbol: string
+          location_id: string
+          location_name: string
+          category_id: string
+          category_name: string
+          user_id: string
+          user_name: string
+          user_profile_picture: string
+          created_at: string
+          updated_at: string
+          is_active: boolean
+          images: string[]
+        }[]
+      }
     }
     Enums: {
       listing_category:

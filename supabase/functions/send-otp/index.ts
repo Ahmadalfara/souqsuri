@@ -62,16 +62,15 @@ serve(async (req) => {
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 5);
     
-    // Store the OTP in the otp_codes table
+    // Store the OTP in the otp_requests table
     const { error: storeError } = await supabase
-      .from('otp_codes')
-      .upsert(
+      .from('otp_requests')
+      .insert(
         { 
-          phone: formattedPhone, 
+          phone_number: formattedPhone, 
           code: otpCode, 
           expires_at: expiresAt.toISOString() 
-        },
-        { onConflict: 'phone' }
+        }
       );
     
     if (storeError) {
