@@ -46,8 +46,8 @@ export interface SearchParams {
   category_id?: string;
   location_id?: string;
   currency_id?: string;
-  min_price?: number;
-  max_price?: number;
+  min_price?: number | null;
+  max_price?: number | null;
   sort_field?: 'price' | 'created_at';
   sort_direction?: 'asc' | 'desc';
   page_size?: number;
