@@ -4,7 +4,7 @@ import { NormalizedAd, SearchParams } from '@/types/normalized';
 
 export async function searchNormalizedAds(params: SearchParams = {}): Promise<NormalizedAd[]> {
   try {
-    // Use a more secure approach by setting explicit parameters without NULL values
+    // استخدام المعاملات النصية بشكل آمن لتجنب قيم NULL
     const { data, error } = await supabase.rpc('search_normalized_ads', {
       search_query: params.search_query || '',
       category_filter: params.category_id || '',
@@ -52,7 +52,7 @@ export async function createNormalizedAd(ad: Partial<NormalizedAd>): Promise<Nor
 
 export async function getNormalizedAdById(id: string): Promise<NormalizedAd | null> {
   try {
-    // Fixed approach: don't use search_rpc for single item retrieval
+    // نهج مباشر: استخدام استعلام مباشر بدلاً من وظيفة البحث
     const { data, error } = await supabase
       .from('normalized_ads')
       .select(`
@@ -70,7 +70,7 @@ export async function getNormalizedAdById(id: string): Promise<NormalizedAd | nu
       throw error;
     }
 
-    // Transform the response to match NormalizedAd type
+    // تحويل البيانات إلى نمط NormalizedAd
     const normalizedAd: NormalizedAd = {
       ...data,
       currency_name: data.currency?.name || '',

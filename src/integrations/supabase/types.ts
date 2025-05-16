@@ -9,6 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      currencies: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          symbol: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          symbol: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          symbol?: string
+        }
+        Relationships: []
+      }
       districts: {
         Row: {
           created_at: string
@@ -160,6 +199,24 @@ export type Database = {
           },
         ]
       }
+      locations: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
@@ -194,6 +251,73 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      normalized_ads: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          currency_id: string | null
+          description: string
+          id: string
+          images: string[] | null
+          is_active: boolean
+          location_id: string | null
+          price: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          currency_id?: string | null
+          description: string
+          id?: string
+          images?: string[] | null
+          is_active?: boolean
+          location_id?: string | null
+          price: number
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          currency_id?: string | null
+          description?: string
+          id?: string
+          images?: string[] | null
+          is_active?: boolean
+          location_id?: string | null
+          price?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "normalized_ads_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normalized_ads_currency_id_fkey"
+            columns: ["currency_id"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "normalized_ads_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
             referencedColumns: ["id"]
           },
         ]
