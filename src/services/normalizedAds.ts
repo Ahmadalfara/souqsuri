@@ -4,11 +4,12 @@ import { NormalizedAd, SearchParams } from '@/types/normalized';
 
 export async function searchNormalizedAds(params: SearchParams = {}): Promise<NormalizedAd[]> {
   try {
+    // Use a more secure approach by setting explicit parameters without NULL values
     const { data, error } = await supabase.rpc('search_normalized_ads', {
-      search_query: params.search_query || null,
-      category_filter: params.category_id || null,
-      location_filter: params.location_id || null,
-      currency_filter: params.currency_id || null,
+      search_query: params.search_query || '',
+      category_filter: params.category_id || '',
+      location_filter: params.location_id || '',
+      currency_filter: params.currency_id || '',
       min_price: params.min_price === undefined ? null : params.min_price,
       max_price: params.max_price === undefined ? null : params.max_price,
       sort_field: params.sort_field || 'created_at',
@@ -51,26 +52,36 @@ export async function createNormalizedAd(ad: Partial<NormalizedAd>): Promise<Nor
 
 export async function getNormalizedAdById(id: string): Promise<NormalizedAd | null> {
   try {
-    // We use our search function to get the ad with all joined data
-    const { data, error } = await supabase.rpc('search_normalized_ads', {
-      search_query: null,
-      category_filter: null,
-      location_filter: null,
-      currency_filter: null,
-      min_price: null,
-      max_price: null,
-      sort_field: 'created_at',
-      sort_direction: 'desc',
-      page_size: 1,
-      page_number: 1
-    }).eq('id', id);
+    // Fixed approach: don't use search_rpc for single item retrieval
+    const { data, error } = await supabase
+      .from('normalized_ads')
+      .select(`
+        *,
+        currency:currencies(name, symbol),
+        location:locations(name),
+        category:categories(name),
+        user:profiles(name, profile_picture)
+      `)
+      .eq('id', id)
+      .single();
 
     if (error) {
       console.error('Error getting normalized ad:', error);
       throw error;
     }
 
-    return data && data.length > 0 ? data[0] : null;
+    // Transform the response to match NormalizedAd type
+    const normalizedAd: NormalizedAd = {
+      ...data,
+      currency_name: data.currency?.name || '',
+      currency_symbol: data.currency?.symbol || '',
+      location_name: data.location?.name || '',
+      category_name: data.category?.name || '',
+      user_name: data.user?.name || '',
+      user_profile_picture: data.user?.profile_picture || ''
+    };
+
+    return normalizedAd;
   } catch (error) {
     console.error('Error in getNormalizedAdById:', error);
     return null;
