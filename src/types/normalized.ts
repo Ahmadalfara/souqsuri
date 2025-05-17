@@ -39,6 +39,7 @@ export interface NormalizedAd {
   category_name?: string;
   user_name?: string;
   user_profile_picture?: string;
+  is_promoted?: boolean;
 }
 
 export interface SearchParams {
@@ -52,4 +53,7 @@ export interface SearchParams {
   sort_direction?: 'asc' | 'desc';
   page_size?: number;
   page_number?: number;
+  with_images_only?: boolean;
+  show_promoted_only?: boolean;
+  search_within?: string;
 }

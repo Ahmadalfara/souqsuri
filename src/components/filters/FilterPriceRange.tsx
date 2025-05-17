@@ -7,9 +7,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { formatLargeNumber } from '@/lib/utils';
 import { toast } from '@/components/ui/use-toast';
 import ArabicText from '@/components/ArabicText';
+import { debounce } from 'lodash';
 
-// Extremely high price range - effectively unlimited
-const MAX_PRICE = Number.MAX_SAFE_INTEGER;
+// قيمة سعر عالية جدا - عمليا بلا حدود
+const MAX_PRICE = 1000000000000; // تريليون واحد
 
 interface FilterPriceRangeProps {
   value: [number, number];
@@ -19,36 +20,43 @@ interface FilterPriceRangeProps {
 const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) => {
   const { language, direction } = useLanguage();
   
-  // Local state for min/max inputs
+  // حالة محلية للقيم الدنيا/القصوى
   const [minInput, setMinInput] = useState<string>(value[0].toString());
-  const [maxInput, setMaxInput] = useState<string>(value[1].toString());
+  const [maxInput, setMaxInput] = useState<string>(value[1] === MAX_PRICE ? '∞' : value[1].toString());
   
-  // Update local inputs when props change
+  // تحديث المدخلات المحلية عند تغير الخصائص
   useEffect(() => {
     setMinInput(value[0].toString());
-    setMaxInput(value[1].toString());
+    setMaxInput(value[1] === MAX_PRICE ? '∞' : value[1].toString());
   }, [value]);
   
-  // Format price for display using our utility
+  // تنسيق السعر للعرض باستخدام الأداة المساعدة
   const formatPrice = (price: number) => {
+    if (price === MAX_PRICE) return language === 'ar' ? 'غير محدود' : 'Unlimited';
     return formatLargeNumber(price, language as 'en' | 'ar', 'SYP');
   };
   
-  // Calculate display max for the slider
-  // We'll use a reasonable upper limit for the slider UI, but allow unlimited values in the input
-  const displayMax = 1000000000000; // 1 trillion
+  // حساب الحد الأقصى للعرض لشريط التمرير
+  // سنستخدم حداً أعلى معقولاً لواجهة شريط التمرير، ولكن سنسمح بقيم غير محدودة في الإدخال
+  const displayMax = 10000000000; // 10 مليار
   
-  // Clamp value for slider to prevent UI issues
+  // تقييد القيمة لشريط التمرير لمنع مشاكل واجهة المستخدم
   const clampForSlider = (value: number) => {
     return Math.min(Math.max(0, value), displayMax);
   };
   
-  // Handle slider change
+  // التعامل مع تغيير نطاق السعر
   const handlePriceRangeChange = (newValue: number[]) => {
-    onChange([newValue[0], newValue[1]]);
+    // تطبيق الدالة المؤجلة
+    debouncedOnChange([newValue[0], newValue[1]]);
   };
 
-  // Handle min price input change
+  // إنشاء دالة مؤجلة لتقليل عدد مرات استدعاء الدالة
+  const debouncedOnChange = debounce((newRange: [number, number]) => {
+    onChange(newRange);
+  }, 300);
+
+  // التعامل مع تغيير الحد الأدنى للسعر
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setMinInput(inputValue);
@@ -56,7 +64,9 @@ const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) 
     if (inputValue === '') return;
     
     const newValue = parseInt(inputValue) || 0;
-    if (newValue >= parseInt(maxInput)) {
+    const maxValue = maxInput === '∞' ? MAX_PRICE : parseInt(maxInput) || MAX_PRICE;
+    
+    if (newValue >= maxValue) {
       toast({
         title: language === 'ar' ? 'خطأ في نطاق السعر' : 'Price Range Error',
         description: language === 'ar' 
@@ -67,17 +77,24 @@ const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) 
       return;
     }
     
-    onChange([newValue, value[1]]);
+    debouncedOnChange([newValue, value[1]]);
   };
 
-  // Handle max price input change
+  // التعامل مع تغيير الحد الأقصى للسعر
   const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
+    
+    if (inputValue === '∞' || inputValue === '') {
+      setMaxInput(inputValue);
+      if (inputValue === '∞') {
+        debouncedOnChange([value[0], MAX_PRICE]);
+      }
+      return;
+    }
+    
     setMaxInput(inputValue);
+    const newValue = parseInt(inputValue) || MAX_PRICE;
     
-    if (inputValue === '') return;
-    
-    const newValue = parseInt(inputValue) || 0;
     if (newValue <= parseInt(minInput)) {
       toast({
         title: language === 'ar' ? 'خطأ في نطاق السعر' : 'Price Range Error',
@@ -89,10 +106,10 @@ const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) 
       return;
     }
     
-    onChange([value[0], newValue]);
+    debouncedOnChange([value[0], newValue]);
   };
 
-  // Handle blur events to apply the values
+  // التعامل مع أحداث فقدان التركيز لتطبيق القيم
   const handleMinBlur = () => {
     if (minInput === '' || isNaN(parseInt(minInput))) {
       setMinInput('0');
@@ -101,16 +118,18 @@ const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) 
   };
   
   const handleMaxBlur = () => {
-    if (maxInput === '' || isNaN(parseInt(maxInput))) {
-      const defaultMax = 1000000000; // 1 billion default
-      setMaxInput(defaultMax.toString());
-      onChange([value[0], defaultMax]);
+    if (maxInput === '') {
+      setMaxInput('∞');
+      onChange([value[0], MAX_PRICE]);
+    } else if (maxInput !== '∞' && isNaN(parseInt(maxInput))) {
+      setMaxInput(MAX_PRICE.toString());
+      onChange([value[0], MAX_PRICE]);
     }
   };
 
-  // Reset price range
+  // إعادة ضبط نطاق السعر
   const handleReset = () => {
-    const defaultMax = 1000000000; // 1 billion default
+    const defaultMax = 10000000; // 10 مليون كقيمة افتراضية
     onChange([0, defaultMax]);
     setMinInput('0');
     setMaxInput(defaultMax.toString());
@@ -141,15 +160,18 @@ const FilterPriceRange: React.FC<FilterPriceRangeProps> = ({ value, onChange }) 
         </span>
         <span className="text-sm font-medium text-syrian-green">⟷</span>
         <span className="text-sm text-gray-500 dark:text-gray-400">
-          {formatPrice(parseInt(maxInput) || 0)}
+          {maxInput === '∞' ? (language === 'ar' ? 'غير محدود' : 'Unlimited') : formatPrice(parseInt(maxInput) || 0)}
         </span>
       </div>
       
       <Slider
-        value={[clampForSlider(value[0]), clampForSlider(value[1])]}
+        value={[
+          clampForSlider(parseInt(minInput) || 0), 
+          maxInput === '∞' ? displayMax : clampForSlider(parseInt(maxInput) || displayMax)
+        ]}
         min={0}
         max={displayMax}
-        step={1000000} // Steps of 1 million
+        step={Math.max(1, Math.floor(displayMax / 100))} // تقسيم أكثر تفصيلاً
         onValueChange={handlePriceRangeChange}
         className="my-6"
       />

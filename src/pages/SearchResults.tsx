@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -11,25 +12,17 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useCurrencyConverter } from '@/services/currencyService';
-import { searchListings } from '@/services/listings/search';
-import { getListingsByCategoryId } from '@/services/listings/categorySearch';
-import { formatSearchParams } from '@/services/listings/advancedSearch';
+import { MAX_PRICE } from '@/components/filters/FilterPriceRange';
+import { searchNormalizedAds } from '@/services/normalizedAds';
+import { SearchParams } from '@/types/normalized';
 import ListingGrid from '@/components/listings/ListingGrid';
 import LoadingState from '@/components/listings/LoadingState';
 import EmptyState from '@/components/listings/EmptyState';
 
-// Define the filters type to match our component's state
-interface FilterState {
+// تعريف نوع بيانات الفلاتر ليتناسب مع حالة المكون
+interface FilterState extends SearchParams {
   query: string;
-  category: string;
-  governorate_id: string;
-  district_id: string;
-  priceMin: number | undefined;
-  priceMax: number | undefined;
-  condition: string[];
-  sortBy: string;
-  urgent: boolean;
-  currency: string;
+  searchWithin?: string;
 }
 
 const SearchResults = () => {
@@ -45,18 +38,20 @@ const SearchResults = () => {
     searchParams.get('currency') === 'USD' ? 'USD' : 'SYP'
   );
   
-  // Filter states
+  // حالات الفلاتر
   const [filters, setFilters] = useState<FilterState>({
     query: query,
-    category: categoryParam,
-    governorate_id: searchParams.get('governorate_id') || '',
-    district_id: searchParams.get('district_id') || '',
-    priceMin: searchParams.get('priceMin') ? Number(searchParams.get('priceMin')) : undefined,
-    priceMax: searchParams.get('priceMax') ? Number(searchParams.get('priceMax')) : undefined,
-    condition: searchParams.getAll('condition') || [],
-    sortBy: searchParams.get('sortBy') || 'newest',
-    urgent: searchParams.get('urgent') === 'true',
-    currency: searchParams.get('currency') || ''
+    search_query: query,
+    category_id: searchParams.get('category') || '',
+    location_id: searchParams.get('location') || '',
+    currency_id: searchParams.get('currency_id') || '',
+    min_price: searchParams.get('priceMin') ? Number(searchParams.get('priceMin')) : 0,
+    max_price: searchParams.get('priceMax') ? Number(searchParams.get('priceMax')) : MAX_PRICE,
+    sort_field: (searchParams.get('sortBy') === 'price_asc' || searchParams.get('sortBy') === 'price_desc') ? 'price' : 'created_at',
+    sort_direction: searchParams.get('sortBy') === 'price_asc' || searchParams.get('sortBy') === 'oldest' ? 'asc' : 'desc',
+    with_images_only: searchParams.get('withImagesOnly') === 'true',
+    show_promoted_only: searchParams.get('promotedOnly') === 'true',
+    searchWithin: searchParams.get('searchWithin') || '',
   });
 
   useEffect(() => {
@@ -65,18 +60,26 @@ const SearchResults = () => {
     }
   }, [query, categoryParam, navigate]);
 
-  // Use the appropriate search function based on the query parameters
+  // استخدام وظيفة البحث المناسبة بناءً على معلمات البحث
   const searchFunction = async () => {
     try {
-      if (categoryParam && !query) {
-        // If only category is specified, use getListingsByCategoryId
-        console.log('Searching by category:', categoryParam);
-        return getListingsByCategoryId(categoryParam);
-      } else {
-        // For normal search, we'll use our enhanced search functionality
-        console.log('Using advanced search with filters:', filters);
-        return searchListings(filters);
-      }
+      console.log('Searching with filters:', filters);
+      
+      const searchParams: SearchParams = {
+        search_query: filters.query || filters.search_query,
+        category_id: filters.category_id,
+        location_id: filters.location_id,
+        currency_id: filters.currency_id,
+        min_price: filters.min_price !== undefined ? filters.min_price : null,
+        max_price: filters.max_price !== undefined && filters.max_price < MAX_PRICE ? filters.max_price : null,
+        sort_field: filters.sort_field,
+        sort_direction: filters.sort_direction,
+        with_images_only: filters.with_images_only,
+        show_promoted_only: filters.show_promoted_only,
+        search_within: filters.searchWithin
+      };
+      
+      return searchNormalizedAds(searchParams);
     } catch (error) {
       console.error('Search error:', error);
       throw error;
@@ -86,7 +89,7 @@ const SearchResults = () => {
   const { data: results, isLoading, error, refetch } = useQuery({
     queryKey: ['search', filters],
     queryFn: searchFunction,
-    enabled: !!(query || categoryParam),
+    enabled: !!(query || categoryParam || Object.values(filters).some(v => v !== undefined && v !== '' && v !== false)),
     meta: {
       onError: (error) => {
         console.error('Search query error:', error);
@@ -101,39 +104,41 @@ const SearchResults = () => {
     }
   });
 
-  // Handle search with updated params
+  // التعامل مع البحث بمعلمات محدثة
   const handleSearch = (params: URLSearchParams) => {
     setSearchParams(params);
     
-    // Update filters based on new params
+    // تحديث الفلاتر بناءً على المعلمات الجديدة
     const newFilters: FilterState = {
       query: params.get('q') || '',
-      category: params.get('category') || '',
-      governorate_id: params.get('governorate_id') || '',
-      district_id: params.get('district_id') || '',
-      priceMin: params.get('priceMin') ? Number(params.get('priceMin')) : undefined,
-      priceMax: params.get('priceMax') ? Number(params.get('priceMax')) : undefined,
-      condition: params.getAll('condition') || [],
-      sortBy: params.get('sortBy') || 'newest',
-      urgent: params.get('urgent') === 'true',
-      currency: params.get('currency') || ''
+      search_query: params.get('q') || '',
+      category_id: params.get('category') || '',
+      location_id: params.get('location') || '',
+      currency_id: params.get('currency_id') || '',
+      min_price: params.get('priceMin') ? Number(params.get('priceMin')) : 0,
+      max_price: params.get('priceMax') ? Number(params.get('priceMax')) : MAX_PRICE,
+      sort_field: (params.get('sortBy') === 'price_asc' || params.get('sortBy') === 'price_desc') ? 'price' : 'created_at',
+      sort_direction: params.get('sortBy') === 'price_asc' || params.get('sortBy') === 'oldest' ? 'asc' : 'desc',
+      with_images_only: params.get('withImagesOnly') === 'true',
+      show_promoted_only: params.get('promotedOnly') === 'true',
+      searchWithin: params.get('searchWithin') || '',
     };
     
     setFilters(newFilters);
     refetch();
   };
 
-  // Toggle currency display
+  // تبديل عرض العملة
   const toggleCurrency = () => {
     setDisplayCurrency(prev => prev === 'SYP' ? 'USD' : 'SYP');
   };
 
-  // Format price based on selected currency
+  // تنسيق السعر بناءً على العملة المختارة
   const formatPrice = (price: number, originalCurrency: string): string => {
     if (displayCurrency === originalCurrency) {
       return formatCurrency(price, displayCurrency);
     } else {
-      // Convert price to display currency
+      // تحويل السعر إلى العملة المعروضة
       const convertedPrice = convert(
         price, 
         originalCurrency as 'SYP' | 'USD', 
@@ -143,17 +148,17 @@ const SearchResults = () => {
     }
   };
 
-  // Get the category name in the correct language
+  // الحصول على اسم الفئة باللغة الصحيحة
   const getCategoryDisplayName = () => {
     if (!categoryParam) return '';
     
-    // Map category IDs to display names
+    // تخطيط معرفات الفئات إلى أسماء العرض
     const categoryNames: Record<string, { ar: string, en: string }> = {
       'real_estate': { ar: 'العقارات', en: 'Real Estate' },
-      'vehicles': { ar: 'السيارات', en: 'Cars' },
+      'cars': { ar: 'السيارات', en: 'Cars' },
       'electronics': { ar: 'الإلكترونيات', en: 'Electronics' },
       'furniture': { ar: 'الأثاث', en: 'Furniture' },
-      'clothing': { ar: 'الملابس', en: 'Clothes' },
+      'clothes': { ar: 'الملابس', en: 'Clothes' },
       'jobs': { ar: 'الوظائف', en: 'Jobs' },
       'services': { ar: 'الخدمات', en: 'Services' },
     };
@@ -211,7 +216,12 @@ const SearchResults = () => {
           <div className="mb-6">
             <SearchBar 
               initialQuery={query} 
-              onSearch={handleSearch} 
+              onSearch={handleSearch}
+              onFilterChange={(newFilters) => {
+                const updatedFilters = {...filters, ...newFilters};
+                setFilters(updatedFilters);
+                refetch();
+              }}
             />
           </div>
 

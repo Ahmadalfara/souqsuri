@@ -15,7 +15,9 @@ export async function searchNormalizedAds(params: SearchParams = {}): Promise<No
       sort_field: params.sort_field || 'created_at',
       sort_direction: params.sort_direction || 'desc',
       page_size: params.page_size || 20,
-      page_number: params.page_number || 1
+      page_number: params.page_number || 1,
+      with_images: params.with_images_only || false,
+      show_promoted: params.show_promoted_only || false
     });
 
     if (error) {

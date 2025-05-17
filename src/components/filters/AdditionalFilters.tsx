@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/accordion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ArabicText from '@/components/ArabicText';
+import { debounce } from 'lodash';
 
 interface AdditionalFiltersProps {
   searchWithin: string;
@@ -31,6 +32,18 @@ const AdditionalFilters: React.FC<AdditionalFiltersProps> = ({
 }) => {
   const { language, t } = useLanguage();
   const [accordionValue, setAccordionValue] = useState<string>("additional");
+  const [searchText, setSearchText] = useState(searchWithin);
+  
+  // دالة مؤجلة لبحث النص داخل النتائج
+  const debouncedSearch = debounce((value: string) => {
+    onSearchWithinChange(value);
+  }, 300);
+  
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchText(value);
+    debouncedSearch(value);
+  };
   
   return (
     <Accordion 
@@ -50,7 +63,7 @@ const AdditionalFilters: React.FC<AdditionalFiltersProps> = ({
         </AccordionTrigger>
         <AccordionContent>
           <div className="space-y-4 pt-2">
-            {/* Search Within */}
+            {/* البحث ضمن النتائج */}
             <div className="space-y-2">
               <Label className="dark:text-white">
                 {language === 'ar' ? (
@@ -60,14 +73,14 @@ const AdditionalFilters: React.FC<AdditionalFiltersProps> = ({
                 )}
               </Label>
               <Input
-                value={searchWithin}
-                onChange={(e) => onSearchWithinChange(e.target.value)}
+                value={searchText}
+                onChange={handleSearchChange}
                 placeholder={language === 'ar' ? 'البحث ضمن النتائج' : 'Search within results'}
                 className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
               />
             </div>
             
-            {/* Show Promoted Only */}
+            {/* إظهار الإعلانات المميزة فقط */}
             <div className="flex items-center justify-between">
               <Label className="dark:text-white">
                 {language === 'ar' ? (
@@ -82,7 +95,7 @@ const AdditionalFilters: React.FC<AdditionalFiltersProps> = ({
               />
             </div>
             
-            {/* Show With Images Only */}
+            {/* إظهار الإعلانات التي تحتوي على صور فقط */}
             <div className="flex items-center justify-between">
               <Label className="dark:text-white">
                 {language === 'ar' ? (
