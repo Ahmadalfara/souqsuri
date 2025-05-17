@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, Filter, X } from 'lucide-react';
@@ -12,9 +11,10 @@ interface SearchBarProps {
   className?: string;
   onSearch?: (searchParams: URLSearchParams) => void;
   initialQuery?: string;
+  onFilterChange?: (newFilters: Record<string, any>) => void;
 }
 
-const SearchBar = ({ className = '', onSearch, initialQuery = '' }: SearchBarProps) => {
+const SearchBar = ({ className = '', onSearch, initialQuery = '', onFilterChange }: SearchBarProps) => {
   const [query, setQuery] = useState(initialQuery);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -148,6 +148,11 @@ const SearchBar = ({ className = '', onSearch, initialQuery = '' }: SearchBarPro
       setTimeout(() => {
         performSearch();
       }, 10);
+    }
+    
+    // Call onFilterChange prop if provided
+    if (onFilterChange) {
+      onFilterChange(newFilters);
     }
   };
 
